@@ -1,0 +1,3 @@
+﻿The (only, so far) author of Octetoscope is:
+
+  Роман Донченко (Roman Donchenko) <dpb@corrigendum.ru>

@@ -1,2 +1,6 @@
 .gitattributes text
+.gitignore text
 *.txt text
+*.gradle text
+*.bat text
+/gradlew text eol=lf

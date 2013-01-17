@@ -16,32 +16,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-ext {
-  scalaVersion = '2.10.0'
-  scalaCompilerDep = "org.scala-lang:scala-compiler:${scalaVersion}"
-  scalaLibraryDep = "org.scala-lang:scala-library:${scalaVersion}"
-}
+package ru.corrigendum.octetoscope.application
 
-subprojects {
-  apply plugin: 'scala'
-
-  repositories {
-    mavenCentral()
-  }
-
-  dependencies {
-    scalaTools scalaCompilerDep
-
-    compile scalaLibraryDep
-  }
-
-  targetCompatibility = '1.6'
-
-  // The Ant task doesn't support setting compatibility levels,
-  // and 1.5 compatibility is deprecated in Scala 2.10.
-  compileScala.scalaCompileOptions.useAnt = false
-}
-
-task wrapper(type: Wrapper) {
-  gradleVersion = '1.3'
+object Octetoscope extends App {
+  if (args.length != 0)
+    Console.err.println("Usage: octetoscope")
 }

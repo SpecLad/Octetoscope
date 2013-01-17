@@ -1,3 +1,3 @@
 This is Octetoscope.
 
-Nothing to see here, move along.
+Octetoscope is a program that does nothing.

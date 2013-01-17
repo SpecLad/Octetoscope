@@ -4,3 +4,4 @@
 *.gradle text
 *.bat text
 /gradlew text eol=lf
+*.scala text

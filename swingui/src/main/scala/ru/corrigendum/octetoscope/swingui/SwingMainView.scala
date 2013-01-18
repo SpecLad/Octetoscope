@@ -16,15 +16,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.application
+package ru.corrigendum.octetoscope.swingui
 
-import ru.corrigendum.octetoscope.swingui.SwingApplication
-import ru.corrigendum.octetoscope.presentation.MainPresenter
+import ru.corrigendum.octetoscope.abstractui.MainView
 
-object Octetoscope extends App {
-  if (args.length != 0) {
-    Console.err.println("Usage: octetoscope")
-    sys.exit(1)
-  }
-  SwingApplication.start(view => new MainPresenter(view))
+class SwingMainView extends MainView {
+
 }

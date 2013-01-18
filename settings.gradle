@@ -17,5 +17,7 @@
 */
 
 include 'application'
+include 'presentation'
+include 'ui'
 
 rootProject.name = 'Octetoscope'

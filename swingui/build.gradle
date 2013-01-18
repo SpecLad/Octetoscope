@@ -17,5 +17,6 @@
 */
 
 dependencies {
-  compile project(':presentation')
+  compile scalaSwingDep
+  compile project(':abstractui')
 }

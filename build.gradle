@@ -20,6 +20,7 @@ ext {
   scalaVersion = '2.10.0'
   scalaCompilerDep = "org.scala-lang:scala-compiler:${scalaVersion}"
   scalaLibraryDep = "org.scala-lang:scala-library:${scalaVersion}"
+  scalaSwingDep = "org.scala-lang:scala-swing:${scalaVersion}"
 }
 
 subprojects {

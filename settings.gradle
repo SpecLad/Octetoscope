@@ -18,6 +18,7 @@
 
 include 'application'
 include 'presentation'
-include 'ui'
+include 'swingui'
+include 'abstractui'
 
 rootProject.name = 'Octetoscope'

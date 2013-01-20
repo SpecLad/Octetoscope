@@ -18,9 +18,13 @@
 
 ext {
   scalaVersion = '2.10.0'
+  scalaMajorVersion = scalaVersion.find(/\d+\.\d+/)
   scalaCompilerDep = "org.scala-lang:scala-compiler:${scalaVersion}"
   scalaLibraryDep = "org.scala-lang:scala-library:${scalaVersion}"
   scalaSwingDep = "org.scala-lang:scala-swing:${scalaVersion}"
+
+  scalaTestVersion = '1.9.1'
+  scalaTestDep = "org.scalatest:scalatest_${scalaMajorVersion}:${scalaTestVersion}"
 }
 
 subprojects {
@@ -34,6 +38,8 @@ subprojects {
     scalaTools scalaCompilerDep
 
     compile scalaLibraryDep
+
+    testCompile scalaTestDep
   }
 
   targetCompatibility = '1.6'
@@ -41,6 +47,14 @@ subprojects {
   // The Ant task doesn't support setting compatibility levels,
   // and 1.5 compatibility is deprecated in Scala 2.10.
   compileScala.scalaCompileOptions.useAnt = false
+  compileTestScala.scalaCompileOptions.useAnt = false
+
+  test << {
+    ant.taskdef(name: 'scalatest', classname: 'org.scalatest.tools.ScalaTestAntTask', classpath: classpath.asPath)
+    ant.scalatest(runpath: testClassesDir, haltonfailure: 'true', fork: 'false') {
+      reporter(type: 'stderr')
+    }
+  }
 }
 
 task wrapper(type: Wrapper) {

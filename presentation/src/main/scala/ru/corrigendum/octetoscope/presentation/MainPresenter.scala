@@ -19,7 +19,14 @@
 package ru.corrigendum.octetoscope.presentation
 
 import ru.corrigendum.octetoscope.abstractui.MainView
+import ru.corrigendum.octetoscope.abstractui.MainView.{ClosedEvent, Event}
 
 class MainPresenter(view: MainView) {
-
+  view.subscribe(new view.Sub {
+    def notify(pub: view.Pub, event: Event) {
+      event match {
+        case ClosedEvent() => pub.dispose()
+      }
+    }
+  })
 }

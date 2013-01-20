@@ -19,7 +19,25 @@
 package ru.corrigendum.octetoscope.swingui
 
 import ru.corrigendum.octetoscope.abstractui.MainView
+import swing.{Reactor, Frame}
+import swing.Reactions.StronglyReferenced
+import swing.event.WindowClosing
 
 class SwingMainView extends MainView {
+  private[this] val frame = new Frame()
 
+  frame.pack()
+  frame.visible = true
+
+  new Reactor with StronglyReferenced {
+    reactions += {
+      case WindowClosing(_) => {
+        publish(MainView.ClosedEvent())
+      }
+    }
+  }.listenTo(frame)
+
+  def dispose() {
+    frame.dispose()
+  }
 }

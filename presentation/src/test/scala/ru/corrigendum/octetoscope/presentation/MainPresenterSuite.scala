@@ -16,16 +16,24 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.abstractui
+package ru.corrigendum.octetoscope.presentation
 
-import collection.mutable
+import mocks.MockMainView
+import org.scalatest.{BeforeAndAfter, FunSuite}
+import ru.corrigendum.octetoscope.abstractui.MainView
+import org.scalatest.matchers.MustMatchers._
 
-trait MainView extends mutable.Publisher[MainView.Event] {
-  override type Pub = MainView
-  def dispose()
-}
+class MainPresenterSuite extends FunSuite with BeforeAndAfter {
+  private[this] var view: MockMainView = _
+  private[this] var presenter: MainPresenter = _
 
-object MainView {
-  abstract sealed class Event()
-  sealed case class ClosedEvent() extends Event
+  before {
+    view = new MockMainView()
+    presenter = new MainPresenter(view)
+  }
+
+  test("closing the window") {
+    view.trigger(MainView.ClosedEvent())
+    view must be ('disposed)
+  }
 }

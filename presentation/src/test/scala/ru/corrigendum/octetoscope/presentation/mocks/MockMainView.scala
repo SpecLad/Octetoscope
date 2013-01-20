@@ -16,16 +16,19 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.abstractui
+package ru.corrigendum.octetoscope.presentation.mocks
 
-import collection.mutable
+import ru.corrigendum.octetoscope.abstractui.MainView
 
-trait MainView extends mutable.Publisher[MainView.Event] {
-  override type Pub = MainView
-  def dispose()
-}
+class MockMainView extends MainView {
+  private[this] var _disposed: Boolean = false
+  def disposed = _disposed
 
-object MainView {
-  abstract sealed class Event()
-  sealed case class ClosedEvent() extends Event
+  def dispose() {
+    _disposed = true
+  }
+
+  def trigger(event: MainView.Event) {
+    publish(event)
+  }
 }

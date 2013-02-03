@@ -26,9 +26,6 @@ import swing.event.WindowClosing
 class SwingMainView extends MainView {
   private[this] val frame = new Frame()
 
-  frame.pack()
-  frame.visible = true
-
   new Reactor with StronglyReferenced {
     reactions += {
       case WindowClosing(_) => {
@@ -37,7 +34,19 @@ class SwingMainView extends MainView {
     }
   }.listenTo(frame)
 
+  frame.pack()
+
   def dispose() {
     frame.dispose()
+  }
+
+  def title: String = frame.title
+
+  def title_=(title: String) {
+    frame.title = title
+  }
+
+  def show() {
+    frame.visible = true
   }
 }

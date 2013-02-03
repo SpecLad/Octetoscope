@@ -36,4 +36,9 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.ClosedEvent())
     view must be ('disposed)
   }
+
+  test("initialization") {
+    view must be ('visible)
+    view.title must not be ('empty)
+  }
 }

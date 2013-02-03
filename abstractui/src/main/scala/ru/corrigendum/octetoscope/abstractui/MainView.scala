@@ -23,6 +23,11 @@ import collection.mutable
 trait MainView extends mutable.Publisher[MainView.Event] {
   override type Pub = MainView
   def dispose()
+
+  def title: String
+  def title_=(title: String)
+
+  def show()
 }
 
 object MainView {

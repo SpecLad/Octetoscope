@@ -22,6 +22,9 @@ import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.abstractui.MainView.{ClosedEvent, Event}
 
 class MainPresenter(view: MainView) {
+  view.title = "Octetoscope"
+  view.show()
+
   view.subscribe(new view.Sub {
     def notify(pub: view.Pub, event: Event) {
       event match {

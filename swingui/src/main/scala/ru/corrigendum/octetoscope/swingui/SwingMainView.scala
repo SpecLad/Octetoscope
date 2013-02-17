@@ -19,20 +19,46 @@
 package ru.corrigendum.octetoscope.swingui
 
 import ru.corrigendum.octetoscope.abstractui.MainView
-import swing.{Reactor, Frame}
+import swing._
+import event.{ActionEvent, WindowClosing}
 import swing.Reactions.StronglyReferenced
-import swing.event.WindowClosing
 
-class SwingMainView extends MainView {
-  private[this] val frame = new Frame()
+private class SwingMainView extends SwingView with MainView {
+  private[this] val menuBar = new MenuBar()
+  private[this] val key = new AnyRef()
 
-  new Reactor with StronglyReferenced {
-    reactions += {
-      case WindowClosing(_) => {
-        publish(MainView.ClosedEvent())
+  frame.menuBar = menuBar
+
+  {
+    val menuFile = new Menu("File")
+    val menuHelp = new Menu("Help")
+
+    menuBar.contents += menuFile
+    menuBar.contents += menuHelp
+
+    val reactor = new Reactor with StronglyReferenced {
+      reactions += {
+        case WindowClosing(_) => {
+          publish(MainView.ClosedEvent())
+        }
+        case ActionEvent(c: MenuItem) => {
+          publish(MainView.CommandEvent(c.peer.getClientProperty(key).asInstanceOf[MainView.Command.Value]))
+        }
       }
     }
-  }.listenTo(frame)
+
+    reactor.listenTo(frame)
+
+    def newMenuItem(title: String, menu: Menu, command: MainView.Command.Value) {
+      val item = new MenuItem(title)
+      item.peer.putClientProperty(key, command)
+      menu.contents += item
+      reactor.listenTo(item)
+    }
+
+    newMenuItem("Quit", menuFile, MainView.Command.Quit)
+    newMenuItem("About", menuHelp, MainView.Command.About)
+  }
 
   frame.pack()
 

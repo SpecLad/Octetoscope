@@ -20,8 +20,9 @@ package ru.corrigendum.octetoscope.abstractui
 
 import collection.mutable
 
-trait MainView extends mutable.Publisher[MainView.Event] {
+trait MainView extends View with mutable.Publisher[MainView.Event] {
   override type Pub = MainView
+
   def dispose()
 
   def title: String
@@ -33,4 +34,9 @@ trait MainView extends mutable.Publisher[MainView.Event] {
 object MainView {
   abstract sealed class Event()
   sealed case class ClosedEvent() extends Event
+  sealed case class CommandEvent(command: Command.Value) extends Event
+
+  object Command extends Enumeration {
+    val Quit, About = Value
+  }
 }

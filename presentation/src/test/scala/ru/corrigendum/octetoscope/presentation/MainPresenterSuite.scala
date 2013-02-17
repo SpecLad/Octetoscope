@@ -41,4 +41,14 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view must be ('visible)
     view.title must not be ('empty)
   }
+
+  test("quit command") {
+    view.trigger(MainView.CommandEvent(MainView.Command.Quit))
+    view must be ('disposed)
+  }
+
+  test("about command") {
+    view.trigger(MainView.CommandEvent(MainView.Command.About))
+    view.lastMessageBox must equal (Some ("Octetoscope version unknown", "Octetoscope"))
+  }
 }

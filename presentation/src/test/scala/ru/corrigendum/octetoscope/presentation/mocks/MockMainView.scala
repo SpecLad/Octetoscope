@@ -23,9 +23,11 @@ import ru.corrigendum.octetoscope.abstractui.MainView
 class MockMainView extends MainView {
   private[this] var _disposed: Boolean = false
   private[this] var _visible: Boolean = false
+  private[this] var _lastMessageBox: Option[(String, String)] = None
 
   def disposed = _disposed
   def visible = _visible
+  def lastMessageBox = _lastMessageBox
 
   def dispose() {
     _disposed = true
@@ -39,5 +41,9 @@ class MockMainView extends MainView {
 
   def show() {
     _visible = true
+  }
+
+  def showMessageBox(text: String, title: String) {
+    _lastMessageBox = Some((text, title))
   }
 }

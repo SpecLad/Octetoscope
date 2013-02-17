@@ -16,22 +16,17 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.presentation
+package ru.corrigendum.octetoscope.swingui
 
-import ru.corrigendum.octetoscope.abstractui.MainView
-import ru.corrigendum.octetoscope.abstractui.MainView.{CommandEvent, ClosedEvent, Event}
+import swing.Frame
+import ru.corrigendum.octetoscope.abstractui.View
+import javax.swing.JOptionPane
 
-class MainPresenter(view: MainView) {
-  view.title = "Octetoscope"
-  view.show()
+private class SwingView extends View {
+  private[this] val _frame = new Frame()
+  protected def frame = _frame
 
-  view.subscribe(new view.Sub {
-    def notify(pub: view.Pub, event: Event) {
-      event match {
-        case ClosedEvent() => pub.dispose()
-        case CommandEvent(MainView.Command.About) => pub.showMessageBox("Octetoscope version unknown", "Octetoscope")
-        case CommandEvent(MainView.Command.Quit) => pub.dispose()
-      }
-    }
-  })
+  def showMessageBox(text: String, title: String) {
+    JOptionPane.showMessageDialog(frame.peer, text, title, JOptionPane.INFORMATION_MESSAGE)
+  }
 }

@@ -49,6 +49,6 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
-    view.lastMessageBox must equal (Some ("Octetoscope version unknown", "Octetoscope"))
+    view.messageBoxes must equal (List(("Octetoscope version unknown", "Octetoscope")))
   }
 }

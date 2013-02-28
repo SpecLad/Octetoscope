@@ -16,16 +16,16 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.application
+package ru.corrigendum.octetoscope.presentation.mocks
 
-import ru.corrigendum.octetoscope.swingui.SwingApplication
-import ru.corrigendum.octetoscope.presentation.{DialogBoxerImpl, MainPresenter}
+import ru.corrigendum.octetoscope.abstractui.View
 
-object Octetoscope extends App {
-  if (args.length != 0) {
-    Console.err.println("Usage: octetoscope")
-    sys.exit(1)
+class MockView extends View {
+  private[this] var _messageBoxes: List[(String, String)] = Nil
+
+  def messageBoxes = _messageBoxes
+
+  override def showMessageBox(text: String, title: String) {
+    _messageBoxes :+= (text, title)
   }
-
-  SwingApplication.start(view => new MainPresenter(view, DialogBoxerImpl))
 }

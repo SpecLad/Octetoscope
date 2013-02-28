@@ -18,18 +18,20 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import mocks.MockMainView
+import mocks.{MockDialogBoxer, MockMainView}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
 import org.scalatest.matchers.MustMatchers._
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
+  private[this] var boxer: MockDialogBoxer = _
   private[this] var presenter: MainPresenter = _
 
   before {
     view = new MockMainView()
-    presenter = new MainPresenter(view)
+    boxer = new MockDialogBoxer()
+    presenter = new MainPresenter(view, boxer)
   }
 
   test("closing the window") {
@@ -49,6 +51,6 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
-    view.messageBoxes must equal (List(("Octetoscope version unknown", "Octetoscope")))
+    boxer.messages must equal (List((view, "Octetoscope version unknown")))
   }
 }

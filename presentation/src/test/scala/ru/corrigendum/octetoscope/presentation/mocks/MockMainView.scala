@@ -20,14 +20,12 @@ package ru.corrigendum.octetoscope.presentation.mocks
 
 import ru.corrigendum.octetoscope.abstractui.MainView
 
-class MockMainView extends MainView {
+class MockMainView extends MockView with MainView {
   private[this] var _disposed: Boolean = false
   private[this] var _visible: Boolean = false
-  private[this] var _messageBoxes: List[(String, String)] = Nil
 
   def disposed = _disposed
   def visible = _visible
-  def messageBoxes = _messageBoxes
 
   def dispose() {
     _disposed = true
@@ -41,9 +39,5 @@ class MockMainView extends MainView {
 
   def show() {
     _visible = true
-  }
-
-  def showMessageBox(text: String, title: String) {
-    _messageBoxes = (text, title) :: _messageBoxes
   }
 }

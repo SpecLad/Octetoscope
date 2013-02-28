@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.presentation
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.abstractui.MainView.{CommandEvent, ClosedEvent, Event}
 
-class MainPresenter(view: MainView) {
+class MainPresenter(view: MainView, boxer: DialogBoxer) {
   view.title = "Octetoscope"
   view.show()
 
@@ -29,7 +29,7 @@ class MainPresenter(view: MainView) {
     def notify(pub: view.Pub, event: Event) {
       event match {
         case ClosedEvent() => pub.dispose()
-        case CommandEvent(MainView.Command.About) => pub.showMessageBox("Octetoscope version unknown", "Octetoscope")
+        case CommandEvent(MainView.Command.About) => boxer.showMessageBox(pub, "Octetoscope version unknown")
         case CommandEvent(MainView.Command.Quit) => pub.dispose()
       }
     }

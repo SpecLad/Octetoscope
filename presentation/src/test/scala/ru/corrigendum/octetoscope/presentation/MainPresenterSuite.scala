@@ -26,12 +26,11 @@ import org.scalatest.matchers.MustMatchers._
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
   private[this] var boxer: MockDialogBoxer = _
-  private[this] var presenter: MainPresenter = _
 
   before {
     view = new MockMainView()
     boxer = new MockDialogBoxer()
-    presenter = new MainPresenter("Blarf", view, boxer)
+    new MainPresenter("Blarf", view, boxer)
   }
 
   test("closing the window") {

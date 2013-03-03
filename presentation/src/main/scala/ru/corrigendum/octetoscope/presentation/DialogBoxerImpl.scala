@@ -20,8 +20,8 @@ package ru.corrigendum.octetoscope.presentation
 
 import ru.corrigendum.octetoscope.abstractui.View
 
-object DialogBoxerImpl extends DialogBoxer {
+class DialogBoxerImpl(appName: String) extends DialogBoxer {
   override def showMessageBox(view: View, text: String) {
-    view.showMessageBox(text, "Octetoscope")
+    view.showMessageBox(text, appName)
   }
 }

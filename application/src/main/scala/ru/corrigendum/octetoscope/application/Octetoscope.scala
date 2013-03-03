@@ -22,10 +22,12 @@ import ru.corrigendum.octetoscope.swingui.SwingApplication
 import ru.corrigendum.octetoscope.presentation.{DialogBoxerImpl, MainPresenter}
 
 object Octetoscope extends App {
+  private val APPLICATION_NAME = "Octetoscope"
+
   if (args.length != 0) {
     Console.err.println("Usage: octetoscope")
     sys.exit(1)
   }
 
-  SwingApplication.start(view => new MainPresenter(view, DialogBoxerImpl))
+  SwingApplication.start(view => new MainPresenter(APPLICATION_NAME, view, new DialogBoxerImpl(APPLICATION_NAME)))
 }

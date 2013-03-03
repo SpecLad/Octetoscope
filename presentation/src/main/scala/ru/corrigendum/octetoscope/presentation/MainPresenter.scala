@@ -21,15 +21,15 @@ package ru.corrigendum.octetoscope.presentation
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.abstractui.MainView.{CommandEvent, ClosedEvent, Event}
 
-class MainPresenter(view: MainView, boxer: DialogBoxer) {
-  view.title = "Octetoscope"
+class MainPresenter(appName: String, view: MainView, boxer: DialogBoxer) {
+  view.title = appName
   view.show()
 
   view.subscribe(new view.Sub {
     def notify(pub: view.Pub, event: Event) {
       event match {
         case ClosedEvent() => pub.dispose()
-        case CommandEvent(MainView.Command.About) => boxer.showMessageBox(pub, "Octetoscope version unknown")
+        case CommandEvent(MainView.Command.About) => boxer.showMessageBox(pub, s"$appName version unknown")
         case CommandEvent(MainView.Command.Quit) => pub.dispose()
       }
     }

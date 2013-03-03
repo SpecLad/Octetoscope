@@ -31,7 +31,7 @@ class DialogBoxerSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("message box") {
-    DialogBoxerImpl.showMessageBox(view, "Abracadabra")
-    view.messageBoxes must equal (List(("Abracadabra", "Octetoscope")))
+    new DialogBoxerImpl("Blarf").showMessageBox(view, "Abracadabra")
+    view.messageBoxes must equal (List(("Abracadabra", "Blarf")))
   }
 }

@@ -31,7 +31,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   before {
     view = new MockMainView()
     boxer = new MockDialogBoxer()
-    presenter = new MainPresenter(view, boxer)
+    presenter = new MainPresenter("Blarf", view, boxer)
   }
 
   test("closing the window") {
@@ -41,7 +41,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("initialization") {
     view must be ('visible)
-    view.title must not be ('empty)
+    view.title must equal ("Blarf")
   }
 
   test("quit command") {
@@ -51,6 +51,6 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
-    boxer.messages must equal (List((view, "Octetoscope version unknown")))
+    boxer.messages must equal (List((view, "Blarf version unknown")))
   }
 }

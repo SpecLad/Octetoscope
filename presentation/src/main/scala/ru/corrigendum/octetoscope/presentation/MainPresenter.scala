@@ -31,6 +31,7 @@ class MainPresenter(appName: String, view: MainView, boxer: DialogBoxer) {
         case ClosedEvent() => pub.dispose()
         case CommandEvent(MainView.Command.About) => boxer.showMessageBox(pub, s"$appName version unknown")
         case CommandEvent(MainView.Command.Quit) => pub.dispose()
+        case CommandEvent(_) => // workaround for bug SI-7206
       }
     }
   })

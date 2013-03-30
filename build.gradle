@@ -44,11 +44,6 @@ subprojects {
 
   targetCompatibility = '1.6'
 
-  // The Ant task doesn't support setting compatibility levels,
-  // and 1.5 compatibility is deprecated in Scala 2.10.
-  compileScala.scalaCompileOptions.useAnt = false
-  compileTestScala.scalaCompileOptions.useAnt = false
-
   test << {
     ant.taskdef(name: 'scalatest', classname: 'org.scalatest.tools.ScalaTestAntTask', classpath: classpath.asPath)
     ant.scalatest(runpath: testClassesDir, haltonfailure: 'true', fork: 'false') {

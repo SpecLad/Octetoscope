@@ -22,6 +22,7 @@ applicationName = 'octetoscope'
 mainClassName = 'ru.corrigendum.octetoscope.application.Octetoscope'
 
 dependencies {
+  compile project(':infra')
   compile project(':presentation')
   compile project(':swingui')
 }

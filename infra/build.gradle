@@ -16,11 +16,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-include 'abstractinfra'
-include 'abstractui'
-include 'application'
-include 'infra'
-include 'presentation'
-include 'swingui'
-
-rootProject.name = 'Octetoscope'
+dependencies {
+  compile project(':abstractinfra')
+}

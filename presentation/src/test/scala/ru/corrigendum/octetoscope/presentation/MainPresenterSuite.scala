@@ -22,15 +22,17 @@ import mocks.{MockDialogBoxer, MockMainView}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
 import org.scalatest.matchers.MustMatchers._
+import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
   private[this] var boxer: MockDialogBoxer = _
+  private[this] var strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
 
   before {
     view = new MockMainView()
     boxer = new MockDialogBoxer()
-    new MainPresenter("Blarf", view, boxer)
+    new MainPresenter(strings, "Blarf", view, boxer)
   }
 
   test("closing the window") {
@@ -50,6 +52,6 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
-    boxer.messages must equal (List((view, "Blarf version unknown")))
+    boxer.messages must equal (List((view, strings.appVersionString("Blarf", "unknown"))))
   }
 }

@@ -18,22 +18,18 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import ru.corrigendum.octetoscope.abstractui.MainView
-import ru.corrigendum.octetoscope.abstractui.MainView.{CommandEvent, ClosedEvent, Event}
+import ru.corrigendum.octetoscope.abstractinfra.Translation
 
-class MainPresenter(strings: PresentationStrings, appName: String, view: MainView, boxer: DialogBoxer) {
-  view.title = appName
-  view.show()
+trait PresentationStrings {
+  @Translation(format = "This is {0} version {1}.")
+  def appVersionString(appName: String, version: String): String
+}
 
-  view.subscribe(new view.Sub {
-    def notify(pub: view.Pub, event: Event) {
-      event match {
-        case ClosedEvent() => pub.dispose()
-        case CommandEvent(MainView.Command.About) =>
-          boxer.showMessageBox(pub, strings.appVersionString(appName, "unknown"))
-        case CommandEvent(MainView.Command.Quit) => pub.dispose()
-        case CommandEvent(_) => // workaround for bug SI-7206
-      }
-    }
-  })
+object PresentationStrings {
+  val translationMap: Map[String, Class[_ <: PresentationStrings]] = Map("ru" -> classOf[Ru])
+
+  trait Ru extends PresentationStrings {
+    @Translation(format = "Это {0} версии {1}.")
+    def appVersionString(appName: String, version: String): String
+  }
 }

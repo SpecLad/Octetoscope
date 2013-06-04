@@ -16,7 +16,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-dependencies {
-  compile icuDep
-  compile project(':abstractinfra')
+package ru.corrigendum.octetoscope.abstractinfra;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Translation {
+    String format();
 }

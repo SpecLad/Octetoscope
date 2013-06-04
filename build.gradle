@@ -25,6 +25,9 @@ ext {
 
   scalaTestVersion = '1.9.1'
   scalaTestDep = "org.scalatest:scalatest_${scalaMajorVersion}:${scalaTestVersion}"
+
+  icuVersion = '51.1'
+  icuDep = "com.ibm.icu:icu4j:${icuVersion}"
 }
 
 subprojects {
@@ -42,7 +45,7 @@ subprojects {
     testCompile scalaTestDep
   }
 
-  targetCompatibility = '1.6'
+  targetCompatibility = '1.7'
 
   test << {
     ant.taskdef(name: 'scalatest', classname: 'org.scalatest.tools.ScalaTestAntTask', classpath: classpath.asPath)

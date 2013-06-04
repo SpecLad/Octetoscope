@@ -16,13 +16,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.swingui
-
-import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
-import swing.Swing
-
-object SwingApplication {
-  def start(strings: UIStrings, presentationInit: (MainView) => Unit) {
-    Swing.onEDT(presentationInit(new SwingMainView(strings)))
-  }
+dependencies {
+  compile project(':abstractinfra')
 }

@@ -16,13 +16,29 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.swingui
+package ru.corrigendum.octetoscope.abstractui
 
-import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
-import swing.Swing
+import ru.corrigendum.octetoscope.abstractinfra.Translation
 
-object SwingApplication {
-  def start(strings: UIStrings, presentationInit: (MainView) => Unit) {
-    Swing.onEDT(presentationInit(new SwingMainView(strings)))
+trait UIStrings {
+  @Translation(format = "File")
+  def menuFile(): String
+
+  @Translation(format = "Help")
+  def menuHelp(): String
+
+  @Translation(format = "About")
+  def menuItemAbout(): String
+
+  @Translation(format = "Quit")
+  def menuItemQuit(): String
+}
+
+object UIStrings {
+  val translationMap: Map[String, Class[_ <: UIStrings]] = Map("ru" -> classOf[Ru])
+
+  private trait Ru extends UIStrings {
+    @Translation(format = "Выход")
+    override def menuItemQuit(): String
   }
 }

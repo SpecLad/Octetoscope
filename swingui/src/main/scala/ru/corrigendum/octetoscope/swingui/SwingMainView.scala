@@ -18,20 +18,20 @@
 
 package ru.corrigendum.octetoscope.swingui
 
-import ru.corrigendum.octetoscope.abstractui.MainView
+import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
 import swing._
 import event.{ActionEvent, WindowClosing}
 import swing.Reactions.StronglyReferenced
 
-private class SwingMainView extends SwingView with MainView {
+private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
   private[this] val menuBar = new MenuBar()
   private[this] val key = new AnyRef()
 
   frame.menuBar = menuBar
 
   {
-    val menuFile = new Menu("File")
-    val menuHelp = new Menu("Help")
+    val menuFile = new Menu(strings.menuFile())
+    val menuHelp = new Menu(strings.menuHelp())
 
     menuBar.contents += menuFile
     menuBar.contents += menuHelp
@@ -56,8 +56,8 @@ private class SwingMainView extends SwingView with MainView {
       reactor.listenTo(item)
     }
 
-    newMenuItem("Quit", menuFile, MainView.Command.Quit)
-    newMenuItem("About", menuHelp, MainView.Command.About)
+    newMenuItem(strings.menuItemQuit(), menuFile, MainView.Command.Quit)
+    newMenuItem(strings.menuItemAbout(), menuHelp, MainView.Command.About)
   }
 
   frame.pack()

@@ -20,6 +20,8 @@ package ru.corrigendum.octetoscope.application
 
 import ru.corrigendum.octetoscope.swingui.SwingApplication
 import ru.corrigendum.octetoscope.presentation.{DialogBoxerImpl, MainPresenter}
+import ru.corrigendum.octetoscope.infra.MessageLocalizer
+import ru.corrigendum.octetoscope.abstractui.UIStrings
 
 object Octetoscope extends App {
   private val APPLICATION_NAME = "Octetoscope"
@@ -29,5 +31,7 @@ object Octetoscope extends App {
     sys.exit(1)
   }
 
-  SwingApplication.start(view => new MainPresenter(APPLICATION_NAME, view, new DialogBoxerImpl(APPLICATION_NAME)))
+  SwingApplication.start(
+    MessageLocalizer.localize[UIStrings](classOf[UIStrings], UIStrings.translationMap),
+    view => new MainPresenter(APPLICATION_NAME, view, new DialogBoxerImpl(APPLICATION_NAME)))
 }

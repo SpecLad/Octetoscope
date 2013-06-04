@@ -39,7 +39,7 @@ object MessageLocalizer {
 
     iface.cast(Proxy.newProxyInstance(transIface.getClassLoader, Array(transIface), new InvocationHandler {
       override def invoke(proxy: Any, method: Method, args: Array[AnyRef]): AnyRef =
-        MessageFormat.format(translations(method.getName), args)
+        MessageFormat.format(translations(method.getName), args: _*)
     }))
   }
 }

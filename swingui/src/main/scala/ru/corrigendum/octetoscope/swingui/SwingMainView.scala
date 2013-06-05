@@ -21,7 +21,6 @@ package ru.corrigendum.octetoscope.swingui
 import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
 import swing._
 import event.{ActionEvent, WindowClosing}
-import swing.Reactions.StronglyReferenced
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
   private[this] val menuBar = new MenuBar()
@@ -36,24 +35,23 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     menuBar.contents += menuFile
     menuBar.contents += menuHelp
 
-    val reactor = new Reactor with StronglyReferenced {
-      reactions += {
-        case WindowClosing(_) => {
-          publish(MainView.ClosedEvent())
-        }
-        case ActionEvent(c: MenuItem) => {
-          publish(MainView.CommandEvent(c.peer.getClientProperty(key).asInstanceOf[MainView.Command.Value]))
-        }
+    frame.subscribe(Utils.makeSRReaction({
+      case WindowClosing(_) => {
+        publish(MainView.ClosedEvent())
       }
-    }
+    }))
 
-    reactor.listenTo(frame)
+    val menuReaction = Utils.makeSRReaction({
+      case ActionEvent(c) => {
+        publish(MainView.CommandEvent(c.peer.getClientProperty(key).asInstanceOf[MainView.Command.Value]))
+      }
+    })
 
     def newMenuItem(title: String, menu: Menu, command: MainView.Command.Value) {
       val item = new MenuItem(title)
       item.peer.putClientProperty(key, command)
       menu.contents += item
-      reactor.listenTo(item)
+      item.subscribe(menuReaction)
     }
 
     newMenuItem(strings.menuItemQuit(), menuFile, MainView.Command.Quit)

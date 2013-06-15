@@ -19,28 +19,72 @@
 import org.gradle.api.Project
 
 import org.eclipse.jgit.lib.Constants
+import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.lib.RepositoryBuilder
+import org.eclipse.jgit.revwalk.RevTree
 import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.treewalk.AbstractTreeIterator
+import org.eclipse.jgit.treewalk.FileTreeIterator
+import org.eclipse.jgit.treewalk.TreeWalk
+import org.eclipse.jgit.treewalk.filter.NotIgnoredFilter
 
-public class BuildUtils {
+public final class BuildUtils {
+  private BuildUtils() {}
+
+  private static boolean checkDirty(Repository repo, RevTree baseTree) {
+    def treeWalk = new TreeWalk(repo)
+
+    treeWalk.addTree(baseTree)
+    treeWalk.addTree(new FileTreeIterator(repo))
+
+    treeWalk.recursive = true
+    treeWalk.filter = new NotIgnoredFilter(1)
+
+    while (treeWalk.next()) {
+      def baseItem = treeWalk.getTree(0, AbstractTreeIterator.class)
+      def wtItem = treeWalk.getTree(1, AbstractTreeIterator.class)
+
+      if (baseItem != null && wtItem != null) {
+        if (baseItem.entryObjectId != wtItem.entryObjectId)
+          return true
+      } else if (baseItem != wtItem) {
+        return true
+      }
+    }
+
+    return false
+  }
+
   public static List getVersionInfo(Project project, String tagPrefix) {
     def repo = new RepositoryBuilder().setWorkTree(project.rootDir).build()
 
-    def walk = new RevWalk(repo)
+    try {
+      def walk = new RevWalk(repo)
 
-    def tagMap = repo.tags.findAll { it.key.startsWith(tagPrefix) }.collectEntries {
-      [walk.peel(walk.parseTag(it.value.objectId)).copy(), it.key]
+      try {
+        def tagMap = repo.tags.findAll { it.key.startsWith(tagPrefix) }.collectEntries {
+          [walk.peel(walk.parseTag(it.value.objectId)).copy(), it.key]
+        }
+
+        def headId = repo.resolve(Constants.HEAD)
+
+        def curCommit = walk.lookupCommit(headId)
+        def distanceToTag = 0
+
+        while (!tagMap.containsKey(curCommit.id)) {
+          walk.parseHeaders(curCommit)
+          curCommit = curCommit.parents[0]
+          ++distanceToTag
+        }
+
+        return [headId.name(), distanceToTag,
+            tagMap[curCommit.id].toString().substring(tagPrefix.length()),
+            checkDirty(repo, walk.parseCommit(headId).tree)]
+      } finally {
+        walk.dispose()
+      }
+    } finally {
+      repo.close()
     }
-
-    def curCommit = walk.lookupCommit(repo.resolve(Constants.HEAD))
-    def distanceToTag = 0
-
-    while (!tagMap.containsKey(curCommit.id)) {
-      walk.parseHeaders(curCommit)
-      curCommit = curCommit.parents[0]
-      ++distanceToTag
-    }
-
-    return [repo.resolve(Constants.HEAD).name(), distanceToTag, tagMap[curCommit.id].toString()]
   }
 }

@@ -16,40 +16,28 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-ext {
-  generatedResourcesDir = new File(buildDir, "generated/resources")
-}
+package ru.corrigendum.octetoscope.core
 
-sourceSets {
-  main {
-    resources {
-      srcDir generatedResourcesDir
-    }
+import java.util.Properties
+import resource.managed
+
+case class VersionInfo(releaseVersion: String, extraCommits: Int, commitHash: String, dirty: Boolean)
+
+object VersionInfo {
+  val ours = {
+    val props = new Properties()
+
+    val resStream = getClass.getResourceAsStream("version.properties")
+
+    if (resStream ne null)
+      for (_ <- managed(resStream))
+        props.load(resStream)
+
+    VersionInfo(
+      releaseVersion = props.getProperty("releaseVersion", "unknown"),
+      extraCommits = Option(props.getProperty("extraCommits")).map(_.toInt).getOrElse(0),
+      commitHash = props.getProperty("commitHash", "0" * 40),
+      dirty = Option(props.getProperty("dirty")).exists(_.toBoolean)
+    )
   }
-}
-
-task generateVersionInfo {
-  doLast {
-    def coreDir = new File(generatedResourcesDir, "ru/corrigendum/octetoscope/core")
-    coreDir.mkdirs()
-
-    def versionInfo = BuildUtils.getVersionInfo(rootProject, 'release-')
-
-    def propString = """\
-    releaseVersion = ${versionInfo[0]}
-    extraCommits = ${versionInfo[1]}
-    commitHash = ${versionInfo[2]}
-    dirty = ${versionInfo[3]}
-    """.stripIndent()
-
-    new File(coreDir, "version.properties").write(propString)
-  }
-}
-
-processResources {
-  dependsOn generateVersionInfo
-}
-
-dependencies {
-  compile armDep
 }

@@ -77,9 +77,11 @@ public final class BuildUtils {
           ++distanceToTag
         }
 
-        return [headId.name(), distanceToTag,
+        return [
             tagMap[curCommit.id].toString().substring(tagPrefix.length()),
-            checkDirty(repo, walk.parseCommit(headId).tree)]
+            distanceToTag, headId.name(),
+            checkDirty(repo, walk.parseCommit(headId).tree)
+        ]
       } finally {
         walk.dispose()
       }

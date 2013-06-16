@@ -16,12 +16,36 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-include 'abstractinfra'
-include 'abstractui'
-include 'application'
-include 'core'
-include 'infra'
-include 'presentation'
-include 'swingui'
+ext {
+  generatedResourcesDir = new File(buildDir, "generated/resources")
+}
 
-rootProject.name = 'Octetoscope'
+sourceSets {
+  main {
+    resources {
+      srcDir generatedResourcesDir
+    }
+  }
+}
+
+task generateVersionInfo {
+  doLast {
+    def coreDir = new File(generatedResourcesDir, "ru/corrigendum/octetoscope/core")
+    coreDir.mkdirs()
+
+    def versionInfo = BuildUtils.getVersionInfo(rootProject, 'release-')
+
+    def propString = """\
+    releaseVersion = ${versionInfo[0]}
+    extraCommits = ${versionInfo[1]}
+    commitHash = ${versionInfo[2]}
+    dirty = ${versionInfo[3]}
+    """.stripIndent()
+
+    new File(coreDir, "version.properties").write(propString)
+  }
+}
+
+processResources {
+  dependsOn generateVersionInfo
+}

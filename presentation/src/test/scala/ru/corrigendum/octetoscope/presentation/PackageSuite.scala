@@ -18,23 +18,16 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import ru.corrigendum.octetoscope.abstractui.MainView
-import ru.corrigendum.octetoscope.abstractui.MainView.{CommandEvent, ClosedEvent, Event}
+import org.scalatest.FunSuite
+import org.scalatest.matchers.MustMatchers._
 import ru.corrigendum.octetoscope.core.VersionInfo
 
-class MainPresenter(strings: PresentationStrings, appName: String, view: MainView, boxer: DialogBoxer) {
-  view.title = appName
-  view.show()
-
-  view.subscribe(new view.Sub {
-    def notify(pub: view.Pub, event: Event) {
-      event match {
-        case ClosedEvent() => pub.dispose()
-        case CommandEvent(MainView.Command.About) =>
-          boxer.showMessageBox(pub, strings.appVersionString(appName, formatVersionInfo(VersionInfo.ours)))
-        case CommandEvent(MainView.Command.Quit) => pub.dispose()
-        case CommandEvent(_) => // workaround for bug SI-7206
-      }
-    }
-  })
+class PackageSuite extends FunSuite {
+  test("formatVersionInfo") {
+    val hash = "1234" * 10
+    formatVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) must equal ("1.2-g1234123")
+    formatVersionInfo(VersionInfo("1.2", 34, hash, dirty = false)) must equal ("1.2+34-g1234123")
+    formatVersionInfo(VersionInfo("1.2", 0, hash, dirty = true)) must equal ("1.2-g1234123-dirty")
+    formatVersionInfo(VersionInfo("1.2", 34, hash, dirty = true)) must equal ("1.2+34-g1234123-dirty")
+  }
 }

@@ -16,25 +16,17 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.presentation
+package ru.corrigendum.octetoscope
 
-import ru.corrigendum.octetoscope.abstractui.MainView
-import ru.corrigendum.octetoscope.abstractui.MainView.{CommandEvent, ClosedEvent, Event}
 import ru.corrigendum.octetoscope.core.VersionInfo
 
-class MainPresenter(strings: PresentationStrings, appName: String, view: MainView, boxer: DialogBoxer) {
-  view.title = appName
-  view.show()
-
-  view.subscribe(new view.Sub {
-    def notify(pub: view.Pub, event: Event) {
-      event match {
-        case ClosedEvent() => pub.dispose()
-        case CommandEvent(MainView.Command.About) =>
-          boxer.showMessageBox(pub, strings.appVersionString(appName, formatVersionInfo(VersionInfo.ours)))
-        case CommandEvent(MainView.Command.Quit) => pub.dispose()
-        case CommandEvent(_) => // workaround for bug SI-7206
-      }
-    }
-  })
+package object presentation {
+  private[presentation] def formatVersionInfo(vi: VersionInfo): String = {
+    "%s%s-g%s%s".format(
+      vi.releaseVersion,
+      if (vi.extraCommits != 0) "+" + vi.extraCommits else "",
+      vi.commitHash.substring(0, 7),
+      if (vi.dirty) "-dirty" else ""
+    )
+  }
 }

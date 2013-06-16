@@ -23,6 +23,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
 import org.scalatest.matchers.MustMatchers._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
+import ru.corrigendum.octetoscope.core.VersionInfo
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
@@ -52,6 +53,6 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
-    boxer.messages must equal (List((view, strings.appVersionString("Blarf", "unknown"))))
+    boxer.messages must equal (List((view, strings.appVersionString("Blarf", formatVersionInfo(VersionInfo.ours)))))
   }
 }

@@ -55,7 +55,7 @@ public final class BuildUtils {
     return false
   }
 
-  public static List getVersionInfo(Project project, String tagPrefix) {
+  public static VersionInfo getVersionInfo(Project project, String tagPrefix) {
     def repo = new RepositoryBuilder().setWorkTree(project.rootDir).build()
 
     try {
@@ -77,11 +77,12 @@ public final class BuildUtils {
           ++distanceToTag
         }
 
-        return [
-            tagMap[curCommit.id].toString().substring(tagPrefix.length()),
-            distanceToTag, headId.name(),
-            checkDirty(repo, walk.parseCommit(headId).tree)
-        ]
+        return new VersionInfo(
+            releaseVersion: tagMap[curCommit.id].toString().substring(tagPrefix.length()),
+            extraCommits: distanceToTag,
+            commitHash: headId.name(),
+            dirty: checkDirty(repo, walk.parseCommit(headId).tree)
+        )
       } finally {
         walk.dispose()
       }

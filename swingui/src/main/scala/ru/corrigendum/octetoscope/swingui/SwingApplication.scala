@@ -20,9 +20,11 @@ package ru.corrigendum.octetoscope.swingui
 
 import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
 import swing.Swing
+import javax.swing.UIManager
 
 object SwingApplication {
   def start(strings: UIStrings, presentationInit: (MainView) => Unit) {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
     Swing.onEDT(presentationInit(new SwingMainView(strings)))
   }
 }

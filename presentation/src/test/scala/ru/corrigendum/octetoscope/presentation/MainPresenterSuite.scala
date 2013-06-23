@@ -29,7 +29,7 @@ import java.io.File
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
   private[this] var boxer: MockDialogBoxer = _
-  private[this] var strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
+  private[this] val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
 
   before {
     view = new MockMainView()

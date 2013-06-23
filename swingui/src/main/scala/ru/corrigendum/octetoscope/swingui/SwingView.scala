@@ -18,15 +18,14 @@
 
 package ru.corrigendum.octetoscope.swingui
 
-import swing.Frame
 import ru.corrigendum.octetoscope.abstractui.View
-import javax.swing.JOptionPane
+import javax.swing.{JFrame, JOptionPane}
 
 private class SwingView extends View {
-  private[this] val _frame = new Frame()
+  private[this] val _frame = new JFrame()
   protected def frame = _frame
 
   def showMessageBox(text: String, title: String) {
-    JOptionPane.showMessageDialog(frame.peer, text, title, JOptionPane.INFORMATION_MESSAGE)
+    JOptionPane.showMessageDialog(frame, text, title, JOptionPane.INFORMATION_MESSAGE)
   }
 }

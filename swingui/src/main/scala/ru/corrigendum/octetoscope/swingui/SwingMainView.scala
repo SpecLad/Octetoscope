@@ -19,39 +19,39 @@
 package ru.corrigendum.octetoscope.swingui
 
 import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
-import swing._
-import event.{ActionEvent, WindowClosing}
+import javax.swing.{JMenuItem, JMenu, JMenuBar}
+import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
-  private[this] val menuBar = new MenuBar()
-  private[this] val key = new AnyRef()
+  private[this] val menuBar = new JMenuBar()
 
-  frame.menuBar = menuBar
+  frame.setJMenuBar(menuBar)
 
   {
-    val menuFile = new Menu(strings.menuFile())
-    val menuHelp = new Menu(strings.menuHelp())
+    val menuFile = new JMenu(strings.menuFile())
+    val menuHelp = new JMenu(strings.menuHelp())
 
-    menuBar.contents += menuFile
-    menuBar.contents += menuHelp
+    menuBar.add(menuFile)
+    menuBar.add(menuHelp)
 
-    frame.subscribe(Utils.makeSRReaction({
-      case WindowClosing(_) => {
-        publish(MainView.ClosedEvent())
-      }
-    }))
+    frame.addWindowListener(new WindowListener {
+      override def windowDeiconified(e: WindowEvent) {}
 
-    val menuReaction = Utils.makeSRReaction({
-      case ActionEvent(c) => {
-        publish(MainView.CommandEvent(c.peer.getClientProperty(key).asInstanceOf[MainView.Command.Value]))
-      }
+      override def windowClosing(e: WindowEvent) { publish(MainView.ClosedEvent()) }
+
+      override def windowClosed(e: WindowEvent) {}
+      override def windowActivated(e: WindowEvent) {}
+      override def windowOpened(e: WindowEvent) {}
+      override def windowDeactivated(e: WindowEvent) {}
+      override def windowIconified(e: WindowEvent) {}
     })
 
-    def newMenuItem(title: String, menu: Menu, command: MainView.Command.Value) {
-      val item = new MenuItem(title)
-      item.peer.putClientProperty(key, command)
-      menu.contents += item
-      item.subscribe(menuReaction)
+    def newMenuItem(title: String, menu: JMenu, command: MainView.Command.Value) {
+      val item = new JMenuItem(title)
+      item.addActionListener(new ActionListener {
+        override def actionPerformed(e: ActionEvent) { publish(MainView.CommandEvent(command)) }
+      })
+      menu.add(item)
     }
 
     newMenuItem(strings.menuItemQuit(), menuFile, MainView.Command.Quit)
@@ -64,13 +64,13 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     frame.dispose()
   }
 
-  def title: String = frame.title
+  def title: String = frame.getTitle
 
   def title_=(title: String) {
-    frame.title = title
+    frame.setTitle(title)
   }
 
   def show() {
-    frame.visible = true
+    frame.setVisible(true)
   }
 }

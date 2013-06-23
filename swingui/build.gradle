@@ -17,7 +17,6 @@
 */
 
 dependencies {
-  compile scalaSwingDep
   compile project(':abstractinfra')
   compile project(':abstractui')
 }

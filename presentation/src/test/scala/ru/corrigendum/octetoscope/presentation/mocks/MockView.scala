@@ -19,13 +19,17 @@
 package ru.corrigendum.octetoscope.presentation.mocks
 
 import ru.corrigendum.octetoscope.abstractui.View
+import java.io.File
 
 class MockView extends View {
   private[this] var _messageBoxes: List[(String, String)] = Nil
 
   def messageBoxes = _messageBoxes
+  var selectedFile: Option[File] = None
 
   override def showMessageBox(text: String, title: String) {
     _messageBoxes :+= (text, title)
   }
+
+  def showFileOpenBox(): Option[File] = selectedFile
 }

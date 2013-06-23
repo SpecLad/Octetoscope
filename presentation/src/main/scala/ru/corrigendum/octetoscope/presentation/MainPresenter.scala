@@ -33,6 +33,12 @@ class MainPresenter(strings: PresentationStrings, appName: String, view: MainVie
         case CommandEvent(MainView.Command.About) =>
           boxer.showMessageBox(pub, strings.appVersionString(appName, formatVersionInfo(VersionInfo.ours)))
         case CommandEvent(MainView.Command.Quit) => pub.dispose()
+        case CommandEvent(MainView.Command.Open) => {
+          pub.showFileOpenBox() match {
+            case None =>
+            case Some(path) => pub.addTab(path.getName, path.toString, new Object())
+          }
+        }
         case CommandEvent(_) => // workaround for bug SI-7206
       }
     }

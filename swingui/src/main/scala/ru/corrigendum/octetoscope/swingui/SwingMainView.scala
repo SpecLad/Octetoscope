@@ -19,13 +19,12 @@
 package ru.corrigendum.octetoscope.swingui
 
 import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
-import javax.swing.{JMenuItem, JMenu, JMenuBar}
+import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
   private[this] val menuBar = new JMenuBar()
-
-  frame.setJMenuBar(menuBar)
+  private[this] val tabs = new JTabbedPane()
 
   {
     val menuFile = new JMenu(strings.menuFile())
@@ -54,10 +53,13 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
       menu.add(item)
     }
 
+    newMenuItem(strings.menuItemOpen(), menuFile, MainView.Command.Open)
     newMenuItem(strings.menuItemQuit(), menuFile, MainView.Command.Quit)
     newMenuItem(strings.menuItemAbout(), menuHelp, MainView.Command.About)
   }
 
+  frame.setJMenuBar(menuBar)
+  frame.setContentPane(tabs)
   frame.pack()
 
   def dispose() {
@@ -72,5 +74,9 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
 
   def show() {
     frame.setVisible(true)
+  }
+
+  def addTab(title: String, toolTip: String, baton: AnyRef) {
+    tabs.addTab(title, null, new JLabel(baton.toString), toolTip)
   }
 }

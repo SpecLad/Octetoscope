@@ -18,14 +18,23 @@
 
 package ru.corrigendum.octetoscope.swingui
 
+import javax.swing.{JFileChooser, JOptionPane, JFrame}
+import java.io.File
 import ru.corrigendum.octetoscope.abstractui.View
-import javax.swing.{JFrame, JOptionPane}
 
 private class SwingView extends View {
   private[this] val _frame = new JFrame()
   protected def frame = _frame
 
-  def showMessageBox(text: String, title: String) {
+  override def showMessageBox(text: String, title: String) {
     JOptionPane.showMessageDialog(frame, text, title, JOptionPane.INFORMATION_MESSAGE)
+  }
+
+  override def showFileOpenBox(): Option[File] = {
+    val fc = new JFileChooser()
+    fc.showOpenDialog(frame) match {
+      case JFileChooser.APPROVE_OPTION => Some(fc.getSelectedFile)
+      case _ => None
+    }
   }
 }

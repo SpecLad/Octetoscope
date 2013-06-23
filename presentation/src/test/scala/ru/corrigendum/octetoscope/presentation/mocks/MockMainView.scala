@@ -19,13 +19,17 @@
 package ru.corrigendum.octetoscope.presentation.mocks
 
 import ru.corrigendum.octetoscope.abstractui.MainView
+import java.io.File
+import scala.collection.mutable
 
 class MockMainView extends MockView with MainView {
   private[this] var _disposed: Boolean = false
   private[this] var _visible: Boolean = false
+  private[this] val _tabs = mutable.Buffer[(String, String)]()
 
   def disposed = _disposed
   def visible = _visible
+  def tabs = _tabs.readOnly
 
   def dispose() {
     _disposed = true
@@ -39,5 +43,9 @@ class MockMainView extends MockView with MainView {
 
   def show() {
     _visible = true
+  }
+
+  def addTab(title: String, toolTip: String, baton: AnyRef) {
+    _tabs += ((title, toolTip))
   }
 }

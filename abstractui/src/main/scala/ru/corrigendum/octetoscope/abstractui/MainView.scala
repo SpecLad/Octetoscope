@@ -29,6 +29,8 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
   def title_=(title: String)
 
   def show()
+
+  def addTab(title: String, toolTip: String, baton: AnyRef)
 }
 
 object MainView {
@@ -37,6 +39,6 @@ object MainView {
   sealed case class CommandEvent(command: Command.Value) extends Event
 
   object Command extends Enumeration {
-    val Quit, About = Value
+    val Open, Quit, About = Value
   }
 }

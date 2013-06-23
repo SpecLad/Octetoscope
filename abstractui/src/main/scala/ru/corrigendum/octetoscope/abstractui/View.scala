@@ -18,6 +18,9 @@
 
 package ru.corrigendum.octetoscope.abstractui
 
+import java.io.File
+
 trait View {
   def showMessageBox(text: String, title: String)
+  def showFileOpenBox(): Option[File]
 }

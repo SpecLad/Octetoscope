@@ -24,6 +24,7 @@ import ru.corrigendum.octetoscope.abstractui.MainView
 import org.scalatest.matchers.MustMatchers._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 import ru.corrigendum.octetoscope.core.VersionInfo
+import java.io.File
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
@@ -54,5 +55,17 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
     boxer.messages must equal (List((view, strings.appVersionString("Blarf", formatVersionInfo(VersionInfo.ours)))))
+  }
+
+  test("open command") {
+    view.selectedFile = None
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+    view.tabs must equal (List())
+
+    val fakePath = new File("/abra/cadabra")
+
+    view.selectedFile = Some(fakePath)
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+    view.tabs must equal (List(("cadabra", fakePath.toString)))
   }
 }

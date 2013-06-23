@@ -24,14 +24,18 @@ trait UIStrings {
   @Translation(format = "File")
   def menuFile(): String
 
+  @Translation(format = "Open...")
+  def menuItemOpen(): String
+
+  @Translation(format = "Quit")
+  def menuItemQuit(): String
+
   @Translation(format = "Help")
   def menuHelp(): String
 
   @Translation(format = "About")
   def menuItemAbout(): String
 
-  @Translation(format = "Quit")
-  def menuItemQuit(): String
 }
 
 object UIStrings {

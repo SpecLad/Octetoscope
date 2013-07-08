@@ -21,6 +21,7 @@ package ru.corrigendum.octetoscope.swingui
 import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
 import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
+import ru.corrigendum.octetoscope.abstractui.MainView.Tab
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
   private[this] val menuBar = new JMenuBar()
@@ -76,7 +77,9 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     frame.setVisible(true)
   }
 
-  def addTab(title: String, toolTip: String, baton: AnyRef) {
-    tabs.addTab(title, null, new JLabel(baton.toString), toolTip)
+  override def addTab(title: String, toolTip: String): Tab = {
+    val tab = new Tab {}
+    tabs.addTab(title, null, new JLabel(tab.toString), toolTip)
+    tab
   }
 }

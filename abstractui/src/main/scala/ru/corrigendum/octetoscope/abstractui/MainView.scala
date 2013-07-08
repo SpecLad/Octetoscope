@@ -30,7 +30,7 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
 
   def show()
 
-  def addTab(title: String, toolTip: String, baton: AnyRef)
+  def addTab(title: String, toolTip: String): MainView.Tab
 }
 
 object MainView {
@@ -40,5 +40,8 @@ object MainView {
 
   object Command extends Enumeration {
     val Open, Quit, About = Value
+  }
+
+  trait Tab {
   }
 }

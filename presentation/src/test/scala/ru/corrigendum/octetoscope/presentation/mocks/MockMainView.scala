@@ -19,8 +19,8 @@
 package ru.corrigendum.octetoscope.presentation.mocks
 
 import ru.corrigendum.octetoscope.abstractui.MainView
-import java.io.File
 import scala.collection.mutable
+import ru.corrigendum.octetoscope.abstractui.MainView.Tab
 
 class MockMainView extends MockView with MainView {
   private[this] var _disposed: Boolean = false
@@ -45,7 +45,8 @@ class MockMainView extends MockView with MainView {
     _visible = true
   }
 
-  def addTab(title: String, toolTip: String, baton: AnyRef) {
+  override def addTab(title: String, toolTip: String): MainView.Tab = {
     _tabs += ((title, toolTip))
+    new Tab {}
   }
 }

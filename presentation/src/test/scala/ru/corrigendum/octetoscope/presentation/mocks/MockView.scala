@@ -31,5 +31,5 @@ class MockView extends View {
     _messageBoxes :+= (text, title)
   }
 
-  def showFileOpenBox(): Option[File] = selectedFile
+  override def showFileOpenBox(): Option[File] = selectedFile
 }

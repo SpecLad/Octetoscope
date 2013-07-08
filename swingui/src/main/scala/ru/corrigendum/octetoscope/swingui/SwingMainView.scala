@@ -63,17 +63,17 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
   frame.setContentPane(tabs)
   frame.pack()
 
-  def dispose() {
+  override def dispose() {
     frame.dispose()
   }
 
-  def title: String = frame.getTitle
+  override def title: String = frame.getTitle
 
-  def title_=(title: String) {
+  override def title_=(title: String) {
     frame.setTitle(title)
   }
 
-  def show() {
+  override def show() {
     frame.setVisible(true)
   }
 

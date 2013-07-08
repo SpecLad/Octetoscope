@@ -39,9 +39,9 @@ class MockMainView extends MockView with MainView {
     publish(event)
   }
 
-  var title: String = ""
+  override var title: String = ""
 
-  def show() {
+  override def show() {
     _visible = true
   }
 

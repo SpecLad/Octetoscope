@@ -29,7 +29,7 @@ class MainPresenter(strings: PresentationStrings, appName: String, view: MainVie
   view.subscribe(new view.Sub {
     def notify(pub: view.Pub, event: Event) {
       event match {
-        case ClosedEvent() => pub.dispose()
+        case ClosedEvent => pub.dispose()
         case CommandEvent(MainView.Command.About) =>
           boxer.showMessageBox(pub, strings.appVersionString(appName, formatVersionInfo(VersionInfo.ours)))
         case CommandEvent(MainView.Command.Quit) => pub.dispose()

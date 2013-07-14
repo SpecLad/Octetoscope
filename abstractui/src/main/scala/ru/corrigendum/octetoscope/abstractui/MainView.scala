@@ -35,7 +35,7 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
 
 object MainView {
   abstract sealed class Event
-  sealed case class ClosedEvent() extends Event
+  case object ClosedEvent extends Event
   sealed case class CommandEvent(command: Command.Value) extends Event
 
   object Command extends Enumeration {

@@ -37,7 +37,7 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     frame.addWindowListener(new WindowListener {
       override def windowDeiconified(e: WindowEvent) {}
 
-      override def windowClosing(e: WindowEvent) { publish(MainView.ClosedEvent()) }
+      override def windowClosing(e: WindowEvent) { publish(MainView.ClosedEvent) }
 
       override def windowClosed(e: WindowEvent) {}
       override def windowActivated(e: WindowEvent) {}

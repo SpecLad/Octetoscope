@@ -79,7 +79,10 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
 
   override def addTab(title: String, toolTip: String): Tab = {
     val tab = new Tab {}
-    tabs.addTab(title, null, new JLabel(tab.toString), toolTip)
+
+    tabs.addTab(null, null, new JLabel(tab.toString), toolTip)
+    tabs.setTabComponentAt(tabs.getTabCount - 1, TabComponent.get(title))
+
     tab
   }
 }

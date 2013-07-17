@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.swingui
 import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
 import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
-import ru.corrigendum.octetoscope.abstractui.MainView.Tab
+import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
   private[this] val menuBar = new JMenuBar()
@@ -78,11 +78,20 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
   }
 
   override def addTab(title: String, toolTip: String): Tab = {
-    val tab = new Tab {}
+    lazy val tab: TabImpl = new TabImpl(tabs, TabComponent.get(title,
+      () => tab.triggerEvent(MainView.TabClosedEvent)))
 
     tabs.addTab(null, null, new JLabel(tab.toString), toolTip)
-    tabs.setTabComponentAt(tabs.getTabCount - 1, TabComponent.get(title))
+    tabs.setTabComponentAt(tabs.getTabCount - 1, tab.component)
 
     tab
+  }
+
+  private class TabImpl(tabs: JTabbedPane, val component: JComponent) extends Tab {
+    def triggerEvent(event: TabEvent) { publish(event); }
+
+    override def close() {
+      tabs.remove(tabs.indexOfTabComponent(component))
+    }
   }
 }

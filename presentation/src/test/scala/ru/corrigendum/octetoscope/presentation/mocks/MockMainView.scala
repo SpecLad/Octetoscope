@@ -25,7 +25,7 @@ import ru.corrigendum.octetoscope.abstractui.MainView.Tab
 class MockMainView extends MockView with MainView {
   private[this] var _disposed: Boolean = false
   private[this] var _visible: Boolean = false
-  private[this] val _tabs = mutable.Buffer[(String, String)]()
+  private[this] val _tabs = mutable.Buffer[MockTab]()
 
   def disposed = _disposed
   def visible = _visible
@@ -46,7 +46,13 @@ class MockMainView extends MockView with MainView {
   }
 
   override def addTab(title: String, toolTip: String): MainView.Tab = {
-    _tabs += ((title, toolTip))
-    new Tab {}
+    _tabs += new MockTab(title, toolTip)
+    _tabs.last
+  }
+
+  class MockTab(val title: String, val toolTip: String) extends Tab {
+    override def close() {
+      _tabs -= this
+    }
   }
 }

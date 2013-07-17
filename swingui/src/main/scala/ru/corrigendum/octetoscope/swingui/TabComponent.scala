@@ -22,9 +22,10 @@ import javax.swing._
 import java.awt._
 import javax.swing.plaf.basic.BasicButtonUI
 import resource.managed
+import java.awt.event.{ActionEvent, ActionListener}
 
 private object TabComponent {
-  def get(title: String): JComponent = {
+  def get(title: String, onClick: () => Unit): JComponent = {
     val panel = new JPanel()
 
     panel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 1))
@@ -55,6 +56,9 @@ private object TabComponent {
     closeButton.setContentAreaFilled(false)
     closeButton.setFocusable(false)
     closeButton.setBorder(BorderFactory.createLineBorder(closeButton.getForeground))
+    closeButton.addActionListener(new ActionListener {
+      override def actionPerformed(e: ActionEvent) { onClick() }
+    })
 
     val buttonHeight = label.getFontMetrics(label.getFont).getAscent + 2
     closeButton.setPreferredSize(new Dimension(buttonHeight, buttonHeight))

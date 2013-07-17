@@ -60,12 +60,15 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   test("open command") {
     view.selectedFile = None
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
-    view.tabs must equal (List())
+    view.tabs must have size 0
 
     val fakePath = new File("/abra/cadabra")
 
     view.selectedFile = Some(fakePath)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
-    view.tabs must equal (List(("cadabra", fakePath.toString)))
+
+    view.tabs must have size 1
+    view.tabs.head.title must equal ("cadabra")
+    view.tabs.head.toolTip must equal (fakePath.toString)
   }
 }

@@ -42,6 +42,10 @@ object MainView {
     val Open, Quit, About = Value
   }
 
-  trait Tab {
+  abstract sealed class TabEvent
+  case object TabClosedEvent extends TabEvent
+
+  trait Tab extends mutable.Publisher[MainView.TabEvent] {
+    def close()
   }
 }

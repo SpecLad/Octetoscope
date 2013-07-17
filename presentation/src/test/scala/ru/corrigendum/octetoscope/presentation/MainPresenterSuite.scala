@@ -71,4 +71,12 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.tabs.head.title must equal ("cadabra")
     view.tabs.head.toolTip must equal (fakePath.toString)
   }
+
+  test("tab closing") {
+    view.selectedFile = Some(new File("/abra/cadabra"))
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+
+    view.tabs.head.trigger(MainView.TabClosedEvent)
+    view.tabs must have size 0
+  }
 }

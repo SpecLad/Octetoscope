@@ -19,15 +19,18 @@
 package ru.corrigendum.octetoscope.presentation
 
 import ru.corrigendum.octetoscope.abstractui.MainView
-import ru.corrigendum.octetoscope.abstractui.MainView.{CommandEvent, ClosedEvent, Event}
+import ru.corrigendum.octetoscope.abstractui.MainView._
 import ru.corrigendum.octetoscope.core.VersionInfo
+import ru.corrigendum.octetoscope.abstractui.MainView.CommandEvent
 
 class MainPresenter(strings: PresentationStrings, appName: String, view: MainView, boxer: DialogBoxer) {
   view.title = appName
   view.show()
 
-  view.subscribe(new view.Sub {
-    def notify(pub: view.Pub, event: Event) {
+  view.subscribe(viewHandler)
+
+  private object viewHandler extends MainView#Sub {
+    override def notify(pub: MainView#Pub, event: Event) {
       event match {
         case ClosedEvent => pub.dispose()
         case CommandEvent(MainView.Command.About) =>
@@ -36,11 +39,19 @@ class MainPresenter(strings: PresentationStrings, appName: String, view: MainVie
         case CommandEvent(MainView.Command.Open) => {
           pub.showFileOpenBox() match {
             case None =>
-            case Some(path) => pub.addTab(path.getName, path.toString)
+            case Some(path) => pub.addTab(path.getName, path.toString).subscribe(tabHandler)
           }
         }
         case CommandEvent(_) => // workaround for bug SI-7206
       }
     }
-  })
+  }
+
+  private object tabHandler extends MainView.Tab#Sub {
+    override def notify(pub: Tab#Pub, event: TabEvent) {
+      event match {
+        case TabClosedEvent => pub.close()
+      }
+    }
+  }
 }

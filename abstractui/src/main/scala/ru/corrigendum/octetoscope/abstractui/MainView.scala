@@ -46,6 +46,7 @@ object MainView {
   case object TabClosedEvent extends TabEvent
 
   trait Tab extends mutable.Publisher[MainView.TabEvent] {
+    override type Pub = Tab
     def close()
   }
 }

@@ -54,5 +54,9 @@ class MockMainView extends MockView with MainView {
     override def close() {
       _tabs -= this
     }
+
+    def trigger(event: MainView.TabEvent) {
+      publish(event)
+    }
   }
 }

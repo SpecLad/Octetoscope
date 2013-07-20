@@ -22,7 +22,7 @@ import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
 import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
-import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.{DefaultTreeCellRenderer, DefaultMutableTreeNode}
 import java.awt.Dimension
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
@@ -86,6 +86,9 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
       () => tab.triggerEvent(MainView.TabClosedEvent)))
 
     val tree = new JTree(new DefaultMutableTreeNode(tab))
+    val cellRenderer = new DefaultTreeCellRenderer
+    cellRenderer.putClientProperty("html.disable", java.lang.Boolean.TRUE)
+    tree.setCellRenderer(cellRenderer)
 
     tabs.addTab(null, null, new JScrollPane(tree), toolTip)
     tabs.setTabComponentAt(tabs.getTabCount - 1, tab.component)

@@ -23,6 +23,7 @@ import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
 import javax.swing.tree.DefaultMutableTreeNode
+import java.awt.Dimension
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
   private[this] val menuBar = new JMenuBar()
@@ -62,7 +63,9 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
 
   frame.setJMenuBar(menuBar)
   frame.setContentPane(tabs)
+  frame.setPreferredSize(new Dimension(800, 600))
   frame.pack()
+  frame.setLocationRelativeTo(null)
 
   override def dispose() {
     frame.dispose()

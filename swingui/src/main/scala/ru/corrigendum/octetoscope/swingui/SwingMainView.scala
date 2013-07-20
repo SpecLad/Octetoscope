@@ -22,6 +22,7 @@ import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
 import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
+import javax.swing.tree.DefaultMutableTreeNode
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
   private[this] val menuBar = new JMenuBar()
@@ -81,7 +82,9 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     lazy val tab: TabImpl = new TabImpl(tabs, TabComponent.get(title,
       () => tab.triggerEvent(MainView.TabClosedEvent)))
 
-    tabs.addTab(null, null, new JLabel(tab.toString), toolTip)
+    val tree = new JTree(new DefaultMutableTreeNode(tab))
+
+    tabs.addTab(null, null, new JScrollPane(tree), toolTip)
     tabs.setTabComponentAt(tabs.getTabCount - 1, tab.component)
 
     tab

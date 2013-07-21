@@ -24,10 +24,13 @@ import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
 import javax.swing.tree.{DefaultTreeCellRenderer, DefaultMutableTreeNode}
 import java.awt.Dimension
+import scala.collection.mutable
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
   private[this] val menuBar = new JMenuBar()
-  private[this] val tabs = new JTabbedPane()
+  private[this] val tabPane = new JTabbedPane()
+
+  private[this] val tabs = mutable.Set[TabImpl]()
 
   {
     val menuFile = new JMenu(strings.menuFile())
@@ -39,7 +42,10 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     frame.addWindowListener(new WindowListener {
       override def windowDeiconified(e: WindowEvent) {}
 
-      override def windowClosing(e: WindowEvent) { publish(MainView.ClosedEvent) }
+      override def windowClosing(e: WindowEvent) {
+        for (tab <- List(tabs.toSeq: _*)) tab.triggerEvent(MainView.TabClosedEvent)
+        publish(MainView.ClosedEvent)
+      }
 
       override def windowClosed(e: WindowEvent) {}
       override def windowActivated(e: WindowEvent) {}
@@ -62,7 +68,7 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
   }
 
   frame.setJMenuBar(menuBar)
-  frame.setContentPane(tabs)
+  frame.setContentPane(tabPane)
   frame.setPreferredSize(new Dimension(800, 600))
   frame.pack()
   frame.setLocationRelativeTo(null)
@@ -82,7 +88,7 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
   }
 
   override def addTab(title: String, toolTip: String): Tab = {
-    lazy val tab: TabImpl = new TabImpl(tabs, TabComponent.get(title,
+    lazy val tab: TabImpl = new TabImpl(TabComponent.get(title,
       () => tab.triggerEvent(MainView.TabClosedEvent)))
 
     val tree = new JTree(new DefaultMutableTreeNode(tab))
@@ -90,17 +96,19 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     cellRenderer.putClientProperty("html.disable", java.lang.Boolean.TRUE)
     tree.setCellRenderer(cellRenderer)
 
-    tabs.addTab(null, null, new JScrollPane(tree), toolTip)
-    tabs.setTabComponentAt(tabs.getTabCount - 1, tab.component)
+    tabPane.addTab(null, null, new JScrollPane(tree), toolTip)
+    tabPane.setTabComponentAt(tabPane.getTabCount - 1, tab.component)
 
+    tabs += tab
     tab
   }
 
-  private class TabImpl(tabs: JTabbedPane, val component: JComponent) extends Tab {
+  private class TabImpl(val component: JComponent) extends Tab {
     def triggerEvent(event: TabEvent) { publish(event); }
 
     override def close() {
-      tabs.remove(tabs.indexOfTabComponent(component))
+      tabPane.remove(tabPane.indexOfTabComponent(component))
+      tabs -= this
     }
   }
 }

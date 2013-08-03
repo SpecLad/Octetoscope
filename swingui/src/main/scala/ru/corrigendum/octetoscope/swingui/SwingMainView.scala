@@ -24,13 +24,10 @@ import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
 import javax.swing.tree.{DefaultTreeCellRenderer, DefaultMutableTreeNode}
 import java.awt.Dimension
-import scala.collection.mutable
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
   private[this] val menuBar = new JMenuBar()
   private[this] val tabPane = new JTabbedPane()
-
-  private[this] val tabs = mutable.Set[TabImpl]()
 
   {
     val menuFile = new JMenu(strings.menuFile())
@@ -43,7 +40,6 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
       override def windowDeiconified(e: WindowEvent) {}
 
       override def windowClosing(e: WindowEvent) {
-        for (tab <- List(tabs.toSeq: _*)) tab.triggerEvent(MainView.TabClosedEvent)
         publish(MainView.ClosedEvent)
       }
 
@@ -99,7 +95,6 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     tabPane.addTab(null, null, new JScrollPane(tree), toolTip)
     tabPane.setTabComponentAt(tabPane.getTabCount - 1, tab.component)
 
-    tabs += tab
     tab
   }
 
@@ -108,7 +103,6 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
 
     override def close() {
       tabPane.remove(tabPane.indexOfTabComponent(component))
-      tabs -= this
     }
   }
 }

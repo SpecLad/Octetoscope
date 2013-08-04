@@ -33,9 +33,12 @@ class MainPresenter(strings: PresentationStrings, appName: String, view: MainVie
     override def notify(pub: MainView#Pub, event: Event) {
       event match {
         case ClosedEvent => pub.dispose()
+
         case CommandEvent(MainView.Command.About) =>
           boxer.showMessageBox(pub, strings.appVersionString(appName, formatVersionInfo(VersionInfo.ours)))
+
         case CommandEvent(MainView.Command.Quit) => pub.dispose()
+
         case CommandEvent(MainView.Command.Open) => {
           pub.showFileOpenBox() match {
             case None =>
@@ -43,6 +46,7 @@ class MainPresenter(strings: PresentationStrings, appName: String, view: MainVie
               pub.addTab(path.getName, path.toString, DisplayTreeNode("whatever", Seq())).subscribe(tabHandler)
           }
         }
+
         case CommandEvent(_) => // workaround for bug SI-7206
       }
     }

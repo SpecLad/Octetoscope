@@ -18,11 +18,11 @@
 
 package ru.corrigendum.octetoscope.swingui
 
-import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
+import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, UIStrings, MainView}
 import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
-import javax.swing.tree.{DefaultTreeCellRenderer, DefaultMutableTreeNode}
+import javax.swing.tree.{TreeNode, DefaultTreeCellRenderer, DefaultMutableTreeNode}
 import java.awt.Dimension
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
@@ -83,11 +83,11 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     frame.setVisible(true)
   }
 
-  override def addTab(title: String, toolTip: String): Tab = {
+  override def addTab(title: String, toolTip: String, root: DisplayTreeNode): Tab = {
     lazy val tab: TabImpl = new TabImpl(TabComponent.get(title,
       () => tab.triggerEvent(MainView.TabClosedEvent)))
 
-    val tree = new JTree(new DefaultMutableTreeNode(tab))
+    val tree = new JTree(abstractTreeNodeToSwing(root))
     val cellRenderer = new DefaultTreeCellRenderer
     cellRenderer.putClientProperty("html.disable", java.lang.Boolean.TRUE)
     tree.setCellRenderer(cellRenderer)
@@ -96,6 +96,12 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     tabPane.setTabComponentAt(tabPane.getTabCount - 1, tab.component)
 
     tab
+  }
+
+  private def abstractTreeNodeToSwing(node: DisplayTreeNode): TreeNode = {
+    val result = new DefaultMutableTreeNode(node.text)
+    for (child <- node.children) result.add(new DefaultMutableTreeNode(node.text))
+    result
   }
 
   private class TabImpl(val component: JComponent) extends Tab {

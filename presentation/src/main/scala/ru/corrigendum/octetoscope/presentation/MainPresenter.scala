@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import ru.corrigendum.octetoscope.abstractui.MainView
+import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView}
 import ru.corrigendum.octetoscope.abstractui.MainView._
 import ru.corrigendum.octetoscope.core.VersionInfo
 import ru.corrigendum.octetoscope.abstractui.MainView.CommandEvent
@@ -39,7 +39,8 @@ class MainPresenter(strings: PresentationStrings, appName: String, view: MainVie
         case CommandEvent(MainView.Command.Open) => {
           pub.showFileOpenBox() match {
             case None =>
-            case Some(path) => pub.addTab(path.getName, path.toString).subscribe(tabHandler)
+            case Some(path) =>
+              pub.addTab(path.getName, path.toString, DisplayTreeNode("whatever", Seq())).subscribe(tabHandler)
           }
         }
         case CommandEvent(_) => // workaround for bug SI-7206

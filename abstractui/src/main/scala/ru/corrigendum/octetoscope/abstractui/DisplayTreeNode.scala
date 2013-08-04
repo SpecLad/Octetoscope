@@ -18,35 +18,4 @@
 
 package ru.corrigendum.octetoscope.abstractui
 
-import collection.mutable
-
-trait MainView extends View with mutable.Publisher[MainView.Event] {
-  override type Pub = MainView
-
-  def dispose()
-
-  def title: String
-  def title_=(title: String)
-
-  def show()
-
-  def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab
-}
-
-object MainView {
-  abstract sealed class Event
-  case object ClosedEvent extends Event
-  sealed case class CommandEvent(command: Command.Value) extends Event
-
-  object Command extends Enumeration {
-    val Open, Quit, About = Value
-  }
-
-  abstract sealed class TabEvent
-  case object TabClosedEvent extends TabEvent
-
-  trait Tab extends mutable.Publisher[MainView.TabEvent] {
-    override type Pub = Tab
-    def close()
-  }
-}
+sealed case class DisplayTreeNode(text: String, children: Seq[DisplayTreeNode])

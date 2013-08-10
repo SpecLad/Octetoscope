@@ -35,7 +35,7 @@ class MainPresenter(strings: PresentationStrings, appName: String, view: MainVie
         case ClosedEvent => pub.dispose()
 
         case CommandEvent(MainView.Command.About) =>
-          boxer.showMessageBox(pub, strings.appVersionString(appName, formatVersionInfo(VersionInfo.ours)))
+          boxer.showMessageBox(pub, strings.appVersionString(appName, presentVersionInfo(VersionInfo.ours)))
 
         case CommandEvent(MainView.Command.Quit) => pub.dispose()
 

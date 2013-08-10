@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope
 import ru.corrigendum.octetoscope.core.VersionInfo
 
 package object presentation {
-  private[presentation] def formatVersionInfo(vi: VersionInfo): String = {
+  private[presentation] def presentVersionInfo(vi: VersionInfo): String = {
     "%s%s-g%s%s".format(
       vi.releaseVersion,
       if (vi.extraCommits != 0) "+" + vi.extraCommits else "",

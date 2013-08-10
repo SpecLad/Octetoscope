@@ -23,11 +23,11 @@ import org.scalatest.matchers.MustMatchers._
 import ru.corrigendum.octetoscope.core.VersionInfo
 
 class PackageSuite extends FunSuite {
-  test("formatVersionInfo") {
+  test("presentVersionInfo") {
     val hash = "1234" * 10
-    formatVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) must equal ("1.2-g1234123")
-    formatVersionInfo(VersionInfo("1.2", 34, hash, dirty = false)) must equal ("1.2+34-g1234123")
-    formatVersionInfo(VersionInfo("1.2", 0, hash, dirty = true)) must equal ("1.2-g1234123-dirty")
-    formatVersionInfo(VersionInfo("1.2", 34, hash, dirty = true)) must equal ("1.2+34-g1234123-dirty")
+    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) must equal ("1.2-g1234123")
+    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = false)) must equal ("1.2+34-g1234123")
+    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = true)) must equal ("1.2-g1234123-dirty")
+    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = true)) must equal ("1.2+34-g1234123-dirty")
   }
 }

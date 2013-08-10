@@ -16,10 +16,28 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-dependencies {
-  compile icuDep
-  compile armDep
+package ru.corrigendum.octetoscope.infra
 
-  compile project(':abstractinfra')
-  compile project(':core')
+import java.io.{FileInputStream, File, FileReader}
+import ru.corrigendum.octetoscope.core.BinaryReader
+import ru.corrigendum.octetoscope.core.Blob
+import scala.collection.mutable
+import resource.managed
+import scala.util.control.Breaks._
+
+object DefaultBinaryReader extends BinaryReader {
+  def readWhole(path: File): Blob = {
+    val buffer = new Array[Byte](1024 * 1024)
+    val result = mutable.ArrayBuffer[Byte]()
+
+    for (file <- managed(new FileInputStream(path))) {
+      breakable { while (true) {
+        val bytesRead = file.read(buffer)
+        if (bytesRead == -1) break()
+        result ++= buffer.take(bytesRead)
+      }}
+    }
+
+    result
+  }
 }

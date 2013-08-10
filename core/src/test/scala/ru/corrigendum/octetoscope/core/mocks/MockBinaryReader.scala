@@ -16,10 +16,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-dependencies {
-  compile icuDep
-  compile armDep
+package ru.corrigendum.octetoscope.core.mocks
 
-  compile project(':abstractinfra')
-  compile project(':core')
+import ru.corrigendum.octetoscope.core.{BinaryReader, Blob}
+import java.io.File
+
+class MockBinaryReader(result: Blob) extends BinaryReader {
+  override def readWhole(path: File): Blob = result
 }

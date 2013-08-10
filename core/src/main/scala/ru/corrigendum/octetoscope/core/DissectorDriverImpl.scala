@@ -20,6 +20,6 @@ package ru.corrigendum.octetoscope.core
 
 import java.io.File
 
-class DissectorDriverImpl extends DissectorDriver {
-  def dissect(path: File): Piece = Atom("dummy")
+class DissectorDriverImpl(reader: BinaryReader, defaultDissector: Dissector) extends DissectorDriver {
+  def dissect(path: File): Piece = defaultDissector.dissect(reader.readWhole(path))
 }

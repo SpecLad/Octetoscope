@@ -20,9 +20,9 @@ package ru.corrigendum.octetoscope.application
 
 import ru.corrigendum.octetoscope.swingui.SwingApplication
 import ru.corrigendum.octetoscope.presentation.{PresentationStrings, DialogBoxerImpl, MainPresenter}
-import ru.corrigendum.octetoscope.infra.MessageLocalizer
+import ru.corrigendum.octetoscope.infra.{DefaultBinaryReader, MessageLocalizer}
 import ru.corrigendum.octetoscope.abstractui.UIStrings
-import ru.corrigendum.octetoscope.core.DissectorDriverImpl
+import ru.corrigendum.octetoscope.core.{BinaryReader, MD2, DissectorDriverImpl}
 
 object Octetoscope extends App {
   private val APPLICATION_NAME = "Octetoscope"
@@ -40,6 +40,6 @@ object Octetoscope extends App {
     view => new MainPresenter(
       presentationStrings, APPLICATION_NAME, view,
       new DialogBoxerImpl(APPLICATION_NAME),
-      new DissectorDriverImpl()
+      new DissectorDriverImpl(DefaultBinaryReader, MD2)
     ))
 }

@@ -16,10 +16,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-dependencies {
-  compile icuDep
-  compile armDep
+package ru.corrigendum.octetoscope.core
 
-  compile project(':abstractinfra')
-  compile project(':core')
+object MD2 extends Dissector {
+  override def dissect(input: Blob): Piece = Atom("dummy")
 }

@@ -16,10 +16,18 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-dependencies {
-  compile icuDep
-  compile armDep
+package ru.corrigendum.octetoscope.core
 
-  compile project(':abstractinfra')
-  compile project(':core')
+import org.scalatest.matchers.MustMatchers._
+import org.scalatest.FunSuite
+import ru.corrigendum.octetoscope.core.mocks.{MockDissector, MockBinaryReader}
+import java.nio.charset.StandardCharsets
+import java.io.File
+
+class DissectorDriverSuite extends FunSuite {
+  test("dissect") {
+    val reader = new MockBinaryReader("magic".getBytes(StandardCharsets.US_ASCII))
+    val driver = new DissectorDriverImpl(reader, MockDissector)
+    driver.dissect(new File("/abra/cadabra")) must equal (Atom("magic"))
+  }
 }

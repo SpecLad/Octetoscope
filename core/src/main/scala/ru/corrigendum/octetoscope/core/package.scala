@@ -16,10 +16,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-dependencies {
-  compile icuDep
-  compile armDep
+package ru.corrigendum.octetoscope
 
-  compile project(':abstractinfra')
-  compile project(':core')
+package object core {
+  type Blob = IndexedSeq[Byte]
 }

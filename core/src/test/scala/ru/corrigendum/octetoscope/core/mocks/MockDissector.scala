@@ -16,10 +16,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-dependencies {
-  compile icuDep
-  compile armDep
+package ru.corrigendum.octetoscope.core.mocks
 
-  compile project(':abstractinfra')
-  compile project(':core')
+import ru.corrigendum.octetoscope.core.{Atom, Blob, Piece, Dissector}
+import java.nio.charset.StandardCharsets
+
+object MockDissector extends Dissector {
+  override def dissect(input: Blob): Piece = Atom(new String(Array(input: _*), StandardCharsets.US_ASCII))
 }

@@ -16,10 +16,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-dependencies {
-  compile icuDep
-  compile armDep
+package ru.corrigendum.octetoscope.core
 
-  compile project(':abstractinfra')
-  compile project(':core')
+import java.io.File
+
+trait BinaryReader {
+  def readWhole(path: File): Blob
 }

@@ -18,23 +18,25 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import mocks.{MockDialogBoxer, MockMainView}
+import ru.corrigendum.octetoscope.presentation.mocks.{MockDissectorDriver, MockDialogBoxer, MockMainView}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
 import org.scalatest.matchers.MustMatchers._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
-import ru.corrigendum.octetoscope.core.VersionInfo
+import ru.corrigendum.octetoscope.core.{Atom, VersionInfo}
 import java.io.File
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
   private[this] var boxer: MockDialogBoxer = _
   private[this] val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
+  private[this] var dissectorDriver: MockDissectorDriver = _
 
   before {
     view = new MockMainView()
     boxer = new MockDialogBoxer()
-    new MainPresenter(strings, "Blarf", view, boxer)
+    dissectorDriver = new MockDissectorDriver(Atom("dummy"))
+    new MainPresenter(strings, "Blarf", view, boxer, dissectorDriver)
   }
 
   test("closing the window") {
@@ -70,6 +72,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.tabs must have size 1
     view.tabs.head.title must equal ("cadabra")
     view.tabs.head.toolTip must equal (fakePath.toString)
+    view.tabs.head.tree must equal (presentPiece(dissectorDriver.dissect(fakePath)))
   }
 
   test("tab closing") {

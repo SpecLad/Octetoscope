@@ -46,11 +46,11 @@ class MockMainView extends MockView with MainView {
   }
 
   override def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab = {
-    _tabs += new MockTab(title, toolTip)
+    _tabs += new MockTab(title, toolTip, root)
     _tabs.last
   }
 
-  class MockTab(val title: String, val toolTip: String) extends Tab {
+  class MockTab(val title: String, val toolTip: String, val tree: DisplayTreeNode) extends Tab {
     override def close() {
       _tabs -= this
     }

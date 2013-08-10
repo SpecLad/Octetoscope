@@ -20,10 +20,14 @@ package ru.corrigendum.octetoscope.presentation
 
 import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView}
 import ru.corrigendum.octetoscope.abstractui.MainView._
-import ru.corrigendum.octetoscope.core.VersionInfo
+import ru.corrigendum.octetoscope.core.{DissectorDriver, VersionInfo}
 import ru.corrigendum.octetoscope.abstractui.MainView.CommandEvent
 
-class MainPresenter(strings: PresentationStrings, appName: String, view: MainView, boxer: DialogBoxer) {
+class MainPresenter(strings: PresentationStrings,
+                    appName: String,
+                    view: MainView,
+                    boxer: DialogBoxer,
+                    dissectorDriver: DissectorDriver) {
   view.title = appName
   view.show()
 
@@ -43,7 +47,10 @@ class MainPresenter(strings: PresentationStrings, appName: String, view: MainVie
           pub.showFileOpenBox() match {
             case None =>
             case Some(path) =>
-              pub.addTab(path.getName, path.toString, DisplayTreeNode("whatever", Seq())).subscribe(tabHandler)
+              pub.addTab(
+                path.getName, path.toString,
+                presentPiece(dissectorDriver.dissect(path))
+              ).subscribe(tabHandler)
           }
         }
 

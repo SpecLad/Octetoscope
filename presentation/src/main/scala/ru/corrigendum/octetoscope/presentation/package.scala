@@ -18,7 +18,8 @@
 
 package ru.corrigendum.octetoscope
 
-import ru.corrigendum.octetoscope.core.VersionInfo
+import ru.corrigendum.octetoscope.core._
+import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 
 package object presentation {
   private[presentation] def presentVersionInfo(vi: VersionInfo): String = {
@@ -28,5 +29,18 @@ package object presentation {
       vi.commitHash.substring(0, 7),
       if (vi.dirty) "-dirty" else ""
     )
+  }
+
+  private[presentation] def presentPiece(piece: Piece): DisplayTreeNode = {
+    def helper(np: NamedPiece): DisplayTreeNode =
+      DisplayTreeNode(
+        np.name + ": " + np.piece.repr,
+        np.piece match {
+          case _: Atom => Nil
+          case m: Molecule => m.children.map(helper)
+        }
+      )
+
+    helper(NamedPiece("WHOLE", piece))
   }
 }

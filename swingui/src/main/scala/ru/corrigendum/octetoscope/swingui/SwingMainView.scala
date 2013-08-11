@@ -22,7 +22,7 @@ import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, UIStrings, MainVi
 import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
-import javax.swing.tree.{TreeNode, DefaultTreeCellRenderer, DefaultMutableTreeNode}
+import javax.swing.tree.{MutableTreeNode, DefaultTreeCellRenderer, DefaultMutableTreeNode}
 import java.awt.Dimension
 
 private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
@@ -88,6 +88,7 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
       () => tab.triggerEvent(MainView.TabClosedEvent)))
 
     val tree = new JTree(abstractTreeNodeToSwing(root))
+    tree.setShowsRootHandles(true)
     val cellRenderer = new DefaultTreeCellRenderer
     cellRenderer.putClientProperty("html.disable", java.lang.Boolean.TRUE)
     tree.setCellRenderer(cellRenderer)
@@ -98,9 +99,9 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
     tab
   }
 
-  private def abstractTreeNodeToSwing(node: DisplayTreeNode): TreeNode = {
+  private def abstractTreeNodeToSwing(node: DisplayTreeNode): MutableTreeNode = {
     val result = new DefaultMutableTreeNode(node.text)
-    for (child <- node.children) result.add(new DefaultMutableTreeNode(node.text))
+    for (child <- node.children) result.add(abstractTreeNodeToSwing(child))
     result
   }
 

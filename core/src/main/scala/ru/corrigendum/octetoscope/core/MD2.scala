@@ -18,6 +18,57 @@
 
 package ru.corrigendum.octetoscope.core
 
+import java.nio.charset.StandardCharsets
+
+// MD2 dissection is based on the Quake II source code,
+// available at <https://github.com/id-Software/Quake-2>.
+
 object MD2 extends Dissector {
-  override def dissect(input: Blob): Piece = Atom("dummy")
+  private def dissectString(input: Blob): Piece = {
+    Atom(new String(Array(input: _*), StandardCharsets.US_ASCII))
+  }
+
+  private def unsign(b: Byte): Int = if(b >= 0) b else 256 + b
+
+  private def dissectInt(input: Blob): Piece = {
+    Atom(
+      (unsign(input(0))
+      | (unsign(input(1)) << 8)
+      | (unsign(input(2)) << 16)
+      | (unsign(input(3)) << 24)).toString)
+  }
+
+  private def dissectHeader(input: Blob): Piece = {
+    // Quake II's struct dmdl_t.
+
+    val children = Vector.newBuilder[NamedPiece]
+
+    children += NamedPiece("Identification", dissectString(input.slice(0, 4)))
+    children += NamedPiece("Version", dissectInt(input.slice(4, 8)))
+
+    children += NamedPiece("Skin width", dissectInt(input.slice(8, 12)))
+    children += NamedPiece("Skin height", dissectInt(input.slice(12, 16)))
+    children += NamedPiece("Frame size", dissectInt(input.slice(16, 20)))
+
+    children += NamedPiece("Number of skins", dissectInt(input.slice(20, 24)))
+    children += NamedPiece("Number of vertices", dissectInt(input.slice(24, 28)))
+    children += NamedPiece("Number of texture coordinates", dissectInt(input.slice(28, 32)))
+    children += NamedPiece("Number of triangles", dissectInt(input.slice(32, 36)))
+    children += NamedPiece("Number of OpenGL commands", dissectInt(input.slice(36, 40)))
+    children += NamedPiece("Number of frames", dissectInt(input.slice(40, 44)))
+
+    children += NamedPiece("Offset of skins", dissectInt(input.slice(44, 48)))
+    children += NamedPiece("Offset of texture coordinates", dissectInt(input.slice(48, 52)))
+    children += NamedPiece("Offset of triangles", dissectInt(input.slice(52, 56)))
+    children += NamedPiece("Offset of frames", dissectInt(input.slice(56, 60)))
+    children += NamedPiece("Offset of OpenGL commands", dissectInt(input.slice(60, 64)))
+    children += NamedPiece("File size", dissectInt(input.slice(64, 68)))
+
+    Molecule("Header", children.result())
+  }
+
+  override def dissect(input: Blob): Piece = {
+
+    Molecule("MD2", Seq(NamedPiece("Header", dissectHeader(input))))
+  }
 }

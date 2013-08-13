@@ -40,7 +40,7 @@ task generateVersionInfo {
       versionInfo = new VersionInfo(extraCommits: 0, commitHash: '0' * 40, dirty: false)
       apply from: versionFile, to: versionInfo
       if (versionInfo.releaseVersion == null)
-        throw new InvalidUserDataException("version.gradle provided, but doesn't set releaseVersion")
+        throw new InvalidUserDataException('version.gradle provided, but doesn\'t set releaseVersion')
     } else {
       versionInfo = BuildUtils.getVersionInfo(rootProject, 'release-')
     }
@@ -53,7 +53,7 @@ task generateVersionInfo {
     dirty = ${versionInfo.dirty}
     """.stripIndent()
 
-    new File(coreDir, "version.properties").write(propString)
+    new File(coreDir, 'version.properties').write(propString)
   }
 }
 

@@ -18,12 +18,12 @@
 
 package ru.corrigendum.octetoscope.infra
 
-import java.io.{FileInputStream, File, FileReader}
-import ru.corrigendum.octetoscope.core.BinaryReader
-import ru.corrigendum.octetoscope.core.Blob
+import java.io.{FileInputStream, File}
 import scala.collection.mutable
 import resource.managed
 import scala.util.control.Breaks._
+import ru.corrigendum.octetoscope.abstractinfra.Blob
+import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
 
 object DefaultBinaryReader extends BinaryReader {
   def readWhole(path: File): Blob = {

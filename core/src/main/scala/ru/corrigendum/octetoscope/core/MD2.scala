@@ -19,6 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import java.nio.charset.StandardCharsets
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 // MD2 dissection is based on the Quake II source code,
 // available at <https://github.com/id-Software/Quake-2>.

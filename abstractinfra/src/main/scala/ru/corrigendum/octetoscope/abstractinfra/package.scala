@@ -16,10 +16,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.core
+package ru.corrigendum.octetoscope
 
-import java.io.File
-
-trait BinaryReader {
-  def readWhole(path: File): Blob
+package object abstractinfra {
+  type Blob = IndexedSeq[Byte]
 }

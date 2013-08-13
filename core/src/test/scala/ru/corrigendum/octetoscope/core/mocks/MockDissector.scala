@@ -18,7 +18,8 @@
 
 package ru.corrigendum.octetoscope.core.mocks
 
-import ru.corrigendum.octetoscope.core.{Atom, Blob, Piece, Dissector}
+import ru.corrigendum.octetoscope.abstractinfra.Blob
+import ru.corrigendum.octetoscope.core.{Atom, Piece, Dissector}
 import java.nio.charset.StandardCharsets
 
 object MockDissector extends Dissector {

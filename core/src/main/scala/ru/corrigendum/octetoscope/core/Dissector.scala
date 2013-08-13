@@ -18,6 +18,8 @@
 
 package ru.corrigendum.octetoscope.core
 
+import ru.corrigendum.octetoscope.abstractinfra.Blob
+
 trait Dissector {
   def dissect(input: Blob): Piece
 }

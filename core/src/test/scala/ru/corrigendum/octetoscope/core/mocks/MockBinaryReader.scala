@@ -18,8 +18,9 @@
 
 package ru.corrigendum.octetoscope.core.mocks
 
-import ru.corrigendum.octetoscope.core.{BinaryReader, Blob}
 import java.io.File
+import ru.corrigendum.octetoscope.abstractinfra.Blob
+import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
 
 class MockBinaryReader(result: Blob) extends BinaryReader {
   override def readWhole(path: File): Blob = result

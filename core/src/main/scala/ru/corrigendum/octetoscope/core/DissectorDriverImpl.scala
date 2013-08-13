@@ -19,6 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import java.io.File
+import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
 
 class DissectorDriverImpl(reader: BinaryReader, defaultDissector: Dissector) extends DissectorDriver {
   def dissect(path: File): Piece = defaultDissector.dissect(reader.readWhole(path))

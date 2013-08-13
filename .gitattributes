@@ -1,6 +1,7 @@
 *.bat text
 *.gradle text
 *.groovy text
+*.java text
 *.properties text
 *.scala text
 *.txt text

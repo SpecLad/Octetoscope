@@ -23,6 +23,9 @@ import ru.corrigendum.octetoscope.abstractinfra.Translation
 trait PresentationStrings {
   @Translation(format = "This is {0} version {1}.")
   def appVersionString(appName: String, version: String): String
+
+  @Translation(format = "Failed to read file:\n{0}")
+  def errorReadingFile(error: String): String
 }
 
 object PresentationStrings {

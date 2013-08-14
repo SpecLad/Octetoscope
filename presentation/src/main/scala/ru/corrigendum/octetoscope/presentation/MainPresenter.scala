@@ -18,10 +18,11 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView}
+import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.abstractui.MainView._
 import ru.corrigendum.octetoscope.core.{DissectorDriver, VersionInfo}
 import ru.corrigendum.octetoscope.abstractui.MainView.CommandEvent
+import java.io.IOException
 
 class MainPresenter(strings: PresentationStrings,
                     appName: String,
@@ -46,11 +47,18 @@ class MainPresenter(strings: PresentationStrings,
         case CommandEvent(MainView.Command.Open) => {
           pub.showFileOpenBox() match {
             case None =>
-            case Some(path) =>
-              pub.addTab(
-                path.getName, path.toString,
-                presentPiece(dissectorDriver.dissect(path))
-              ).subscribe(tabHandler)
+            case Some(path) => {
+              val piece = try {
+                dissectorDriver.dissect(path)
+              } catch {
+                case ioe: IOException => {
+                  boxer.showMessageBox(pub, strings.errorReadingFile(ioe.getMessage))
+                  return
+                }
+              }
+
+              pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(tabHandler)
+            }
           }
         }
 

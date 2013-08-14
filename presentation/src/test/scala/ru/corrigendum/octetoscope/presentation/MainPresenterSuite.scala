@@ -24,7 +24,7 @@ import ru.corrigendum.octetoscope.abstractui.MainView
 import org.scalatest.matchers.MustMatchers._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 import ru.corrigendum.octetoscope.core.{Atom, VersionInfo}
-import java.io.File
+import java.io.{IOException, File}
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
@@ -63,6 +63,17 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.selectedFile = None
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
     view.tabs must have size 0
+  }
+
+  test("open command - exception") {
+    view.selectedFile = Some(MainPresenterSuite.fakePath)
+    val exception = new IOException("whatever")
+    dissectorDriver.exception = Some(exception)
+
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+
+    view.tabs must have size 0
+    boxer.messages must equal (List((view, strings.errorReadingFile(exception.getMessage))))
   }
 
   test("open command - successful") {

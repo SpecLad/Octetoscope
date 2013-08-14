@@ -59,11 +59,13 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     boxer.messages must equal (List((view, strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours)))))
   }
 
-  test("open command") {
+  test("open command - cancelled") {
     view.selectedFile = None
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
     view.tabs must have size 0
+  }
 
+  test("open command - successful") {
     val fakePath = new File("/abra/cadabra")
 
     view.selectedFile = Some(fakePath)

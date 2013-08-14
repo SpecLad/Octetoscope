@@ -66,22 +66,24 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("open command - successful") {
-    val fakePath = new File("/abra/cadabra")
-
-    view.selectedFile = Some(fakePath)
+    view.selectedFile = Some(MainPresenterSuite.fakePath)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs must have size 1
     view.tabs.head.title must equal ("cadabra")
-    view.tabs.head.toolTip must equal (fakePath.toString)
-    view.tabs.head.tree must equal (presentPiece(dissectorDriver.dissect(fakePath)))
+    view.tabs.head.toolTip must equal (MainPresenterSuite.fakePath.toString)
+    view.tabs.head.tree must equal (presentPiece(dissectorDriver.dissect(MainPresenterSuite.fakePath)))
   }
 
   test("tab closing") {
-    view.selectedFile = Some(new File("/abra/cadabra"))
+    view.selectedFile = Some(MainPresenterSuite.fakePath)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs.head.trigger(MainView.TabClosedEvent)
     view.tabs must have size 0
   }
+}
+
+object MainPresenterSuite {
+  private val fakePath = new File("/abra/cadabra")
 }

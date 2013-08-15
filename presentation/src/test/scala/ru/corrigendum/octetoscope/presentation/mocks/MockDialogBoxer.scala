@@ -21,12 +21,12 @@ package ru.corrigendum.octetoscope.presentation.mocks
 import ru.corrigendum.octetoscope.presentation.DialogBoxer
 import ru.corrigendum.octetoscope.abstractui.View
 
-class MockDialogBoxer extends DialogBoxer{
-  var _messages: List[(View, String)] = Nil
+class MockDialogBoxer extends DialogBoxer {
+  var _messages: List[String] = Nil
 
   def messages = _messages
 
-  override def showMessageBox(view: View, text: String) {
-    _messages +:= (view, text)
+  override def showMessageBox(text: String) {
+    _messages +:= text
   }
 }

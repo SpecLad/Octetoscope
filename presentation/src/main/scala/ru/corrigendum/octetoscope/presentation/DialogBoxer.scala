@@ -21,5 +21,5 @@ package ru.corrigendum.octetoscope.presentation
 import ru.corrigendum.octetoscope.abstractui.View
 
 trait DialogBoxer {
-  def showMessageBox(view: View, text: String)
+  def showMessageBox(text: String)
 }

@@ -39,7 +39,7 @@ object Octetoscope extends App {
   SwingApplication.start(uiStrings,
     view => new MainPresenter(
       presentationStrings, APPLICATION_NAME, view,
-      new DialogBoxerImpl(APPLICATION_NAME),
+      new DialogBoxerImpl(view, APPLICATION_NAME),
       new DissectorDriverImpl(DefaultBinaryReader, MD2)
     ))
 }

@@ -56,7 +56,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
-    boxer.messages must equal (List((view, strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours)))))
+    boxer.messages must equal (List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours))))
   }
 
   test("open command - cancelled") {
@@ -73,7 +73,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs must have size 0
-    boxer.messages must equal (List((view, strings.errorReadingFile(exception.getMessage))))
+    boxer.messages must equal (List(strings.errorReadingFile(exception.getMessage)))
   }
 
   test("open command - successful") {

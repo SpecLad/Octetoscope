@@ -40,7 +40,7 @@ class MainPresenter(strings: PresentationStrings,
         case ClosedEvent => pub.dispose()
 
         case CommandEvent(MainView.Command.About) =>
-          boxer.showMessageBox(pub, strings.appVersionString(appName, presentVersionInfo(VersionInfo.ours)))
+          boxer.showMessageBox(strings.appVersionString(appName, presentVersionInfo(VersionInfo.ours)))
 
         case CommandEvent(MainView.Command.Quit) => pub.dispose()
 
@@ -52,7 +52,7 @@ class MainPresenter(strings: PresentationStrings,
                 dissectorDriver.dissect(path)
               } catch {
                 case ioe: IOException => {
-                  boxer.showMessageBox(pub, strings.errorReadingFile(ioe.getMessage))
+                  boxer.showMessageBox(strings.errorReadingFile(ioe.getMessage))
                   return
                 }
               }

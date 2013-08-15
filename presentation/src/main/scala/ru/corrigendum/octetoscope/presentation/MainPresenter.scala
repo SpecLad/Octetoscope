@@ -48,7 +48,7 @@ class MainPresenter(strings: PresentationStrings,
           pub.showFileOpenBox() match {
             case None =>
             case Some(path) => {
-              val piece = try {
+              val maybePiece = try {
                 dissectorDriver.dissect(path)
               } catch {
                 case ioe: IOException => {
@@ -57,7 +57,13 @@ class MainPresenter(strings: PresentationStrings,
                 }
               }
 
-              pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(tabHandler)
+              maybePiece match {
+                case None =>
+                  boxer.showMessageBox(strings.cantDissectEmptyFile())
+                case Some(piece) =>
+                  pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(tabHandler)
+              }
+
             }
           }
         }

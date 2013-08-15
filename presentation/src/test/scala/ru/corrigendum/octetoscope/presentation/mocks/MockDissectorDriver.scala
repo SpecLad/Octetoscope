@@ -21,11 +21,12 @@ package ru.corrigendum.octetoscope.presentation.mocks
 import ru.corrigendum.octetoscope.core.{Piece, DissectorDriver}
 import java.io.{IOException, File}
 
-class MockDissectorDriver(result: Piece) extends DissectorDriver {
-  def dissect(path: File): Piece = {
+class MockDissectorDriver extends DissectorDriver {
+  override def dissect(path: File): Option[Piece] = {
     exception.foreach(throw _)
     result
   }
 
+  var result: Option[Piece] = None
   var exception: Option[Exception] = None
 }

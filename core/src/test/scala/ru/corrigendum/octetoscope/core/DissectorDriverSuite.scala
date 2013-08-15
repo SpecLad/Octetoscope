@@ -25,9 +25,19 @@ import java.nio.charset.StandardCharsets
 import java.io.File
 
 class DissectorDriverSuite extends FunSuite {
-  test("dissect") {
+  test("dissect empty") {
+    val reader = new MockBinaryReader(IndexedSeq.empty)
+    val driver = new DissectorDriverImpl(reader, MockDissector)
+    driver.dissect(DissectorDriverSuite.FakePath) must equal (None)
+  }
+
+  test("dissect nonempty") {
     val reader = new MockBinaryReader("magic".getBytes(StandardCharsets.US_ASCII))
     val driver = new DissectorDriverImpl(reader, MockDissector)
-    driver.dissect(new File("/abra/cadabra")) must equal (Atom("magic"))
+    driver.dissect(DissectorDriverSuite.FakePath) must equal (Some(Atom("magic")))
   }
+}
+
+object DissectorDriverSuite {
+  val FakePath = new File("/abra/cadabra")
 }

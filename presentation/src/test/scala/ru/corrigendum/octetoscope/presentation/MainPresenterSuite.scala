@@ -35,7 +35,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   before {
     view = new MockMainView()
     boxer = new MockDialogBoxer()
-    dissectorDriver = new MockDissectorDriver(Atom("dummy"))
+    dissectorDriver = new MockDissectorDriver()
     new MainPresenter(strings, "Blarf", view, boxer, dissectorDriver)
   }
 
@@ -76,18 +76,28 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     boxer.messages must equal (List(strings.errorReadingFile(exception.getMessage)))
   }
 
+  test("open command - empty") {
+    view.selectedFile = Some(MainPresenterSuite.FakePath)
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+
+    view.tabs must have size 0
+    boxer.messages must equal (List(strings.cantDissectEmptyFile()))
+  }
+
   test("open command - successful") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
+    dissectorDriver.result = Some(MainPresenterSuite.FakePiece)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs must have size 1
     view.tabs.head.title must equal ("cadabra")
     view.tabs.head.toolTip must equal (MainPresenterSuite.FakePath.toString)
-    view.tabs.head.tree must equal (presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath)))
+    view.tabs.head.tree must equal (presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath).get))
   }
 
   test("tab closing") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
+    dissectorDriver.result = Some(MainPresenterSuite.FakePiece)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs.head.trigger(MainView.TabClosedEvent)
@@ -97,4 +107,5 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
 object MainPresenterSuite {
   private val FakePath = new File("/abra/cadabra")
+  private val FakePiece = Atom("dummy")
 }

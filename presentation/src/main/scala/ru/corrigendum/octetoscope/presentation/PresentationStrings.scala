@@ -24,6 +24,9 @@ trait PresentationStrings {
   @Translation(format = "This is {0} version {1}.")
   def appVersionString(appName: String, version: String): String
 
+  @Translation(format = "The file you have selected is empty.\nEmpty files can't be dissected.")
+  def cantDissectEmptyFile(): String
+
   @Translation(format = "Failed to read file:\n{0}")
   def errorReadingFile(error: String): String
 }

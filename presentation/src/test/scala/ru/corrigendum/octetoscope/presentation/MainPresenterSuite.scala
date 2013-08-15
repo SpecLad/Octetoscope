@@ -66,7 +66,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("open command - exception") {
-    view.selectedFile = Some(MainPresenterSuite.fakePath)
+    view.selectedFile = Some(MainPresenterSuite.FakePath)
     val exception = new IOException("whatever")
     dissectorDriver.exception = Some(exception)
 
@@ -77,17 +77,17 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("open command - successful") {
-    view.selectedFile = Some(MainPresenterSuite.fakePath)
+    view.selectedFile = Some(MainPresenterSuite.FakePath)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs must have size 1
     view.tabs.head.title must equal ("cadabra")
-    view.tabs.head.toolTip must equal (MainPresenterSuite.fakePath.toString)
-    view.tabs.head.tree must equal (presentPiece(dissectorDriver.dissect(MainPresenterSuite.fakePath)))
+    view.tabs.head.toolTip must equal (MainPresenterSuite.FakePath.toString)
+    view.tabs.head.tree must equal (presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath)))
   }
 
   test("tab closing") {
-    view.selectedFile = Some(MainPresenterSuite.fakePath)
+    view.selectedFile = Some(MainPresenterSuite.FakePath)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs.head.trigger(MainView.TabClosedEvent)
@@ -96,5 +96,5 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 }
 
 object MainPresenterSuite {
-  private val fakePath = new File("/abra/cadabra")
+  private val FakePath = new File("/abra/cadabra")
 }

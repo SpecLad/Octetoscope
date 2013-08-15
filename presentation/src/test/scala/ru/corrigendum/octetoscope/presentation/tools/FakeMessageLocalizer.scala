@@ -25,7 +25,7 @@ object FakeMessageLocalizer {
   def localize[T](iface: Class[T]): T = iface.cast(Proxy.newProxyInstance(iface.getClassLoader, Array(iface),
     new InvocationHandler {
       def invoke(proxy: Any, method: Method, args: Array[AnyRef]): AnyRef =
-        method.getName + " (" + args.map(_.toString).mkString(", ") +
+        method.getName + " (" + (if (args eq null) "" else args.map(_.toString).mkString(", ")) +
           ") @" + (method.getName.hashCode + util.Arrays.hashCode(args)).toString
     }
   ))

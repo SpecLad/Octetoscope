@@ -24,20 +24,21 @@ import resource.managed
 import scala.util.control.Breaks._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
+import ru.corrigendum.octetoscope.core.ArrayBlob
 
 object DefaultBinaryReader extends BinaryReader {
   def readWhole(path: File): Blob = {
     val buffer = new Array[Byte](1024 * 1024)
-    val result = mutable.ArrayBuffer[Byte]()
+    val builder = new mutable.ArrayBuilder.ofByte
 
     for (file <- managed(new FileInputStream(path))) {
       breakable { while (true) {
         val bytesRead = file.read(buffer)
         if (bytesRead == -1) break()
-        result ++= buffer.take(bytesRead)
+        builder ++= buffer.take(bytesRead)
       }}
     }
 
-    result
+    new ArrayBlob(builder.result())
   }
 }

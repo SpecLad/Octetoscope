@@ -22,8 +22,9 @@ import java.io.File
 import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
 
 class DissectorDriverImpl(reader: BinaryReader, defaultDissector: Dissector) extends DissectorDriver {
-  override def dissect(path: File): Option[Piece] = reader.readWhole(path) match {
-    case IndexedSeq() => None
-    case nonEmptyBlob => Some(defaultDissector.dissect(nonEmptyBlob))
+  override def dissect(path: File): Option[Piece] =  {
+    val contents = reader.readWhole(path)
+    if (contents.size == 0) None
+    else Some(defaultDissector.dissect(contents))
   }
 }

@@ -26,7 +26,7 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 object MD2 extends Dissector {
   private def dissectString(input: Blob): Piece = {
-    Atom(new String(Array(input: _*), StandardCharsets.US_ASCII))
+    Atom(new String(input.toArray, StandardCharsets.US_ASCII))
   }
 
   private def unsign(b: Byte): Int = if(b >= 0) b else 256 + b

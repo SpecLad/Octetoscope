@@ -18,27 +18,22 @@
 
 package ru.corrigendum.octetoscope.core
 
-import org.scalatest.matchers.MustMatchers._
-import org.scalatest.FunSuite
-import ru.corrigendum.octetoscope.core.mocks.{MockDissector, MockBinaryReader}
-import java.nio.charset.StandardCharsets
-import java.io.File
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-class DissectorDriverSuite extends FunSuite {
-  test("dissect empty") {
-    val reader = new MockBinaryReader(Blob.empty)
-    val driver = new DissectorDriverImpl(reader, MockDissector)
-    driver.dissect(DissectorDriverSuite.FakePath) must equal (None)
+class ArrayBlob private (array: Array[Byte], offset: Int, length: Int) extends Blob {
+  def this(array: Array[Byte]) = this(array, 0, array.length)
+
+  override def apply(index: Long): Byte = {
+    if (index < 0 || index >= length) throw new IndexOutOfBoundsException
+    array(offset + index.toInt)
   }
 
-  test("dissect nonempty") {
-    val reader = new MockBinaryReader(new ArrayBlob("magic".getBytes(StandardCharsets.US_ASCII)))
-    val driver = new DissectorDriverImpl(reader, MockDissector)
-    driver.dissect(DissectorDriverSuite.FakePath) must equal (Some(Atom("magic")))
-  }
-}
+  override def size: Long = length
 
-object DissectorDriverSuite {
-  val FakePath = new File("/abra/cadabra")
+  override def slice(start: Long, end: Long): Blob = {
+    if (start < 0 || end >= length || start > end) throw new IndexOutOfBoundsException
+    new ArrayBlob(array, offset + start.toInt, end.toInt - start.toInt)
+  }
+
+  override def toArray: Array[Byte] = array.slice(offset, offset + length)
 }

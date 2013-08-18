@@ -32,14 +32,20 @@ package object presentation {
   }
 
   private[presentation] def presentPiece(piece: Piece): DisplayTreeNode = {
-    def helper(np: NamedPiece): DisplayTreeNode =
+    def helper(np: NamedPiece): DisplayTreeNode = {
+      val displayText = np.piece.repr match {
+        case None => np.name
+        case Some(repr) => np.name + ": " + repr
+      }
+
       DisplayTreeNode(
-        np.name + ": " + np.piece.repr,
+        displayText,
         np.piece match {
           case _: Atom => Nil
           case m: Molecule => m.children.map(helper)
         }
       )
+    }
 
     helper(NamedPiece("WHOLE", piece))
   }

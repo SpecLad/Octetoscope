@@ -32,20 +32,24 @@ class PackageSuite extends FunSuite {
     presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = true)) must equal ("1.2+34-g1234123-dirty")
   }
 
-  test("presentPiece - atom") {
-    presentPiece(Atom("alpha")) must equal (DisplayTreeNode("WHOLE: alpha", Nil))
+  test("presentPiece - atom - with value") {
+    presentPiece(Atom(Some("alpha"))) must equal (DisplayTreeNode("WHOLE: alpha", Nil))
+  }
+
+  test("presentPiece - atom - without value") {
+    presentPiece(Atom(None)) must equal (DisplayTreeNode("WHOLE", Nil))
   }
 
   test("presentPiece - molecule") {
     val molecule =
-      Molecule("beta", Seq(
-        NamedPiece("one", Atom("gamma")),
-        NamedPiece("two", Atom("delta"))))
+      Molecule(Some("beta"), Seq(
+        NamedPiece("one", Atom(Some("gamma"))),
+        NamedPiece("two", Atom(None))))
 
     val displayed =
       DisplayTreeNode("WHOLE: beta", Seq(
         DisplayTreeNode("one: gamma", Nil),
-        DisplayTreeNode("two: delta", Nil)
+        DisplayTreeNode("two", Nil)
       ))
 
     presentPiece(molecule) must equal (displayed)

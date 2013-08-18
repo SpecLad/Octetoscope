@@ -26,17 +26,17 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 object MD2 extends Dissector {
   private def dissectString(input: Blob): Piece = {
-    Atom(new String(input.toArray, StandardCharsets.US_ASCII))
+    Atom(Some(new String(input.toArray, StandardCharsets.US_ASCII)))
   }
 
   private def unsign(b: Byte): Int = if(b >= 0) b else 256 + b
 
   private def dissectInt(input: Blob): Piece = {
-    Atom(
+    Atom(Some(
       (unsign(input(0))
       | (unsign(input(1)) << 8)
       | (unsign(input(2)) << 16)
-      | (unsign(input(3)) << 24)).toString)
+      | (unsign(input(3)) << 24)).toString))
   }
 
   private def dissectHeader(input: Blob): Piece = {
@@ -65,11 +65,11 @@ object MD2 extends Dissector {
     children += NamedPiece("Offset of OpenGL commands", dissectInt(input.slice(60, 64)))
     children += NamedPiece("File size", dissectInt(input.slice(64, 68)))
 
-    Molecule("Header", children.result())
+    Molecule(None, children.result())
   }
 
   override def dissect(input: Blob): Piece = {
 
-    Molecule("MD2", Seq(NamedPiece("Header", dissectHeader(input))))
+    Molecule(Some("MD2"), Seq(NamedPiece("Header", dissectHeader(input))))
   }
 }

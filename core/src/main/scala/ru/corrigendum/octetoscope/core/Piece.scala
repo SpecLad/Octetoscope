@@ -19,11 +19,11 @@
 package ru.corrigendum.octetoscope.core
 
 abstract sealed class Piece {
-  def repr: String
+  def repr: Option[String]
 }
 
-sealed case class Atom(repr: String) extends Piece
+sealed case class Atom(repr: Option[String]) extends Piece
 
 sealed case class NamedPiece(name: String, piece: Piece)
 
-sealed case class Molecule(repr: String, children: Seq[NamedPiece]) extends Piece
+sealed case class Molecule(repr: Option[String], children: Seq[NamedPiece]) extends Piece

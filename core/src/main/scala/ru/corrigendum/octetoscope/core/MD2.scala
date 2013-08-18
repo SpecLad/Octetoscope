@@ -42,30 +42,30 @@ object MD2 extends Dissector {
   private def dissectHeader(input: Blob): Piece = {
     // Quake II's struct dmdl_t.
 
-    val children = Vector.newBuilder[NamedPiece]
+    val builder = new MoleculeBuilder
 
-    children += NamedPiece("Identification", dissectString(input.slice(0, 4)))
-    children += NamedPiece("Version", dissectInt(input.slice(4, 8)))
+    builder.addChild("Identification", dissectString(input.slice(0, 4)))
+    builder.addChild("Version", dissectInt(input.slice(4, 8)))
 
-    children += NamedPiece("Skin width", dissectInt(input.slice(8, 12)))
-    children += NamedPiece("Skin height", dissectInt(input.slice(12, 16)))
-    children += NamedPiece("Frame size", dissectInt(input.slice(16, 20)))
+    builder.addChild("Skin width", dissectInt(input.slice(8, 12)))
+    builder.addChild("Skin height", dissectInt(input.slice(12, 16)))
+    builder.addChild("Frame size", dissectInt(input.slice(16, 20)))
 
-    children += NamedPiece("Number of skins", dissectInt(input.slice(20, 24)))
-    children += NamedPiece("Number of vertices", dissectInt(input.slice(24, 28)))
-    children += NamedPiece("Number of texture coordinates", dissectInt(input.slice(28, 32)))
-    children += NamedPiece("Number of triangles", dissectInt(input.slice(32, 36)))
-    children += NamedPiece("Number of OpenGL commands", dissectInt(input.slice(36, 40)))
-    children += NamedPiece("Number of frames", dissectInt(input.slice(40, 44)))
+    builder.addChild("Number of skins", dissectInt(input.slice(20, 24)))
+    builder.addChild("Number of vertices", dissectInt(input.slice(24, 28)))
+    builder.addChild("Number of texture coordinates", dissectInt(input.slice(28, 32)))
+    builder.addChild("Number of triangles", dissectInt(input.slice(32, 36)))
+    builder.addChild("Number of OpenGL commands", dissectInt(input.slice(36, 40)))
+    builder.addChild("Number of frames", dissectInt(input.slice(40, 44)))
 
-    children += NamedPiece("Offset of skins", dissectInt(input.slice(44, 48)))
-    children += NamedPiece("Offset of texture coordinates", dissectInt(input.slice(48, 52)))
-    children += NamedPiece("Offset of triangles", dissectInt(input.slice(52, 56)))
-    children += NamedPiece("Offset of frames", dissectInt(input.slice(56, 60)))
-    children += NamedPiece("Offset of OpenGL commands", dissectInt(input.slice(60, 64)))
-    children += NamedPiece("File size", dissectInt(input.slice(64, 68)))
+    builder.addChild("Offset of skins", dissectInt(input.slice(44, 48)))
+    builder.addChild("Offset of texture coordinates", dissectInt(input.slice(48, 52)))
+    builder.addChild("Offset of triangles", dissectInt(input.slice(52, 56)))
+    builder.addChild("Offset of frames", dissectInt(input.slice(56, 60)))
+    builder.addChild("Offset of OpenGL commands", dissectInt(input.slice(60, 64)))
+    builder.addChild("File size", dissectInt(input.slice(64, 68)))
 
-    Molecule(None, children.result())
+    builder.build()
   }
 
   override def dissect(input: Blob): Piece = {

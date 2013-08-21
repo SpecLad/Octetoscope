@@ -31,7 +31,7 @@ class ArrayBlob private (array: Array[Byte], offset: Int, length: Int) extends B
   override def size: Long = length
 
   override def slice(start: Long, end: Long): Blob = {
-    if (start < 0 || end >= length || start > end) throw new IndexOutOfBoundsException
+    if (start < 0 || end > length || start > end) throw new IndexOutOfBoundsException
     new ArrayBlob(array, offset + start.toInt, end.toInt - start.toInt)
   }
 

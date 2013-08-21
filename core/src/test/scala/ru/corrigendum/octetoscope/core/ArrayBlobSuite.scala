@@ -48,8 +48,11 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("slice - normal") {
-    val slice = blob.slice(2, 4)
-    slice.toArray must equal (Array[Byte](5, 6))
+    blob.slice(2, 4).toArray must equal (Array[Byte](5, 6))
+    blob.slice(0, 4).toArray must equal (Array[Byte](3, 4, 5, 6))
+    blob.slice(2, 5).toArray must equal (Array[Byte](5, 6, 7))
+    blob.slice(0, 5).toArray must equal (Array[Byte](3, 4, 5, 6, 7))
+    blob.slice(2, 2).toArray must equal (Array[Byte]())
   }
 
   test("slice - out of range") {

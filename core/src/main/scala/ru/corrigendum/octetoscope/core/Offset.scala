@@ -16,27 +16,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.abstractinfra
+package ru.corrigendum.octetoscope.core
 
-trait Blob {
-  def apply(index: Long): Byte
-  def size: Long
-  def slice(start: Long, end: Long = size): Blob
-  def toArray: Array[Byte]
-}
-
-object Blob {
-  private val emptyArray = Array[Byte]()
-
-  val empty: Blob = new Blob {
-    override def apply(index: Long): Byte = throw new IndexOutOfBoundsException
-
-    override def size: Long = 0
-
-    override def slice(start: Long, end: Long): Blob =
-      if (start == 0 && end == 0) empty
-      else throw new IndexOutOfBoundsException
-
-    override def toArray: Array[Byte] = emptyArray
-  }
-}
+sealed case class Offset(bytes: Long = 0)

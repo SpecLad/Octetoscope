@@ -21,5 +21,5 @@ package ru.corrigendum.octetoscope.core
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 trait Dissector {
-  def dissect(input: Blob): Piece
+  def dissect(input: Blob, offset: Offset = Offset()): Piece
 }

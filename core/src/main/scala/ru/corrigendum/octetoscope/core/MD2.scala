@@ -68,7 +68,7 @@ object MD2 extends Dissector {
     builder.build()
   }
 
-  override def dissect(input: Blob): Piece = {
+  override def dissect(input: Blob, offset: Offset): Piece = {
 
     Molecule(Some("MD2"), Seq(NamedPiece("Header", dissectHeader(input))))
   }

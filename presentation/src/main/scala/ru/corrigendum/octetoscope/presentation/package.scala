@@ -32,7 +32,7 @@ package object presentation {
   }
 
   private[presentation] def presentPiece(piece: Piece): DisplayTreeNode = {
-    def helper(np: NamedPiece): DisplayTreeNode = {
+    def helper(np: SubPiece): DisplayTreeNode = {
       val displayText = np.piece.repr match {
         case None => np.name
         case Some(repr) => np.name + ": " + repr
@@ -47,6 +47,6 @@ package object presentation {
       )
     }
 
-    helper(NamedPiece("WHOLE", piece))
+    helper(SubPiece("WHOLE", Offset(), piece))
   }
 }

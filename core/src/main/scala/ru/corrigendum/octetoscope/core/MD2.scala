@@ -30,32 +30,32 @@ object MD2 extends Dissector {
 
     val builder = new MoleculeBuilder
 
-    builder.addChild("Identification", AsciiString(4).dissect(input, Offset(0)))
-    builder.addChild("Version", SInt32L.dissect(input, Offset(4)))
+    builder.addChild("Identification", Offset(), AsciiString(4).dissect(input, Offset(0)))
+    builder.addChild("Version", Offset(), SInt32L.dissect(input, Offset(4)))
 
-    builder.addChild("Skin width", SInt32L.dissect(input, Offset(8)))
-    builder.addChild("Skin height", SInt32L.dissect(input, Offset(12)))
-    builder.addChild("Frame size", SInt32L.dissect(input, Offset(16)))
+    builder.addChild("Skin width", Offset(), SInt32L.dissect(input, Offset(8)))
+    builder.addChild("Skin height", Offset(), SInt32L.dissect(input, Offset(12)))
+    builder.addChild("Frame size", Offset(), SInt32L.dissect(input, Offset(16)))
 
-    builder.addChild("Number of skins", SInt32L.dissect(input, Offset(20)))
-    builder.addChild("Number of vertices", SInt32L.dissect(input, Offset(24)))
-    builder.addChild("Number of texture coordinates", SInt32L.dissect(input, Offset(28)))
-    builder.addChild("Number of triangles", SInt32L.dissect(input, Offset(32)))
-    builder.addChild("Number of OpenGL commands", SInt32L.dissect(input, Offset(36)))
-    builder.addChild("Number of frames", SInt32L.dissect(input, Offset(40)))
+    builder.addChild("Number of skins", Offset(), SInt32L.dissect(input, Offset(20)))
+    builder.addChild("Number of vertices", Offset(), SInt32L.dissect(input, Offset(24)))
+    builder.addChild("Number of texture coordinates", Offset(), SInt32L.dissect(input, Offset(28)))
+    builder.addChild("Number of triangles", Offset(), SInt32L.dissect(input, Offset(32)))
+    builder.addChild("Number of OpenGL commands", Offset(), SInt32L.dissect(input, Offset(36)))
+    builder.addChild("Number of frames", Offset(), SInt32L.dissect(input, Offset(40)))
 
-    builder.addChild("Offset of skins", SInt32L.dissect(input, Offset(44)))
-    builder.addChild("Offset of texture coordinates", SInt32L.dissect(input, Offset(48)))
-    builder.addChild("Offset of triangles", SInt32L.dissect(input, Offset(52)))
-    builder.addChild("Offset of frames", SInt32L.dissect(input, Offset(56)))
-    builder.addChild("Offset of OpenGL commands", SInt32L.dissect(input, Offset(60)))
-    builder.addChild("File size", SInt32L.dissect(input, Offset(64)))
+    builder.addChild("Offset of skins", Offset(), SInt32L.dissect(input, Offset(44)))
+    builder.addChild("Offset of texture coordinates", Offset(), SInt32L.dissect(input, Offset(48)))
+    builder.addChild("Offset of triangles", Offset(), SInt32L.dissect(input, Offset(52)))
+    builder.addChild("Offset of frames", Offset(), SInt32L.dissect(input, Offset(56)))
+    builder.addChild("Offset of OpenGL commands", Offset(), SInt32L.dissect(input, Offset(60)))
+    builder.addChild("File size", Offset(), SInt32L.dissect(input, Offset(64)))
 
     builder.build()
   }
 
   override def dissect(input: Blob, offset: Offset): Piece = {
-
-    Molecule(Some("MD2"), Seq(NamedPiece("Header", dissectHeader(input))))
+    val header = dissectHeader(input)
+    Molecule(header.length, Some("MD2"), Seq(SubPiece("Header", offset, header)))
   }
 }

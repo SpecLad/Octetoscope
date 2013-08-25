@@ -29,22 +29,25 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("default") {
-    builder.build() must equal (Molecule(None, Seq()))
+    builder.build() must equal (Molecule(0, None, Seq()))
   }
 
   test("with repr") {
     builder.setRepr("value")
-    builder.build() must equal (Molecule(Some("value"), Seq()))
+    builder.build() must equal (Molecule(0, Some("value"), Seq()))
   }
 
   test("with children") {
-    builder.addChild("alpha", Atom(Some("a")))
-    builder.addChild("beta", Atom(None))
+    val alpha = SubPiece("alpha", Offset(0), Atom(8, Some("a")))
+    val beta = SubPiece("beta", Offset(2), Atom(16, None))
+    val gamma = SubPiece("gamma", Offset(1), Atom(8, None))
+
+    builder.addChild(alpha.name, alpha.offset, alpha.piece)
+    builder.addChild(beta.name, beta.offset, beta.piece)
+    builder.addChild(gamma.name, gamma.offset, gamma.piece)
+
     builder.build() must equal (
-      Molecule(None, Seq(
-        NamedPiece("alpha", Atom(Some("a"))),
-        NamedPiece("beta", Atom(None))
-      ))
+      Molecule(32, None, Seq(alpha, beta, gamma))
     )
   }
 }

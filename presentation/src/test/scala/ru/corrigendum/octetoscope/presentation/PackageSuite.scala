@@ -20,7 +20,7 @@ package ru.corrigendum.octetoscope.presentation
 
 import org.scalatest.FunSuite
 import org.scalatest.matchers.MustMatchers._
-import ru.corrigendum.octetoscope.core.{NamedPiece, Molecule, Atom, VersionInfo}
+import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 
 class PackageSuite extends FunSuite {
@@ -33,18 +33,18 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - atom - with value") {
-    presentPiece(Atom(Some("alpha"))) must equal (DisplayTreeNode("WHOLE: alpha", Nil))
+    presentPiece(Atom(40, Some("alpha"))) must equal (DisplayTreeNode("WHOLE: alpha", Nil))
   }
 
   test("presentPiece - atom - without value") {
-    presentPiece(Atom(None)) must equal (DisplayTreeNode("WHOLE", Nil))
+    presentPiece(Atom(16, None)) must equal (DisplayTreeNode("WHOLE", Nil))
   }
 
   test("presentPiece - molecule") {
     val molecule =
-      Molecule(Some("beta"), Seq(
-        NamedPiece("one", Atom(Some("gamma"))),
-        NamedPiece("two", Atom(None))))
+      Molecule(100, Some("beta"), Seq(
+        SubPiece("one", Offset(0), Atom(10, Some("gamma"))),
+        SubPiece("two", Offset(50), Atom(10, None))))
 
     val displayed =
       DisplayTreeNode("WHOLE: beta", Seq(

@@ -42,12 +42,14 @@ class PrimitiveDissectorsSuite extends FunSuite {
 
 object PrimitiveDissectorsSuite {
   def verify(dissector: Dissector, expectedRepr: String, bytes: Byte*) {
-    dissector.dissect(new ArrayBlob(bytes.toArray)) must equal (Atom(Some(expectedRepr)))
+    dissector.dissect(new ArrayBlob(bytes.toArray)) must equal (
+      Atom(bytes.size * Offset.BitsPerByte, Some(expectedRepr)))
   }
 
   def verifyWithPad(dissector: Dissector, expectedRepr: String, bytes: Byte*) {
     val paddedBytes = (-1).toByte +: bytes :+ (-1).toByte
     val blob = new ArrayBlob(paddedBytes.toArray)
-    dissector.dissect(blob, Offset(1)) must equal (Atom(Some(expectedRepr)))
+    dissector.dissect(blob, Offset(1)) must equal (
+      Atom(bytes.size * Offset.BitsPerByte, Some(expectedRepr)))
   }
 }

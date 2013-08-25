@@ -18,11 +18,18 @@
 
 package ru.corrigendum.octetoscope.core
 
-sealed case class Offset(bytes: Long = 0) {
-  def totalBits: Long = bytes * Offset.BitsPerByte
-  def - (that: Offset): Long = this.totalBits - that.totalBits
-}
+import org.scalatest.FunSuite
+import org.scalatest.matchers.MustMatchers._
 
-object Offset {
-  val BitsPerByte: Long = 8
+class OffsetSuite extends FunSuite {
+  test("totalBits") {
+    Offset(0).totalBits must equal (0)
+    Offset(3).totalBits must equal (24)
+  }
+
+  test("minus") {
+    (Offset(4) - Offset(4)) must equal (0)
+    (Offset(8) - Offset(4)) must equal (32)
+    (Offset(3) - Offset(4)) must equal (-8)
+  }
 }

@@ -24,5 +24,5 @@ import java.nio.charset.StandardCharsets
 
 object MockDissector extends Dissector {
   override def dissect(input: Blob, offset: Offset): Piece =
-    Atom(Some(new String(input.slice(offset.bytes).toArray, StandardCharsets.US_ASCII)))
+    Atom(Offset(input.size) - offset, Some(new String(input.slice(offset.bytes).toArray, StandardCharsets.US_ASCII)))
 }

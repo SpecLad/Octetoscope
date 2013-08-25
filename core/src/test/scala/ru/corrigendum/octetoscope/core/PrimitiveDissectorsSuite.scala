@@ -34,6 +34,10 @@ class PrimitiveDissectorsSuite extends FunSuite {
 
     verifyWithPad(SInt32L, "67305985", 1, 2, 3, 4)
   }
+  test("AsciiString") {
+    verify(AsciiString(4), "\"abcd\"", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
+    verifyWithPad(AsciiString(3), "\"efg\"", 'e'.toByte, 'f'.toByte, 'g'.toByte)
+  }
 }
 
 object PrimitiveDissectorsSuite {

@@ -19,6 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
+import java.nio.charset.StandardCharsets
 
 object PrimitiveDissectors {
   object SInt32L extends Dissector {
@@ -32,5 +33,20 @@ object PrimitiveDissectors {
 
       Atom(Some(value.toString))
     }
+  }
+
+  class AsciiString private (length: Int) extends Dissector {
+    override def dissect(input: Blob, offset: Offset): Piece = {
+      val Offset(bo) = offset
+
+      val value = new String(input.slice(bo, bo + length).toArray,
+        StandardCharsets.US_ASCII)
+
+      Atom(Some("\"" + value + "\""))
+    }
+  }
+
+  object AsciiString {
+    def apply(length: Int) = new AsciiString(length)
   }
 }

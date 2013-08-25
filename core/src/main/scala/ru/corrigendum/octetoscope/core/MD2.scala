@@ -18,7 +18,6 @@
 
 package ru.corrigendum.octetoscope.core
 
-import java.nio.charset.StandardCharsets
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import PrimitiveDissectors._
 
@@ -26,16 +25,12 @@ import PrimitiveDissectors._
 // available at <https://github.com/id-Software/Quake-2>.
 
 object MD2 extends Dissector {
-  private def dissectString(input: Blob): Piece = {
-    Atom(Some(new String(input.toArray, StandardCharsets.US_ASCII)))
-  }
-
   private def dissectHeader(input: Blob): Piece = {
     // Quake II's struct dmdl_t.
 
     val builder = new MoleculeBuilder
 
-    builder.addChild("Identification", dissectString(input.slice(0, 4)))
+    builder.addChild("Identification", AsciiString(4).dissect(input, Offset(0)))
     builder.addChild("Version", SInt32L.dissect(input, Offset(4)))
 
     builder.addChild("Skin width", SInt32L.dissect(input, Offset(8)))

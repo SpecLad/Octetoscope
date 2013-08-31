@@ -18,24 +18,14 @@
 
 package ru.corrigendum.octetoscope.core
 
-import org.scalatest.FunSuite
-import org.scalatest.matchers.MustMatchers._
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-class OffsetSuite extends FunSuite {
-  test("totalBits") {
-    Offset(0).totalBits must equal (0)
-    Offset(3).totalBits must equal (24)
-  }
+class SequentialAdder(blob: Blob, initialOffset: Offset, builder: MoleculeBuilder) {
+  var internalOffset = Offset()
 
-  test("plus") {
-    (Offset(4) + 0) must equal (Offset(4))
-    (Offset(4) + 8) must equal (Offset(5))
-    (Offset(4) + -16) must equal (Offset(2))
-  }
-
-  test("minus") {
-    (Offset(4) - Offset(4)) must equal (0)
-    (Offset(8) - Offset(4)) must equal (32)
-    (Offset(3) - Offset(4)) must equal (-8)
+  def apply(name: String, dissector: Dissector) {
+    val piece = dissector.dissect(blob, initialOffset + internalOffset.totalBits)
+    builder.addChild(name, internalOffset, piece)
+    internalOffset += piece.length
   }
 }

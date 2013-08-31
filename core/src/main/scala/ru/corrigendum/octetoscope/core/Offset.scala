@@ -21,6 +21,7 @@ package ru.corrigendum.octetoscope.core
 sealed case class Offset(bytes: Long = 0) {
   def totalBits: Long = bytes * Offset.BitsPerByte
   def - (that: Offset): Long = this.totalBits - that.totalBits
+  def + (bits: Long): Offset = { assert(bits % 8 == 0); Offset(bytes + bits / 8); }
 }
 
 object Offset {

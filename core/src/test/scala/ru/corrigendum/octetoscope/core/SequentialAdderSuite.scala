@@ -20,22 +20,20 @@ package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
 import org.scalatest.matchers.MustMatchers._
+import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 
-class OffsetSuite extends FunSuite {
-  test("totalBits") {
-    Offset(0).totalBits must equal (0)
-    Offset(3).totalBits must equal (24)
-  }
+class SequentialAdderSuite extends FunSuite {
+  test("apply") {
+    val blob = new ArrayBlob(Array[Byte](-1, 1, 0, 0, 0, 2, 0, 0, 0, -1))
+    val builder = new MoleculeBuilder
 
-  test("plus") {
-    (Offset(4) + 0) must equal (Offset(4))
-    (Offset(4) + 8) must equal (Offset(5))
-    (Offset(4) + -16) must equal (Offset(2))
-  }
+    val adder = new SequentialAdder(blob, Offset(1), builder)
+    adder("alpha", SInt32L)
+    adder("beta", SInt32L)
 
-  test("minus") {
-    (Offset(4) - Offset(4)) must equal (0)
-    (Offset(8) - Offset(4)) must equal (32)
-    (Offset(3) - Offset(4)) must equal (-8)
+    builder.build() must equal (Molecule(64, None, Seq(
+      SubPiece("alpha", Offset(0), Atom(32, Some("1"))),
+      SubPiece("beta", Offset(4), Atom(32, Some("2")))
+    )))
   }
 }

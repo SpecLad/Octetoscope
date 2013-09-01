@@ -21,16 +21,16 @@ package ru.corrigendum.octetoscope.core
 import scala.language.implicitConversions
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-trait MoleculeBuilderDissector {
-  def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder)
+trait MoleculeBuilderDissector[+Value] {
+  def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder): Value
 }
 
 object MoleculeBuilderDissector {
-  implicit def toDissector(mbd: MoleculeBuilderDissector): Dissector[Unit] = new Dissector[Unit] {
-    override def dissect(input: Blob, offset: Offset): (Piece, Unit) = {
+  implicit def toDissector[Value](mbd: MoleculeBuilderDissector[Value]): Dissector[Value] = new Dissector[Value] {
+    override def dissect(input: Blob, offset: Offset) = {
       val builder = new MoleculeBuilder
-      mbd.dissect(input, offset, builder)
-      (builder.build(), Unit)
+      val value = mbd.dissect(input, offset, builder)
+      (builder.build(), value)
     }
   }
 }

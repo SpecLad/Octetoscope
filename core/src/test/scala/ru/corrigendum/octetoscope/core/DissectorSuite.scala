@@ -24,9 +24,10 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class DissectorSuite extends FunSuite {
   test("MoleculeBuilderDissector to Dissector") {
-    val mbd = new MoleculeBuilderDissector {
-      def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) {
+    val mbd = new MoleculeBuilderDissector[Int] {
+      def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) = {
         builder.addChild("alpha", Offset(1), Atom(8, Some("a")))
+        60
       }
     }
 
@@ -35,7 +36,7 @@ class DissectorSuite extends FunSuite {
         Molecule(16, None, Seq(
           SubPiece("alpha", Offset(1), Atom(8, Some("a")))
         )),
-        ()
+        60
       )
     )
   }

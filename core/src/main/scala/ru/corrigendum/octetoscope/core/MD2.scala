@@ -24,8 +24,8 @@ import PrimitiveDissectors._
 // MD2 dissection is based on the Quake II source code,
 // available at <https://github.com/id-Software/Quake-2>.
 
-object MD2 extends MoleculeBuilderDissector {
-  private object Header extends MoleculeBuilderDissector {
+object MD2 extends MoleculeBuilderDissector[Unit] {
+  private object Header extends MoleculeBuilderDissector[Unit] {
     // Quake II's struct dmdl_t.
     override def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) {
       val adder = new SequentialAdder(input, offset, builder)

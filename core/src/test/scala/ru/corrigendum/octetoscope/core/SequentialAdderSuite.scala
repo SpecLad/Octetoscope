@@ -28,8 +28,8 @@ class SequentialAdderSuite extends FunSuite {
     val builder = new MoleculeBuilder
 
     val adder = new SequentialAdder(blob, Offset(1), builder)
-    adder("alpha", SInt32L)
-    adder("beta", SInt32L)
+    adder("alpha", SInt32L) must equal (1)
+    adder("beta", SInt32L) must equal (2)
 
     builder.build() must equal (Molecule(64, None, Seq(
       SubPiece("alpha", Offset(0), Atom(32, Some("1"))),

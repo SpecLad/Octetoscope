@@ -26,11 +26,11 @@ trait MoleculeBuilderDissector {
 }
 
 object MoleculeBuilderDissector {
-  implicit def toDissector(mbd: MoleculeBuilderDissector): Dissector = new Dissector {
-    override def dissect(input: Blob, offset: Offset): Piece = {
+  implicit def toDissector(mbd: MoleculeBuilderDissector): Dissector[Unit] = new Dissector[Unit] {
+    override def dissect(input: Blob, offset: Offset): (Piece, Unit) = {
       val builder = new MoleculeBuilder
       mbd.dissect(input, offset, builder)
-      builder.build()
+      (builder.build(), Unit)
     }
   }
 }

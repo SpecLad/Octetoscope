@@ -22,7 +22,11 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.{Offset, Atom, Piece, Dissector}
 import java.nio.charset.StandardCharsets
 
-object MockDissector extends Dissector {
-  override def dissect(input: Blob, offset: Offset): Piece =
-    Atom(Offset(input.size) - offset, Some(new String(input.slice(offset.bytes).toArray, StandardCharsets.US_ASCII)))
+object MockDissector extends Dissector[Unit] {
+  override def dissect(input: Blob, offset: Offset) =
+    (
+      Atom(Offset(input.size) - offset,
+        Some(new String(input.slice(offset.bytes).toArray, StandardCharsets.US_ASCII))),
+      Unit
+    )
 }

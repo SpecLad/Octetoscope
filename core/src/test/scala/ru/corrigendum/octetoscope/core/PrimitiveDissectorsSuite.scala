@@ -26,30 +26,39 @@ class PrimitiveDissectorsSuite extends FunSuite {
   import PrimitiveDissectorsSuite._
 
   test("SInt32L") {
-    verify(SInt32L, "0", 0, 0, 0, 0)
-    verify(SInt32L, "67305985", 1, 2, 3, 4)
-    verify(SInt32L, "83754751", -1, -2, -3, 4)
-    verify(SInt32L, "-50462977", -1, -2, -3, -4)
-    verify(SInt32L, "-1", -1, -1, -1, -1)
+    verify(SInt32L, "0", 0, 0, 0, 0, 0)
+    verify(SInt32L, "67305985", 67305985, 1, 2, 3, 4)
+    verify(SInt32L, "83754751", 83754751, -1, -2, -3, 4)
+    verify(SInt32L, "-50462977", -50462977, -1, -2, -3, -4)
+    verify(SInt32L, "-1", -1, -1, -1, -1, -1)
 
-    verifyWithPad(SInt32L, "67305985", 1, 2, 3, 4)
+    verifyWithPad(SInt32L, "67305985", 67305985, 1, 2, 3, 4)
   }
+
   test("AsciiString") {
-    verify(AsciiString(4), "\"abcd\"", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
-    verifyWithPad(AsciiString(3), "\"efg\"", 'e'.toByte, 'f'.toByte, 'g'.toByte)
+    verify(AsciiString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
+    verifyWithPad(AsciiString(3), "\"efg\"", "efg", 'e'.toByte, 'f'.toByte, 'g'.toByte)
   }
 }
 
 object PrimitiveDissectorsSuite {
-  def verify(dissector: Dissector, expectedRepr: String, bytes: Byte*) {
+  def verify[Value](dissector: Dissector[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
     dissector.dissect(new ArrayBlob(bytes.toArray)) must equal (
-      Atom(bytes.size * Offset.BitsPerByte, Some(expectedRepr)))
+      (
+        Atom(bytes.size * Offset.BitsPerByte, Some(expectedRepr)),
+        expectedValue
+      )
+    )
   }
 
-  def verifyWithPad(dissector: Dissector, expectedRepr: String, bytes: Byte*) {
+  def verifyWithPad[Value](dissector: Dissector[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
     val paddedBytes = (-1).toByte +: bytes :+ (-1).toByte
     val blob = new ArrayBlob(paddedBytes.toArray)
     dissector.dissect(blob, Offset(1)) must equal (
-      Atom(bytes.size * Offset.BitsPerByte, Some(expectedRepr)))
+      (
+        Atom(bytes.size * Offset.BitsPerByte, Some(expectedRepr)),
+        expectedValue
+      )
+    )
   }
 }

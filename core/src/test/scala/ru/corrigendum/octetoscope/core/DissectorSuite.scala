@@ -31,9 +31,12 @@ class DissectorSuite extends FunSuite {
     }
 
     MoleculeBuilderDissector.toDissector(mbd).dissect(Blob.empty) must equal (
-      Molecule(16, None, Seq(
-        SubPiece("alpha", Offset(1), Atom(8, Some("a")))
-      ))
+      (
+        Molecule(16, None, Seq(
+          SubPiece("alpha", Offset(1), Atom(8, Some("a")))
+        )),
+        ()
+      )
     )
   }
 }

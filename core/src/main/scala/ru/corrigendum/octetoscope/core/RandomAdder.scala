@@ -18,22 +18,12 @@
 
 package ru.corrigendum.octetoscope.core
 
-import org.scalatest.FunSuite
-import org.scalatest.matchers.MustMatchers._
-import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-class SequentialAdderSuite extends FunSuite {
-  test("apply") {
-    val blob = new ArrayBlob(Array[Byte](-1, 1, 0, 0, 0, 2, 0, 0, 0, -1))
-    val builder = new MoleculeBuilder
-
-    val adder = new SequentialAdder(blob, Offset(1), builder)
-    adder("alpha", SInt32L) must equal (1)
-    adder("beta", SInt32L) must equal (2)
-
-    builder.build() must equal (Molecule(64, None, Seq(
-      SubPiece("alpha", Offset(0), Atom(32, Some("1"))),
-      SubPiece("beta", Offset(4), Atom(32, Some("2")))
-    )))
+class RandomAdder(blob: Blob, initialOffset: Offset, builder: MoleculeBuilder) {
+  def apply[Value](name: String, offset: Offset, dissector: Dissector[Value]): Value = {
+    val (piece, value) = dissector.dissect(blob, initialOffset + offset.totalBits)
+    builder.addChild(name, offset, piece)
+    value
   }
 }

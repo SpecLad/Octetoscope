@@ -54,8 +54,8 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
   }
 
   override def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) {
-    val (header, _) = Header.dissect(input, offset)
-    builder.addChild("Header", Offset(), header)
+    val adder = new RandomAdder(input, offset, builder)
+    adder("Header", Offset(0), Header)
     builder.setRepr("MD2")
   }
 }

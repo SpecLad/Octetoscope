@@ -24,39 +24,38 @@ import PrimitiveDissectors._
 // MD2 dissection is based on the Quake II source code,
 // available at <https://github.com/id-Software/Quake-2>.
 
-object MD2 extends Dissector {
-  private def dissectHeader(input: Blob): Piece = {
+object MD2 extends MoleculeBuilderDissector {
+  private object Header extends MoleculeBuilderDissector {
     // Quake II's struct dmdl_t.
+    override def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) {
+      val adder = new SequentialAdder(input, offset, builder)
 
-    val builder = new MoleculeBuilder
-    val adder = new SequentialAdder(input, Offset(), builder)
+      adder("Identification", AsciiString(4))
+      adder("Version", SInt32L)
 
-    adder("Identification", AsciiString(4))
-    adder("Version", SInt32L)
+      adder("Skin width", SInt32L)
+      adder("Skin height", SInt32L)
+      adder("Frame size", SInt32L)
 
-    adder("Skin width", SInt32L)
-    adder("Skin height", SInt32L)
-    adder("Frame size", SInt32L)
+      adder("Number of skins", SInt32L)
+      adder("Number of vertices", SInt32L)
+      adder("Number of texture coordinates", SInt32L)
+      adder("Number of triangles", SInt32L)
+      adder("Number of OpenGL commands", SInt32L)
+      adder("Number of frames", SInt32L)
 
-    adder("Number of skins", SInt32L)
-    adder("Number of vertices", SInt32L)
-    adder("Number of texture coordinates", SInt32L)
-    adder("Number of triangles", SInt32L)
-    adder("Number of OpenGL commands", SInt32L)
-    adder("Number of frames", SInt32L)
-
-    adder("Offset of skins", SInt32L)
-    adder("Offset of texture coordinates", SInt32L)
-    adder("Offset of triangles", SInt32L)
-    adder("Offset of frames", SInt32L)
-    adder("Offset of OpenGL commands", SInt32L)
-    adder("File size", SInt32L)
-
-    builder.build()
+      adder("Offset of skins", SInt32L)
+      adder("Offset of texture coordinates", SInt32L)
+      adder("Offset of triangles", SInt32L)
+      adder("Offset of frames", SInt32L)
+      adder("Offset of OpenGL commands", SInt32L)
+      adder("File size", SInt32L)
+    }
   }
 
-  override def dissect(input: Blob, offset: Offset): Piece = {
-    val header = dissectHeader(input)
-    Molecule(header.length, Some("MD2"), Seq(SubPiece("Header", offset, header)))
+  override def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) {
+    val header = Header.dissect(input, offset)
+    builder.addChild("Header", Offset(), header)
+    builder.setRepr("MD2")
   }
 }

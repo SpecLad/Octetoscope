@@ -39,6 +39,13 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(AsciiString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
     verifyWithPad(AsciiString(3), "\"efg\"", "efg", 'e'.toByte, 'f'.toByte, 'g'.toByte)
   }
+
+  test("AsciiZString") {
+    verify(AsciiZString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
+    verify(AsciiZString(4), "\"abc\"", "abc", 'a'.toByte, 'b'.toByte, 'c'.toByte, 0)
+    verify(AsciiZString(4), "\"ab\"", "ab", 'a'.toByte, 'b'.toByte, 0, 'd'.toByte)
+    verifyWithPad(AsciiZString(3), "\"ef\"", "ef", 'e'.toByte, 'f'.toByte, 0)
+  }
 }
 
 object PrimitiveDissectorsSuite {

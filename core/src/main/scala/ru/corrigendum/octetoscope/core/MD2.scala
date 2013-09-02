@@ -25,10 +25,11 @@ import PrimitiveDissectors._
 // available at <https://github.com/id-Software/Quake-2>.
 
 object MD2 extends MoleculeBuilderDissector[Unit] {
-  private object Header extends MoleculeBuilderDissector[Unit] {
+  private object Header extends MoleculeBuilderDissector[HeaderValue] {
     // Quake II's struct dmdl_t.
-    override def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) {
+    override def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) = {
       val adder = new SequentialAdder(input, offset, builder)
+      val value = new HeaderValue
 
       adder("Identification", AsciiString(4))
       adder("Version", SInt32L)
@@ -37,25 +38,42 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
       adder("Skin height", SInt32L)
       adder("Frame size", SInt32L)
 
-      adder("Number of skins", SInt32L)
+      value.numSkins = adder("Number of skins", SInt32L)
       adder("Number of vertices", SInt32L)
       adder("Number of texture coordinates", SInt32L)
       adder("Number of triangles", SInt32L)
       adder("Number of OpenGL commands", SInt32L)
       adder("Number of frames", SInt32L)
 
-      adder("Offset of skins", SInt32L)
+      value.offSkins = adder("Offset of skins", SInt32L)
       adder("Offset of texture coordinates", SInt32L)
       adder("Offset of triangles", SInt32L)
       adder("Offset of frames", SInt32L)
       adder("Offset of OpenGL commands", SInt32L)
       adder("File size", SInt32L)
+
+      value
+    }
+  }
+
+  private class HeaderValue {
+    var numSkins: Int = _
+    var offSkins: Int = _
+  }
+
+  private class Skins(numSkins: Int) extends MoleculeBuilderDissector[Unit] {
+    override def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) {
+      val adder = new SequentialAdder(input, offset, builder)
+
+      for (_ <- 0 until numSkins)
+        adder("Skin", AsciiZString(64))
     }
   }
 
   override def dissect(input: Blob, offset: Offset, builder: MoleculeBuilder) {
     val adder = new RandomAdder(input, offset, builder)
-    adder("Header", Offset(0), Header)
+    val header = adder("Header", Offset(0), Header)
+    adder("Skins", Offset(header.offSkins), new Skins(header.numSkins))
     builder.setRepr("MD2")
   }
 }

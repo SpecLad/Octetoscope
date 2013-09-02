@@ -35,18 +35,43 @@ object PrimitiveDissectors {
     }
   }
 
+  private object StringUtils {
+    def decode(input: Blob, byteOffset: Long, length: Int) = {
+      val value = new String(input.slice(byteOffset, byteOffset + length).toArray,
+        StandardCharsets.US_ASCII)
+      (Some("\"" + value + "\""), value)
+    }
+  }
+
   class AsciiString private (length: Int) extends Dissector[String] {
     override def dissect(input: Blob, offset: Offset) = {
       val Offset(bo) = offset
 
-      val value = new String(input.slice(bo, bo + length).toArray,
-        StandardCharsets.US_ASCII)
+      val (repr, value) = StringUtils.decode(input, bo, length)
 
-      (Atom(length * Offset.BitsPerByte, Some("\"" + value + "\"")), value)
+      (Atom(length * Offset.BitsPerByte, repr), value)
     }
   }
 
   object AsciiString {
     def apply(length: Int) = new AsciiString(length)
+  }
+
+  class AsciiZString private (length: Int) extends Dissector[String] {
+    override def dissect(input: Blob, offset: Offset) = {
+      val Offset(bo) = offset
+      var actualLen = 0
+
+      while (actualLen < length && input(bo + actualLen) != 0)
+        actualLen += 1
+
+      val (repr, value) = StringUtils.decode(input, bo, actualLen)
+
+      (Atom(length * Offset.BitsPerByte, repr), value)
+    }
+  }
+
+  object AsciiZString {
+    def apply(length: Int) = new AsciiZString(length)
   }
 }

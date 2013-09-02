@@ -26,25 +26,25 @@ class PrimitiveDissectorsSuite extends FunSuite {
   import PrimitiveDissectorsSuite._
 
   test("SInt32L") {
-    verify(SInt32L, "0", 0, 0, 0, 0, 0)
-    verify(SInt32L, "67305985", 67305985, 1, 2, 3, 4)
-    verify(SInt32L, "83754751", 83754751, -1, -2, -3, 4)
-    verify(SInt32L, "-50462977", -50462977, -1, -2, -3, -4)
-    verify(SInt32L, "-1", -1, -1, -1, -1, -1)
+    verify(sInt32L, "0", 0, 0, 0, 0, 0)
+    verify(sInt32L, "67305985", 67305985, 1, 2, 3, 4)
+    verify(sInt32L, "83754751", 83754751, -1, -2, -3, 4)
+    verify(sInt32L, "-50462977", -50462977, -1, -2, -3, -4)
+    verify(sInt32L, "-1", -1, -1, -1, -1, -1)
 
-    verifyWithPad(SInt32L, "67305985", 67305985, 1, 2, 3, 4)
+    verifyWithPad(sInt32L, "67305985", 67305985, 1, 2, 3, 4)
   }
 
   test("AsciiString") {
-    verify(AsciiString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
-    verifyWithPad(AsciiString(3), "\"efg\"", "efg", 'e'.toByte, 'f'.toByte, 'g'.toByte)
+    verify(asciiString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
+    verifyWithPad(asciiString(3), "\"efg\"", "efg", 'e'.toByte, 'f'.toByte, 'g'.toByte)
   }
 
   test("AsciiZString") {
-    verify(AsciiZString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
-    verify(AsciiZString(4), "\"abc\"", "abc", 'a'.toByte, 'b'.toByte, 'c'.toByte, 0)
-    verify(AsciiZString(4), "\"ab\"", "ab", 'a'.toByte, 'b'.toByte, 0, 'd'.toByte)
-    verifyWithPad(AsciiZString(3), "\"ef\"", "ef", 'e'.toByte, 'f'.toByte, 0)
+    verify(asciiZString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
+    verify(asciiZString(4), "\"abc\"", "abc", 'a'.toByte, 'b'.toByte, 'c'.toByte, 0)
+    verify(asciiZString(4), "\"ab\"", "ab", 'a'.toByte, 'b'.toByte, 0, 'd'.toByte)
+    verifyWithPad(asciiZString(3), "\"ef\"", "ef", 'e'.toByte, 'f'.toByte, 0)
   }
 }
 

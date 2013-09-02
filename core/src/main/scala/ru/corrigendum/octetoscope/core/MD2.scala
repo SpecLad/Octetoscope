@@ -31,26 +31,26 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
       val adder = new SequentialAdder(input, offset, builder)
       val value = new HeaderValue
 
-      adder("Identification", AsciiString(4))
-      adder("Version", SInt32L)
+      adder("Identification", asciiString(4))
+      adder("Version", sInt32L)
 
-      adder("Skin width", SInt32L)
-      adder("Skin height", SInt32L)
-      adder("Frame size", SInt32L)
+      adder("Skin width", sInt32L)
+      adder("Skin height", sInt32L)
+      adder("Frame size", sInt32L)
 
-      value.numSkins = adder("Number of skins", SInt32L)
-      adder("Number of vertices", SInt32L)
-      adder("Number of texture coordinates", SInt32L)
-      adder("Number of triangles", SInt32L)
-      adder("Number of OpenGL commands", SInt32L)
-      adder("Number of frames", SInt32L)
+      value.numSkins = adder("Number of skins", sInt32L)
+      adder("Number of vertices", sInt32L)
+      adder("Number of texture coordinates", sInt32L)
+      adder("Number of triangles", sInt32L)
+      adder("Number of OpenGL commands", sInt32L)
+      adder("Number of frames", sInt32L)
 
-      value.offSkins = adder("Offset of skins", SInt32L)
-      adder("Offset of texture coordinates", SInt32L)
-      adder("Offset of triangles", SInt32L)
-      adder("Offset of frames", SInt32L)
-      adder("Offset of OpenGL commands", SInt32L)
-      adder("File size", SInt32L)
+      value.offSkins = adder("Offset of skins", sInt32L)
+      adder("Offset of texture coordinates", sInt32L)
+      adder("Offset of triangles", sInt32L)
+      adder("Offset of frames", sInt32L)
+      adder("Offset of OpenGL commands", sInt32L)
+      adder("File size", sInt32L)
 
       value
     }
@@ -66,7 +66,7 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
       val adder = new SequentialAdder(input, offset, builder)
 
       for (_ <- 0 until numSkins)
-        adder("Skin", AsciiZString(64))
+        adder("Skin", asciiZString(64))
     }
   }
 

@@ -22,7 +22,7 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import java.nio.charset.StandardCharsets
 
 object PrimitiveDissectors {
-  object SInt32L extends Dissector[Int] {
+  private object SInt32L extends Dissector[Int] {
     override def dissect(input: Blob, offset: Offset) = {
       val Offset(bo) = offset
 
@@ -35,43 +35,37 @@ object PrimitiveDissectors {
     }
   }
 
-  private object StringUtils {
-    def decode(input: Blob, byteOffset: Long, length: Int) = {
-      val value = new String(input.slice(byteOffset, byteOffset + length).toArray,
+  def sInt32L: Dissector[Int] = SInt32L
+
+  abstract private class AsciiStringGeneric(length: Int) extends Dissector[String] {
+    def findLength(input: Blob, byteOffset: Long): Int
+
+    final override def dissect(input: Blob, offset: Offset) = {
+      val Offset(bo) = offset
+
+      val value = new String(input.slice(bo, bo + findLength(input, bo)).toArray,
         StandardCharsets.US_ASCII)
-      (Some("\"" + value + "\""), value)
+
+      (Atom(length * Offset.BitsPerByte, Some("\"" + value + "\"")), value)
     }
   }
 
-  class AsciiString private (length: Int) extends Dissector[String] {
-    override def dissect(input: Blob, offset: Offset) = {
-      val Offset(bo) = offset
-
-      val (repr, value) = StringUtils.decode(input, bo, length)
-
-      (Atom(length * Offset.BitsPerByte, repr), value)
-    }
+  private class AsciiString(length: Int) extends AsciiStringGeneric(length) {
+    override def findLength(input: Blob, byteOffset: Long): Int = length
   }
 
-  object AsciiString {
-    def apply(length: Int) = new AsciiString(length)
-  }
+  def asciiString(length: Int): Dissector[String] = new AsciiString(length)
 
-  class AsciiZString private (length: Int) extends Dissector[String] {
-    override def dissect(input: Blob, offset: Offset) = {
-      val Offset(bo) = offset
+  private class AsciiZString(length: Int) extends AsciiStringGeneric(length) {
+    def findLength(input: Blob, byteOffset: Long): Int = {
       var actualLen = 0
 
-      while (actualLen < length && input(bo + actualLen) != 0)
+      while (actualLen < length && input(byteOffset + actualLen) != 0)
         actualLen += 1
 
-      val (repr, value) = StringUtils.decode(input, bo, actualLen)
-
-      (Atom(length * Offset.BitsPerByte, repr), value)
+      actualLen
     }
   }
 
-  object AsciiZString {
-    def apply(length: Int) = new AsciiZString(length)
-  }
+  def asciiZString(length: Int): Dissector[String] = new AsciiZString(length)
 }

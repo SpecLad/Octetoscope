@@ -43,8 +43,8 @@ class PackageSuite extends FunSuite {
   test("presentPiece - molecule") {
     val molecule =
       Molecule(100, Some("beta"), Seq(
-        SubPiece("one", Offset(0), Atom(10, Some("gamma"))),
-        SubPiece("two", Offset(50), Atom(10, None))))
+        SubPiece("one", Bytes(0), Atom(10, Some("gamma"))),
+        SubPiece("two", Bytes(50), Atom(10, None))))
 
     val displayed =
       DisplayTreeNode("WHOLE: beta", Seq(

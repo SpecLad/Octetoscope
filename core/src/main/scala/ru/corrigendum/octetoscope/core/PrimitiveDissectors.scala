@@ -23,8 +23,8 @@ import java.nio.charset.StandardCharsets
 
 object PrimitiveDissectors {
   private object SInt32L extends Dissector[Int] {
-    override def dissect(input: Blob, offset: Offset) = {
-      val Offset(bo) = offset
+    override def dissect(input: Blob, offset: InfoSize) = {
+      val Bytes(bo) = offset
 
       val value = (input(bo) & 0xFF) |
         ((input(bo + 1) & 0xFF) << 8) |
@@ -40,13 +40,13 @@ object PrimitiveDissectors {
   abstract private class AsciiStringGeneric(length: Int) extends Dissector[String] {
     def findLength(input: Blob, byteOffset: Long): Int
 
-    final override def dissect(input: Blob, offset: Offset) = {
-      val Offset(bo) = offset
+    final override def dissect(input: Blob, offset: InfoSize) = {
+      val Bytes(bo) = offset
 
       val value = new String(input.slice(bo, bo + findLength(input, bo)).toArray,
         StandardCharsets.US_ASCII)
 
-      (Atom(length * Offset.BitsPerByte, Some("\"" + value + "\"")), value)
+      (Atom(length * InfoSize.BitsPerByte, Some("\"" + value + "\"")), value)
     }
   }
 

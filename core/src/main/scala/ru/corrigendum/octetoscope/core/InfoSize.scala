@@ -18,12 +18,19 @@
 
 package ru.corrigendum.octetoscope.core
 
-sealed case class Offset(bytes: Long = 0) {
-  def totalBits: Long = bytes * Offset.BitsPerByte
-  def - (that: Offset): Long = this.totalBits - that.totalBits
-  def + (bits: Long): Offset = { assert(bits % 8 == 0); Offset(bytes + bits / 8); }
+sealed case class InfoSize(bytes: Long = 0) {
+  assert(bytes >= 0)
+
+  def totalBits: Long = bytes * InfoSize.BitsPerByte
+  def - (that: InfoSize): Long = this.totalBits - that.totalBits
+  def + (bits: Long): InfoSize = { assert(bits % 8 == 0); InfoSize(bytes + bits / 8); }
 }
 
-object Offset {
+object InfoSize {
   val BitsPerByte: Long = 8
+}
+
+object Bytes {
+  def apply(bytes: Long) = InfoSize(bytes)
+  def unapply(size: InfoSize) = InfoSize.unapply(size)
 }

@@ -20,8 +20,8 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-class RandomAdder(blob: Blob, initialOffset: Offset, builder: MoleculeBuilder) {
-  def apply[Value](name: String, offset: Offset, dissector: Dissector[Value]): Value = {
+class RandomAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder) {
+  def apply[Value](name: String, offset: InfoSize, dissector: Dissector[Value]): Value = {
     val (piece, value) = dissector.dissect(blob, initialOffset + offset.totalBits)
     builder.addChild(name, offset, piece)
     value

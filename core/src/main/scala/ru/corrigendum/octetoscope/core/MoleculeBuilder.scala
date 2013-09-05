@@ -25,7 +25,7 @@ class MoleculeBuilder {
 
   def setRepr(repr: String) { this.repr = Some(repr) }
 
-  def addChild(name: String, offset: Offset, piece: Piece) {
+  def addChild(name: String, offset: InfoSize, piece: Piece) {
     childrenBuilder += SubPiece(name, offset, piece)
     length = math.max(length, offset.totalBits + piece.length)
   }

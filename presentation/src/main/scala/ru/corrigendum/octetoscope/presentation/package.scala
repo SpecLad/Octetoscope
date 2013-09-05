@@ -47,6 +47,6 @@ package object presentation {
       )
     }
 
-    helper(SubPiece("WHOLE", Offset(), piece))
+    helper(SubPiece("WHOLE", InfoSize(), piece))
   }
 }

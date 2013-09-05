@@ -38,9 +38,9 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("with children") {
-    val alpha = SubPiece("alpha", Offset(0), Atom(8, Some("a")))
-    val beta = SubPiece("beta", Offset(2), Atom(16, None))
-    val gamma = SubPiece("gamma", Offset(1), Atom(8, None))
+    val alpha = SubPiece("alpha", Bytes(0), Atom(8, Some("a")))
+    val beta = SubPiece("beta", Bytes(2), Atom(16, None))
+    val gamma = SubPiece("gamma", Bytes(1), Atom(8, None))
 
     builder.addChild(alpha.name, alpha.offset, alpha.piece)
     builder.addChild(beta.name, beta.offset, beta.piece)

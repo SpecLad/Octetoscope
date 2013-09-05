@@ -25,6 +25,6 @@ abstract sealed class Piece {
 
 sealed case class Atom(length: Long, repr: Option[String]) extends Piece
 
-sealed case class SubPiece(name: String, offset: Offset, piece: Piece)
+sealed case class SubPiece(name: String, offset: InfoSize, piece: Piece)
 
 sealed case class Molecule(length: Long, repr: Option[String], children: Seq[SubPiece]) extends Piece

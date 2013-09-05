@@ -52,7 +52,7 @@ object PrimitiveDissectorsSuite {
   def verify[Value](dissector: Dissector[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
     dissector.dissect(new ArrayBlob(bytes.toArray)) must equal (
       (
-        Atom(bytes.size * Offset.BitsPerByte, Some(expectedRepr)),
+        Atom(bytes.size * InfoSize.BitsPerByte, Some(expectedRepr)),
         expectedValue
       )
     )
@@ -61,9 +61,9 @@ object PrimitiveDissectorsSuite {
   def verifyWithPad[Value](dissector: Dissector[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
     val paddedBytes = (-1).toByte +: bytes :+ (-1).toByte
     val blob = new ArrayBlob(paddedBytes.toArray)
-    dissector.dissect(blob, Offset(1)) must equal (
+    dissector.dissect(blob, Bytes(1)) must equal (
       (
-        Atom(bytes.size * Offset.BitsPerByte, Some(expectedRepr)),
+        Atom(bytes.size * InfoSize.BitsPerByte, Some(expectedRepr)),
         expectedValue
       )
     )

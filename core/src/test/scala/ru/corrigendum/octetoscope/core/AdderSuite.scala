@@ -27,13 +27,13 @@ class AdderSuite extends FunSuite {
     val blob = new ArrayBlob(Array[Byte](-1, 1, 0, 0, 0, 2, 0, 0, 0, -1))
     val builder = new MoleculeBuilder
 
-    val adder = new SequentialAdder(blob, Offset(1), builder)
+    val adder = new SequentialAdder(blob, Bytes(1), builder)
     adder("alpha", sInt32L) must equal (1)
     adder("beta", sInt32L) must equal (2)
 
     builder.build() must equal (Molecule(64, None, Seq(
-      SubPiece("alpha", Offset(0), Atom(32, Some("1"))),
-      SubPiece("beta", Offset(4), Atom(32, Some("2")))
+      SubPiece("alpha", Bytes(0), Atom(32, Some("1"))),
+      SubPiece("beta", Bytes(4), Atom(32, Some("2")))
     )))
   }
 
@@ -41,13 +41,13 @@ class AdderSuite extends FunSuite {
     val blob = new ArrayBlob(Array[Byte](-1, 3, 0, 0, 0, -1, 4, 0, 0, 0, -1))
     val builder = new MoleculeBuilder
 
-    val adder = new RandomAdder(blob, Offset(1), builder)
-    adder("alpha", Offset(0), sInt32L) must equal (3)
-    adder("beta", Offset(5), sInt32L) must equal (4)
+    val adder = new RandomAdder(blob, Bytes(1), builder)
+    adder("alpha", Bytes(0), sInt32L) must equal (3)
+    adder("beta", Bytes(5), sInt32L) must equal (4)
 
     builder.build() must equal (Molecule(72, None, Seq(
-      SubPiece("alpha", Offset(0), Atom(32, Some("3"))),
-      SubPiece("beta", Offset(5), Atom(32, Some("4")))
+      SubPiece("alpha", Bytes(0), Atom(32, Some("3"))),
+      SubPiece("beta", Bytes(5), Atom(32, Some("4")))
     )))
   }
 }

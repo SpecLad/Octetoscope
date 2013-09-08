@@ -21,13 +21,13 @@ package ru.corrigendum.octetoscope.core
 class MoleculeBuilder {
   private[this] val childrenBuilder = Seq.newBuilder[SubPiece]
   private[this] var repr: Option[String] = None
-  private[this] var length: Long = 0
+  private[this] var length: InfoSize = InfoSize()
 
   def setRepr(repr: String) { this.repr = Some(repr) }
 
   def addChild(name: String, offset: InfoSize, piece: Piece) {
     childrenBuilder += SubPiece(name, offset, piece)
-    length = math.max(length, offset.totalBits + piece.length)
+    length = List(length, offset + piece.size).max
   }
 
   def build(): Molecule = Molecule(length, repr, childrenBuilder.result())

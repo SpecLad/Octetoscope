@@ -24,9 +24,9 @@ class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuil
   var internalOffset = InfoSize()
 
   def apply[Value](name: String, dissector: Dissector[Value]): Value = {
-    val (piece, value) = dissector.dissect(blob, initialOffset + internalOffset.totalBits)
+    val (piece, value) = dissector.dissect(blob, initialOffset + internalOffset)
     builder.addChild(name, internalOffset, piece)
-    internalOffset += piece.length
+    internalOffset += piece.size
     value
   }
 }

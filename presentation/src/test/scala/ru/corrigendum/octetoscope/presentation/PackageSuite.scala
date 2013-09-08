@@ -33,18 +33,18 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - atom - with value") {
-    presentPiece(Atom(40, Some("alpha"))) must equal (DisplayTreeNode("WHOLE: alpha", Nil))
+    presentPiece(Atom(Bytes(5), Some("alpha"))) must equal (DisplayTreeNode("WHOLE: alpha", Nil))
   }
 
   test("presentPiece - atom - without value") {
-    presentPiece(Atom(16, None)) must equal (DisplayTreeNode("WHOLE", Nil))
+    presentPiece(Atom(Bytes(2), None)) must equal (DisplayTreeNode("WHOLE", Nil))
   }
 
   test("presentPiece - molecule") {
     val molecule =
-      Molecule(100, Some("beta"), Seq(
-        SubPiece("one", Bytes(0), Atom(10, Some("gamma"))),
-        SubPiece("two", Bytes(50), Atom(10, None))))
+      Molecule(Bytes(100), Some("beta"), Seq(
+        SubPiece("one", Bytes(0), Atom(Bytes(10), Some("gamma"))),
+        SubPiece("two", Bytes(50), Atom(Bytes(10), None))))
 
     val displayed =
       DisplayTreeNode("WHOLE: beta", Seq(

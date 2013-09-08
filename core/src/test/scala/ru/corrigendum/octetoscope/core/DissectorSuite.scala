@@ -26,15 +26,15 @@ class DissectorSuite extends FunSuite {
   test("MoleculeBuilderDissector to Dissector") {
     val mbd = new MoleculeBuilderDissector[Int] {
       def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) = {
-        builder.addChild("alpha", Bytes(1), Atom(8, Some("a")))
+        builder.addChild("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
         60
       }
     }
 
     MoleculeBuilderDissector.toDissector(mbd).dissect(Blob.empty) must equal (
       (
-        Molecule(16, None, Seq(
-          SubPiece("alpha", Bytes(1), Atom(8, Some("a")))
+        Molecule(Bytes(2), None, Seq(
+          SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
         )),
         60
       )

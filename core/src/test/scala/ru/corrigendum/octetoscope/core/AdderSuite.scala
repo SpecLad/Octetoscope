@@ -31,9 +31,9 @@ class AdderSuite extends FunSuite {
     adder("alpha", sInt32L) must equal (1)
     adder("beta", sInt32L) must equal (2)
 
-    builder.build() must equal (Molecule(64, None, Seq(
-      SubPiece("alpha", Bytes(0), Atom(32, Some("1"))),
-      SubPiece("beta", Bytes(4), Atom(32, Some("2")))
+    builder.build() must equal (Molecule(Bytes(8), None, Seq(
+      SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("1"))),
+      SubPiece("beta", Bytes(4), Atom(Bytes(4), Some("2")))
     )))
   }
 
@@ -45,9 +45,9 @@ class AdderSuite extends FunSuite {
     adder("alpha", Bytes(0), sInt32L) must equal (3)
     adder("beta", Bytes(5), sInt32L) must equal (4)
 
-    builder.build() must equal (Molecule(72, None, Seq(
-      SubPiece("alpha", Bytes(0), Atom(32, Some("3"))),
-      SubPiece("beta", Bytes(5), Atom(32, Some("4")))
+    builder.build() must equal (Molecule(Bytes(9), None, Seq(
+      SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("3"))),
+      SubPiece("beta", Bytes(5), Atom(Bytes(4), Some("4")))
     )))
   }
 }

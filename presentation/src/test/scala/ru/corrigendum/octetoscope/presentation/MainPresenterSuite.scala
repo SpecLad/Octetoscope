@@ -23,7 +23,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
 import org.scalatest.matchers.MustMatchers._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
-import ru.corrigendum.octetoscope.core.{Atom, VersionInfo}
+import ru.corrigendum.octetoscope.core.{Bytes, Atom, VersionInfo}
 import java.io.{IOException, File}
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
@@ -107,5 +107,5 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
 object MainPresenterSuite {
   private val FakePath = new File("/abra/cadabra")
-  private val FakePiece = Atom(40, Some("dummy"))
+  private val FakePiece = Atom(Bytes(5), Some("dummy"))
 }

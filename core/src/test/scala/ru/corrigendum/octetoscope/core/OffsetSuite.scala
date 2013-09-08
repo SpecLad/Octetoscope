@@ -28,14 +28,18 @@ class OffsetSuite extends FunSuite {
   }
 
   test("plus") {
-    (Bytes(4) + 0) must equal (Bytes(4))
-    (Bytes(4) + 8) must equal (Bytes(5))
-    (Bytes(4) + -16) must equal (Bytes(2))
+    (Bytes(4) + InfoSize()) must equal (Bytes(4))
+    (Bytes(4) + Bytes(1)) must equal (Bytes(5))
   }
 
   test("minus") {
-    (Bytes(4) - Bytes(4)) must equal (0)
-    (Bytes(8) - Bytes(4)) must equal (32)
-    (Bytes(3) - Bytes(4)) must equal (-8)
+    (Bytes(4) - Bytes(4)) must equal (InfoSize())
+    (Bytes(8) - Bytes(4)) must equal (Bytes(4))
+  }
+
+  test("compare") {
+    Bytes(5) must be < Bytes(7)
+    Bytes(5) must be > Bytes(3)
+    Bytes(5).compareTo(Bytes(5)) must equal (0)
   }
 }

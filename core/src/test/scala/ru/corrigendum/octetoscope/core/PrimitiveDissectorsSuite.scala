@@ -52,7 +52,7 @@ object PrimitiveDissectorsSuite {
   def verify[Value](dissector: Dissector[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
     dissector.dissect(new ArrayBlob(bytes.toArray)) must equal (
       (
-        Atom(bytes.size * InfoSize.BitsPerByte, Some(expectedRepr)),
+        Atom(Bytes(bytes.size), Some(expectedRepr)),
         expectedValue
       )
     )
@@ -63,7 +63,7 @@ object PrimitiveDissectorsSuite {
     val blob = new ArrayBlob(paddedBytes.toArray)
     dissector.dissect(blob, Bytes(1)) must equal (
       (
-        Atom(bytes.size * InfoSize.BitsPerByte, Some(expectedRepr)),
+        Atom(Bytes(bytes.size), Some(expectedRepr)),
         expectedValue
       )
     )

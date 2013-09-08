@@ -31,7 +31,7 @@ object PrimitiveDissectors {
         ((input(bo + 2) & 0xFF) << 16) |
         ((input(bo + 3) & 0xFF) << 24)
 
-      (Atom(32, Some(value.toString)), value)
+      (Atom(Bytes(4), Some(value.toString)), value)
     }
   }
 
@@ -46,7 +46,7 @@ object PrimitiveDissectors {
       val value = new String(input.slice(bo, bo + findLength(input, bo)).toArray,
         StandardCharsets.US_ASCII)
 
-      (Atom(length * InfoSize.BitsPerByte, Some("\"" + value + "\"")), value)
+      (Atom(Bytes(length), Some("\"" + value + "\"")), value)
     }
   }
 

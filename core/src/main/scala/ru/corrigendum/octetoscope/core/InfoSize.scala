@@ -18,12 +18,14 @@
 
 package ru.corrigendum.octetoscope.core
 
-sealed case class InfoSize(bytes: Long = 0) {
+sealed case class InfoSize(bytes: Long = 0) extends Ordered[InfoSize] {
   assert(bytes >= 0)
 
   def totalBits: Long = bytes * InfoSize.BitsPerByte
-  def - (that: InfoSize): Long = this.totalBits - that.totalBits
-  def + (bits: Long): InfoSize = { assert(bits % 8 == 0); InfoSize(bytes + bits / 8); }
+  def - (that: InfoSize): InfoSize = InfoSize(this.bytes - that.bytes)
+  def + (that: InfoSize): InfoSize = InfoSize(this.bytes + that.bytes)
+
+  override def compare(that: InfoSize): Int = this.bytes.compareTo(that.bytes)
 }
 
 object InfoSize {

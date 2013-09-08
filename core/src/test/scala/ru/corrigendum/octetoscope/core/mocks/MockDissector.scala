@@ -29,6 +29,6 @@ object MockDissector extends Dissector[Unit] {
     (
       Atom(Bytes(input.size) - offset,
         Some(new String(input.slice(offset.bytes).toArray, StandardCharsets.US_ASCII))),
-      Unit
+      ()
     )
 }

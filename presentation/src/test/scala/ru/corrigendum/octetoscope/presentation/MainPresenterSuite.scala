@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.presentation
 import ru.corrigendum.octetoscope.presentation.mocks.{MockDissectorDriver, MockDialogBoxer, MockMainView}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 import ru.corrigendum.octetoscope.core.{Bytes, Atom, VersionInfo}
 import java.io.{IOException, File}
@@ -41,28 +41,28 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("closing the window") {
     view.trigger(MainView.ClosedEvent)
-    view must be ('disposed)
+    view should be ('disposed)
   }
 
   test("initialization") {
-    view must be ('visible)
-    view.title must equal ("Blarf")
+    view should be ('visible)
+    view.title should equal ("Blarf")
   }
 
   test("quit command") {
     view.trigger(MainView.CommandEvent(MainView.Command.Quit))
-    view must be ('disposed)
+    view should be ('disposed)
   }
 
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
-    boxer.messages must equal (List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours))))
+    boxer.messages should equal (List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours))))
   }
 
   test("open command - cancelled") {
     view.selectedFile = None
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
-    view.tabs must have size 0
+    view.tabs should have size 0
   }
 
   test("open command - exception") {
@@ -72,16 +72,16 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.tabs must have size 0
-    boxer.messages must equal (List(strings.errorReadingFile(exception.getMessage)))
+    view.tabs should have size 0
+    boxer.messages should equal (List(strings.errorReadingFile(exception.getMessage)))
   }
 
   test("open command - empty") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.tabs must have size 0
-    boxer.messages must equal (List(strings.cantDissectEmptyFile()))
+    view.tabs should have size 0
+    boxer.messages should equal (List(strings.cantDissectEmptyFile()))
   }
 
   test("open command - successful") {
@@ -89,10 +89,10 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     dissectorDriver.result = Some(MainPresenterSuite.FakePiece)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.tabs must have size 1
-    view.tabs.head.title must equal ("cadabra")
-    view.tabs.head.toolTip must equal (MainPresenterSuite.FakePath.toString)
-    view.tabs.head.tree must equal (presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath).get))
+    view.tabs should have size 1
+    view.tabs.head.title should equal ("cadabra")
+    view.tabs.head.toolTip should equal (MainPresenterSuite.FakePath.toString)
+    view.tabs.head.tree should equal (presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath).get))
   }
 
   test("tab closing") {
@@ -101,7 +101,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs.head.trigger(MainView.TabClosedEvent)
-    view.tabs must have size 0
+    view.tabs should have size 0
   }
 }
 

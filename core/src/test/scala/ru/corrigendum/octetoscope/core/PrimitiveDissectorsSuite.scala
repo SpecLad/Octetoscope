@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 import PrimitiveDissectors._
 
 class PrimitiveDissectorsSuite extends FunSuite {
@@ -50,7 +50,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
 
 object PrimitiveDissectorsSuite {
   def verify[Value](dissector: Dissector[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
-    dissector.dissect(new ArrayBlob(bytes.toArray)) must equal (
+    dissector.dissect(new ArrayBlob(bytes.toArray)) should equal (
       (
         Atom(Bytes(bytes.size), Some(expectedRepr)),
         expectedValue
@@ -61,7 +61,7 @@ object PrimitiveDissectorsSuite {
   def verifyWithPad[Value](dissector: Dissector[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
     val paddedBytes = (-1).toByte +: bytes :+ (-1).toByte
     val blob = new ArrayBlob(paddedBytes.toArray)
-    dissector.dissect(blob, Bytes(1)) must equal (
+    dissector.dissect(blob, Bytes(1)) should equal (
       (
         Atom(Bytes(bytes.size), Some(expectedRepr)),
         expectedValue

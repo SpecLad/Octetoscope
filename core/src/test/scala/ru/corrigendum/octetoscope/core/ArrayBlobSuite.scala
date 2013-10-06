@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 import java.util
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
@@ -31,35 +31,35 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("apply - normal") {
-    blob(1) must equal (4)
+    blob(1) should equal (4)
   }
 
   test("apply - out of range") {
-    evaluating { blob(5) } must produce [IndexOutOfBoundsException]
-    evaluating { blob(-1) } must produce [IndexOutOfBoundsException]
+    evaluating { blob(5) } should produce [IndexOutOfBoundsException]
+    evaluating { blob(-1) } should produce [IndexOutOfBoundsException]
   }
 
   test("toArray") {
-    blob.toArray must equal (Array[Byte](3, 4, 5, 6, 7))
+    blob.toArray should equal (Array[Byte](3, 4, 5, 6, 7))
   }
 
   test("size") {
-    blob.size must equal (5)
+    blob.size should equal (5)
   }
 
   test("slice - normal") {
-    blob.slice(2, 4).toArray must equal (Array[Byte](5, 6))
-    blob.slice(0, 4).toArray must equal (Array[Byte](3, 4, 5, 6))
-    blob.slice(2, 5).toArray must equal (Array[Byte](5, 6, 7))
-    blob.slice(0, 5).toArray must equal (Array[Byte](3, 4, 5, 6, 7))
-    blob.slice(2, 2).toArray must equal (Array[Byte]())
+    blob.slice(2, 4).toArray should equal (Array[Byte](5, 6))
+    blob.slice(0, 4).toArray should equal (Array[Byte](3, 4, 5, 6))
+    blob.slice(2, 5).toArray should equal (Array[Byte](5, 6, 7))
+    blob.slice(0, 5).toArray should equal (Array[Byte](3, 4, 5, 6, 7))
+    blob.slice(2, 2).toArray should equal (Array[Byte]())
   }
 
   test("slice - out of range") {
-    evaluating { blob.slice(-1, 4) } must produce [IndexOutOfBoundsException]
-    evaluating { blob.slice(5, 6) } must produce [IndexOutOfBoundsException]
-    evaluating { blob.slice(2, 6) } must produce [IndexOutOfBoundsException]
-    evaluating { blob.slice(-2, -1) } must produce [IndexOutOfBoundsException]
-    evaluating { blob.slice(4, 2) } must produce [IndexOutOfBoundsException]
+    evaluating { blob.slice(-1, 4) } should produce [IndexOutOfBoundsException]
+    evaluating { blob.slice(5, 6) } should produce [IndexOutOfBoundsException]
+    evaluating { blob.slice(2, 6) } should produce [IndexOutOfBoundsException]
+    evaluating { blob.slice(-2, -1) } should produce [IndexOutOfBoundsException]
+    evaluating { blob.slice(4, 2) } should produce [IndexOutOfBoundsException]
   }
 }

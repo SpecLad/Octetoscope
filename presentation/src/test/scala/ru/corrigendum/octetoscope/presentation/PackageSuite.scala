@@ -19,25 +19,25 @@
 package ru.corrigendum.octetoscope.presentation
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 
 class PackageSuite extends FunSuite {
   test("presentVersionInfo") {
     val hash = "1234" * 10
-    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) must equal ("1.2-g1234123")
-    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = false)) must equal ("1.2+34-g1234123")
-    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = true)) must equal ("1.2-g1234123-dirty")
-    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = true)) must equal ("1.2+34-g1234123-dirty")
+    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) should equal ("1.2-g1234123")
+    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = false)) should equal ("1.2+34-g1234123")
+    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = true)) should equal ("1.2-g1234123-dirty")
+    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = true)) should equal ("1.2+34-g1234123-dirty")
   }
 
   test("presentPiece - atom - with value") {
-    presentPiece(Atom(Bytes(5), Some("alpha"))) must equal (DisplayTreeNode("WHOLE: alpha", Nil))
+    presentPiece(Atom(Bytes(5), Some("alpha"))) should equal (DisplayTreeNode("WHOLE: alpha", Nil))
   }
 
   test("presentPiece - atom - without value") {
-    presentPiece(Atom(Bytes(2), None)) must equal (DisplayTreeNode("WHOLE", Nil))
+    presentPiece(Atom(Bytes(2), None)) should equal (DisplayTreeNode("WHOLE", Nil))
   }
 
   test("presentPiece - molecule") {
@@ -52,6 +52,6 @@ class PackageSuite extends FunSuite {
         DisplayTreeNode("two", Nil)
       ))
 
-    presentPiece(molecule) must equal (displayed)
+    presentPiece(molecule) should equal (displayed)
   }
 }

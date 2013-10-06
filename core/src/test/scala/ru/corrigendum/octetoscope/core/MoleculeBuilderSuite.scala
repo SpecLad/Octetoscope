@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 
 class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   var builder: MoleculeBuilder = _
@@ -29,12 +29,12 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("default") {
-    builder.build() must equal (Molecule(InfoSize(), None, Seq()))
+    builder.build() should equal (Molecule(InfoSize(), None, Seq()))
   }
 
   test("with repr") {
     builder.setRepr("value")
-    builder.build() must equal (Molecule(InfoSize(), Some("value"), Seq()))
+    builder.build() should equal (Molecule(InfoSize(), Some("value"), Seq()))
   }
 
   test("with children") {
@@ -46,25 +46,25 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
     builder.addChild(beta.name, beta.offset, beta.piece)
     builder.addChild(gamma.name, gamma.offset, gamma.piece)
 
-    builder.build() must equal (
+    builder.build() should equal (
       Molecule(Bytes(4), None, Seq(alpha, beta, gamma))
     )
   }
 
   test("with quality") {
     builder.impair(PieceQuality.Bad)
-    builder.build() must equal (Molecule(InfoSize(), None, Seq(), PieceQuality.Bad))
+    builder.build() should equal (Molecule(InfoSize(), None, Seq(), PieceQuality.Bad))
   }
 
   test("with decreasing quality") {
     builder.impair(PieceQuality.Dubious)
     builder.impair(PieceQuality.Broken)
-    builder.build() must equal (Molecule(InfoSize(), None, Seq(), PieceQuality.Broken))
+    builder.build() should equal (Molecule(InfoSize(), None, Seq(), PieceQuality.Broken))
   }
 
   test("with increasing quality") {
     builder.impair(PieceQuality.Broken)
     builder.impair(PieceQuality.Dubious)
-    builder.build() must equal (Molecule(InfoSize(), None, Seq(), PieceQuality.Broken))
+    builder.build() should equal (Molecule(InfoSize(), None, Seq(), PieceQuality.Broken))
   }
 }

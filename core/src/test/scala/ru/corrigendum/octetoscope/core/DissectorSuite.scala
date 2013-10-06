@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class DissectorSuite extends FunSuite {
@@ -31,7 +31,7 @@ class DissectorSuite extends FunSuite {
       }
     }
 
-    MoleculeBuilderDissector.toDissector(mbd).dissect(Blob.empty) must equal (
+    MoleculeBuilderDissector.toDissector(mbd).dissect(Blob.empty) should equal (
       (
         Molecule(Bytes(2), None, Seq(
           SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))

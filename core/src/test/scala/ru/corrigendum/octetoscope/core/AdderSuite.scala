@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 
 class AdderSuite extends FunSuite {
@@ -28,10 +28,10 @@ class AdderSuite extends FunSuite {
     val builder = new MoleculeBuilder
 
     val adder = new SequentialAdder(blob, Bytes(1), builder)
-    adder("alpha", sInt32L) must equal (1)
-    adder("beta", sInt32L) must equal (2)
+    adder("alpha", sInt32L) should equal (1)
+    adder("beta", sInt32L) should equal (2)
 
-    builder.build() must equal (Molecule(Bytes(8), None, Seq(
+    builder.build() should equal (Molecule(Bytes(8), None, Seq(
       SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("1"))),
       SubPiece("beta", Bytes(4), Atom(Bytes(4), Some("2")))
     )))
@@ -42,10 +42,10 @@ class AdderSuite extends FunSuite {
     val builder = new MoleculeBuilder
 
     val adder = new RandomAdder(blob, Bytes(1), builder)
-    adder("alpha", Bytes(0), sInt32L) must equal (3)
-    adder("beta", Bytes(5), sInt32L) must equal (4)
+    adder("alpha", Bytes(0), sInt32L) should equal (3)
+    adder("beta", Bytes(5), sInt32L) should equal (4)
 
-    builder.build() must equal (Molecule(Bytes(9), None, Seq(
+    builder.build() should equal (Molecule(Bytes(9), None, Seq(
       SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("3"))),
       SubPiece("beta", Bytes(5), Atom(Bytes(4), Some("4")))
     )))

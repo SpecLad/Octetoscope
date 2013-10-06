@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 
 import mocks.MockView
 import org.scalatest.{BeforeAndAfter, FunSuite}
@@ -32,6 +32,6 @@ class DialogBoxerSuite extends FunSuite with BeforeAndAfter {
 
   test("message box") {
     new DialogBoxerImpl(view, "Blarf").showMessageBox("Abracadabra")
-    view.messageBoxes must equal (List(("Abracadabra", "Blarf")))
+    view.messageBoxes should equal (List(("Abracadabra", "Blarf")))
   }
 }

@@ -19,27 +19,27 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 
 class OffsetSuite extends FunSuite {
   test("totalBits") {
-    Bytes(0).totalBits must equal (0)
-    Bytes(3).totalBits must equal (24)
+    Bytes(0).totalBits should equal (0)
+    Bytes(3).totalBits should equal (24)
   }
 
   test("plus") {
-    (Bytes(4) + InfoSize()) must equal (Bytes(4))
-    (Bytes(4) + Bytes(1)) must equal (Bytes(5))
+    (Bytes(4) + InfoSize()) should equal (Bytes(4))
+    (Bytes(4) + Bytes(1)) should equal (Bytes(5))
   }
 
   test("minus") {
-    (Bytes(4) - Bytes(4)) must equal (InfoSize())
-    (Bytes(8) - Bytes(4)) must equal (Bytes(4))
+    (Bytes(4) - Bytes(4)) should equal (InfoSize())
+    (Bytes(8) - Bytes(4)) should equal (Bytes(4))
   }
 
   test("compare") {
-    Bytes(5) must be < Bytes(7)
-    Bytes(5) must be > Bytes(3)
-    Bytes(5).compareTo(Bytes(5)) must equal (0)
+    Bytes(5) should be < Bytes(7)
+    Bytes(5) should be > Bytes(3)
+    Bytes(5).compareTo(Bytes(5)) should equal (0)
   }
 }

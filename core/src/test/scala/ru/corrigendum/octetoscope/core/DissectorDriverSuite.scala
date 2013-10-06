@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.core
 
-import org.scalatest.matchers.MustMatchers._
+import org.scalatest.matchers.ShouldMatchers._
 import org.scalatest.FunSuite
 import ru.corrigendum.octetoscope.core.mocks.{MockDissector, MockBinaryReader}
 import java.nio.charset.StandardCharsets
@@ -29,13 +29,13 @@ class DissectorDriverSuite extends FunSuite {
   test("dissect empty") {
     val reader = new MockBinaryReader(Blob.empty)
     val driver = new DissectorDriverImpl(reader, MockDissector)
-    driver.dissect(DissectorDriverSuite.FakePath) must equal (None)
+    driver.dissect(DissectorDriverSuite.FakePath) should equal (None)
   }
 
   test("dissect nonempty") {
     val reader = new MockBinaryReader(new ArrayBlob("magic".getBytes(StandardCharsets.US_ASCII)))
     val driver = new DissectorDriverImpl(reader, MockDissector)
-    driver.dissect(DissectorDriverSuite.FakePath) must equal (Some(Atom(Bytes(5), Some("magic"))))
+    driver.dissect(DissectorDriverSuite.FakePath) should equal (Some(Atom(Bytes(5), Some("magic"))))
   }
 }
 

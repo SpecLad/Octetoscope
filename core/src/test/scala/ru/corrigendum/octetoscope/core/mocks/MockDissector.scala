@@ -22,7 +22,6 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core._
 import java.nio.charset.StandardCharsets
 import ru.corrigendum.octetoscope.core.Atom
-import scala.Some
 
 object MockDissector extends Dissector[Unit] {
   override def dissect(input: Blob, offset: InfoSize) =

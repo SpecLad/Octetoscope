@@ -18,13 +18,30 @@
 
 package ru.corrigendum.octetoscope.core
 
+object PieceQuality extends Enumeration {
+  val Good, Dubious, Bad, Broken = Value
+}
+
 abstract sealed class Piece {
   def size: InfoSize
   def repr: Option[String]
+  def quality: PieceQuality.Value
+  def notes: Seq[String]
 }
 
-sealed case class Atom(size: InfoSize, repr: Option[String]) extends Piece
+sealed case class Atom(
+  size: InfoSize,
+  repr: Option[String],
+  quality: PieceQuality.Value = PieceQuality.Good,
+  notes: Seq[String] = List()
+) extends Piece
 
 sealed case class SubPiece(name: String, offset: InfoSize, piece: Piece)
 
-sealed case class Molecule(size: InfoSize, repr: Option[String], children: Seq[SubPiece]) extends Piece
+sealed case class Molecule(
+  size: InfoSize,
+  repr: Option[String],
+  children: Seq[SubPiece],
+  quality: PieceQuality.Value = PieceQuality.Good,
+  notes: Seq[String] = List()
+) extends Piece

@@ -21,7 +21,7 @@ ext {
   scalaMajorVersion = scalaVersion.find(/\d+\.\d+/)
   scalaLibraryDep = "org.scala-lang:scala-library:${scalaVersion}"
 
-  scalaTestVersion = '1.9.1'
+  scalaTestVersion = '1.9.2'
   scalaTestDep = "org.scalatest:scalatest_${scalaMajorVersion}:${scalaTestVersion}"
 
   icuVersion = '51.1'

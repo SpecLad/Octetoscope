@@ -22,6 +22,7 @@ class MoleculeBuilder {
   private[this] val childrenBuilder = Seq.newBuilder[SubPiece]
   private[this] var repr: Option[String] = None
   private[this] var length: InfoSize = InfoSize()
+  private[this] var quality: PieceQuality.Value = PieceQuality.Good
 
   def setRepr(repr: String) { this.repr = Some(repr) }
 
@@ -30,5 +31,10 @@ class MoleculeBuilder {
     length = List(length, offset + piece.size).max
   }
 
-  def build(): Molecule = Molecule(length, repr, childrenBuilder.result())
+  def impair(newQuality: PieceQuality.Value) {
+    if (newQuality.id > quality.id)
+      quality = newQuality
+  }
+
+  def build(): Molecule = Molecule(length, repr, childrenBuilder.result(), quality)
 }

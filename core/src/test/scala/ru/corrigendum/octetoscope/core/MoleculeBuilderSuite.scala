@@ -67,4 +67,10 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
     builder.impair(PieceQuality.Dubious)
     builder.build() should equal (Molecule(InfoSize(), None, Seq(), PieceQuality.Broken))
   }
+
+  test("with notes") {
+    builder.addNote("foo")
+    builder.addNote("bar")
+    builder.build() should equal (Molecule(InfoSize(), None, Seq(), notes = Seq("foo", "bar")))
+  }
 }

@@ -23,6 +23,7 @@ class MoleculeBuilder {
   private[this] var repr: Option[String] = None
   private[this] var length: InfoSize = InfoSize()
   private[this] var quality: PieceQuality.Value = PieceQuality.Good
+  private[this] val notes = Seq.newBuilder[String]
 
   def setRepr(repr: String) { this.repr = Some(repr) }
 
@@ -36,5 +37,7 @@ class MoleculeBuilder {
       quality = newQuality
   }
 
-  def build(): Molecule = Molecule(length, repr, childrenBuilder.result(), quality)
+  def addNote(note: String) { notes += note }
+
+  def build(): Molecule = Molecule(length, repr, childrenBuilder.result(), quality, notes.result())
 }

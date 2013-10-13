@@ -27,6 +27,14 @@ abstract sealed class Piece {
   def repr: Option[String]
   def quality: PieceQuality.Value
   def notes: Seq[String]
+
+  final def impaired(quality: PieceQuality.Value): Piece =
+    if (this.quality.id < quality.id) withQuality(quality)
+    else this
+
+  protected def withQuality(quality: PieceQuality.Value): Piece
+
+  def withNote(note: String): Piece
 }
 
 sealed case class Atom(
@@ -34,7 +42,10 @@ sealed case class Atom(
   repr: Option[String],
   quality: PieceQuality.Value = PieceQuality.Good,
   notes: Seq[String] = List()
-) extends Piece
+) extends Piece {
+  protected override def withQuality(quality: PieceQuality.Value): Atom = copy(quality = quality)
+  override def withNote(note: String): Piece = copy(notes = notes :+ note)
+}
 
 sealed case class SubPiece(name: String, offset: InfoSize, piece: Piece)
 
@@ -44,4 +55,7 @@ sealed case class Molecule(
   children: Seq[SubPiece],
   quality: PieceQuality.Value = PieceQuality.Good,
   notes: Seq[String] = List()
-) extends Piece
+) extends Piece {
+  protected override def withQuality(quality: PieceQuality.Value): Molecule = copy(quality = quality)
+  override def withNote(note: String): Piece = copy(notes = notes :+ note)
+}

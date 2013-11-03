@@ -16,17 +16,21 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.core.mocks
+package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.core._
-import java.nio.charset.StandardCharsets
-import ru.corrigendum.octetoscope.core.Atom
 
-object MockDissector extends Dissector[String] {
-  override def dissect(input: Blob, offset: InfoSize) = {
-    val str = new String(input.slice(offset.bytes).toArray, StandardCharsets.US_ASCII)
-
-    (Atom(Bytes(input.size) - offset, Some(str)), str)
+object SpecialDissectors {
+  private class Transformed[OldValue, NewValue](
+    old: Dissector[OldValue], transform: (Piece, OldValue) => (Piece, NewValue)
+  ) extends Dissector[NewValue] {
+    override def dissect(input: Blob, offset: InfoSize): (Piece, NewValue) = {
+      val (piece, value) = old.dissect(input, offset)
+      transform(piece, value)
+    }
   }
+
+  def transformed[OldValue, NewValue](
+    old: Dissector[OldValue], transform: (Piece, OldValue) => (Piece, NewValue)
+  ): Dissector[NewValue] = new Transformed(old, transform)
 }

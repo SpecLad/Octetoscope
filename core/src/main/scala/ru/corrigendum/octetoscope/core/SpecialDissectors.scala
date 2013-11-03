@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.core
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 object SpecialDissectors {
-  private class Transformed[OldValue, NewValue](
+  private class Transformed[-OldValue, +NewValue](
     old: Dissector[OldValue], transform: (Piece, OldValue) => (Piece, NewValue)
   ) extends Dissector[NewValue] {
     override def dissect(input: Blob, offset: InfoSize): (Piece, NewValue) = {

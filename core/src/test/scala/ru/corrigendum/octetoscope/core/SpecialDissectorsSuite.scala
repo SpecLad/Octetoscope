@@ -20,7 +20,8 @@ package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers._
-import ru.corrigendum.octetoscope.core.mocks.MockDissector
+import ru.corrigendum.octetoscope.core.mocks.{MockConstraint, MockDissector}
+import ru.corrigendum.octetoscope.core.SpecialDissectors.Constraint
 
 class SpecialDissectorsSuite extends FunSuite {
   test("transformed") {
@@ -34,5 +35,36 @@ class SpecialDissectorsSuite extends FunSuite {
 
     piece should equal (Atom(Bytes(1), Some("?"), notes = Seq("transformed")))
     value should equal (Some("?!"))
+  }
+
+  test("constrained - satisfied") {
+    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, PieceQuality.Dubious)
+
+    val blob = new ArrayBlob(Array[Byte]('a'.toByte, 'b'.toByte))
+
+    constrained.dissect(blob) should equal (MockDissector.dissect(blob))
+  }
+
+  test("constrained - unsatisfied") {
+    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, PieceQuality.Dubious)
+
+    val blob = new ArrayBlob(Array[Byte]('a'.toByte))
+
+    val (piece, value) = constrained.dissect(blob)
+
+    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Dubious, Seq("constrained")))
+  }
+
+  test("constrained - unsatisfied & already worse") {
+    val constrained = SpecialDissectors.constrained(
+      SpecialDissectors.constrained(MockDissector, MockConstraint, PieceQuality.Bad),
+      MockConstraint, PieceQuality.Dubious
+    )
+
+    val blob = new ArrayBlob(Array[Byte]('a'.toByte))
+
+    val (piece, value) = constrained.dissect(blob)
+
+    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Bad, Seq("constrained", "constrained")))
   }
 }

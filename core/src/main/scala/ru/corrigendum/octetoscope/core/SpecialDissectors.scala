@@ -33,4 +33,18 @@ object SpecialDissectors {
   def transformed[OldValue, NewValue](
     old: Dissector[OldValue], transform: (Piece, OldValue) => (Piece, NewValue)
   ): Dissector[NewValue] = new Transformed(old, transform)
+
+  trait Constraint[-Value] {
+    def check(value: Value): Boolean
+    def note: String
+  }
+
+  def constrained[Value](
+    dissector: Dissector[Value], constraint: Constraint[Value], quality: PieceQuality.Value
+  ): Dissector[Value] = {
+    def transform(piece: Piece, value: Value) =
+      if (constraint.check(value)) (piece, value)
+      else (piece.impaired(quality).withNote(constraint.note), value)
+    transformed(dissector, transform)
+  }
 }

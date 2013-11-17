@@ -21,8 +21,18 @@ package ru.corrigendum.octetoscope.core
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
+import ru.corrigendum.octetoscope.core.mocks.MockDissector
 
 class DissectorSuite extends FunSuite {
+  test("Dissector.dissectO") {
+    val blob = new ArrayBlob(Array[Byte](1, 2))
+    val result = MockDissector.dissect(blob)
+    val resultO = MockDissector.dissectO(blob)
+
+    resultO._1 should equal (result._1)
+    resultO._2 should equal (Some(result._2))
+  }
+
   test("MoleculeBuilderDissector to Dissector") {
     val mbd = new MoleculeBuilderDissector[Int] {
       def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) = {

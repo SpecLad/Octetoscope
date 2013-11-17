@@ -20,6 +20,17 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-trait Dissector[+Value] {
+// A dissector that may or may not return a value. The O is for Option.
+trait DissectorO[+Value] {
+  def dissectO(input: Blob, offset: InfoSize = InfoSize()): (Piece, Option[Value])
+}
+
+// A dissector that will always return a value.
+trait Dissector[+Value] extends DissectorO[Value] {
+  final override def dissectO(input: Blob, offset: InfoSize = InfoSize()): (Piece, Option[Value]) = {
+    val (piece, value) = dissect(input, offset)
+    (piece, Some(value))
+  }
+
   def dissect(input: Blob, offset: InfoSize = InfoSize()): (Piece, Value)
 }

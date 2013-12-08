@@ -34,6 +34,22 @@ object SpecialDissectors {
     old: Dissector[OldValue], transform: (Piece, OldValue) => (Piece, NewValue)
   ): Dissector[NewValue] = new Transformed(old, transform)
 
+  private class TransformedO[-OldValue, +NewValue](
+    old: DissectorO[OldValue], transform: (Piece, OldValue) => (Piece, Option[NewValue])
+  ) extends DissectorO[NewValue] {
+    override def dissectO(input: Blob, offset: InfoSize): (Piece, Option[NewValue]) = {
+      val (piece, valueO) = old.dissectO(input, offset)
+      valueO match {
+        case None => (piece, None)
+        case Some(value) => transform(piece, value)
+      }
+    }
+  }
+
+  def transformedO[OldValue, NewValue](
+    old: DissectorO[OldValue], transform: (Piece, OldValue) => (Piece, Option[NewValue])
+  ): DissectorO[NewValue] = new TransformedO(old, transform)
+
   trait Constraint[-Value] {
     def check(value: Value): Boolean
     def note: String

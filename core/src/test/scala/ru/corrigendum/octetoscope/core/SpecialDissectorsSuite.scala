@@ -128,4 +128,29 @@ class SpecialDissectorsSuite extends FunSuite {
     piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Bad, Seq("constrained", "constrained")))
     value should equal (Some("a"))
   }
+
+  test("stronglyConstrainedO - None") {
+    val constrained = SpecialDissectors.stronglyConstrainedO(MockDissectorO, MockConstraint, PieceQuality.Dubious)
+
+    constrained.dissectO(null) should equal (MockDissectorO.dissectO(null))
+  }
+
+  test("stronglyConstrainedO - Some - satisfied") {
+    val constrained = SpecialDissectors.stronglyConstrainedO(MockDissector, MockConstraint, PieceQuality.Dubious)
+
+    val blob = new ArrayBlob(Array[Byte]('a'.toByte, 'b'.toByte))
+
+    constrained.dissectO(blob) should equal (MockDissector.dissectO(blob))
+  }
+
+  test("stronglyConstrainedO - Some - unsatisfied") {
+    val constrained = SpecialDissectors.stronglyConstrainedO(MockDissector, MockConstraint, PieceQuality.Dubious)
+
+    val blob = new ArrayBlob(Array[Byte]('a'.toByte))
+
+    val (piece, value) = constrained.dissectO(blob)
+
+    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Dubious, Seq("constrained")))
+    value should equal (None)
+  }
 }

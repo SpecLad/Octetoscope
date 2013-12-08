@@ -72,4 +72,13 @@ object SpecialDissectors {
       else (piece.impaired(quality).withNote(constraint.note), Some(value))
     transformedO(dissector, transform)
   }
+
+  def stronglyConstrainedO[Value](
+    dissector: DissectorO[Value], constraint: Constraint[Value], quality: PieceQuality.Value
+  ): DissectorO[Value] = {
+    def transform(piece: Piece, value: Value) =
+      if (constraint.check(value)) (piece, Some(value))
+      else (piece.impaired(quality).withNote(constraint.note), None)
+    transformedO(dissector, transform)
+  }
 }

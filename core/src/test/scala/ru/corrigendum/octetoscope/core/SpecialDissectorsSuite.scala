@@ -20,8 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers._
-import ru.corrigendum.octetoscope.core.mocks.{MockConstraint, MockDissector}
-import ru.corrigendum.octetoscope.abstractinfra.Blob
+import ru.corrigendum.octetoscope.core.mocks.{MockDissectorO, MockConstraint, MockDissector}
 
 class SpecialDissectorsSuite extends FunSuite {
   test("transformed") {
@@ -73,14 +72,9 @@ class SpecialDissectorsSuite extends FunSuite {
   test("transformedO - None") {
     val transform = (piece: Piece, value: String) => (piece.withNote("transformed"), Some(value + "!"))
 
-    val dissector = new DissectorO[String] {
-      override def dissectO(input: Blob, offset: InfoSize): (Piece, Option[String]) =
-        (Atom(InfoSize(6), Some("a")), None)
-    }
+    val transformed = SpecialDissectors.transformedO(MockDissectorO, transform)
 
-    val transformed = SpecialDissectors.transformedO(dissector, transform)
-
-    transformed.dissectO(null) should equal (dissector.dissectO(null))
+    transformed.dissectO(null) should equal (MockDissectorO.dissectO(null))
   }
 
   test("transformedO - Some") {

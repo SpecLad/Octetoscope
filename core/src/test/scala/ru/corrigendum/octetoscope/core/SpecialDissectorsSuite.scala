@@ -53,6 +53,7 @@ class SpecialDissectorsSuite extends FunSuite {
     val (piece, value) = constrained.dissect(blob)
 
     piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Dubious, Seq("constrained")))
+    value should equal ("a")
   }
 
   test("constrained - unsatisfied & already worse") {
@@ -66,5 +67,6 @@ class SpecialDissectorsSuite extends FunSuite {
     val (piece, value) = constrained.dissect(blob)
 
     piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Bad, Seq("constrained", "constrained")))
+    value should equal ("a")
   }
 }

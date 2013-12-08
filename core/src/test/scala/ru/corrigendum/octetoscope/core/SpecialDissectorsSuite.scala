@@ -25,16 +25,16 @@ import ru.corrigendum.octetoscope.core.SpecialDissectors.Constraint
 
 class SpecialDissectorsSuite extends FunSuite {
   test("transformed") {
-    val transform = (piece: Piece, value: String) => (piece.withNote("transformed"), Some(value + "!"))
+    val transform = (piece: Piece, value: String) => (piece.withNote("transformed"), value.toInt)
 
     val transformed = SpecialDissectors.transformed(MockDissector, transform)
 
-    val blob = new ArrayBlob(Array[Byte]('?'.toByte))
+    val blob = new ArrayBlob(Array[Byte]('0'.toByte))
 
     val (piece, value) = transformed.dissect(blob)
 
-    piece should equal (Atom(Bytes(1), Some("?"), notes = Seq("transformed")))
-    value should equal (Some("?!"))
+    piece should equal (Atom(Bytes(1), Some("0"), notes = Seq("transformed")))
+    value should equal (0)
   }
 
   test("constrained - satisfied") {

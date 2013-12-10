@@ -54,4 +54,19 @@ class PackageSuite extends FunSuite {
 
     presentPiece(molecule) should equal (displayed)
   }
+
+  test("presentPiece - without value - with note") {
+    presentPiece(Atom(Bytes(2), None, notes = Seq("note"))) should equal (
+      DisplayTreeNode("WHOLE (note)", Nil))
+  }
+
+  test("presentPiece - with value - with note") {
+    presentPiece(Atom(Bytes(2), Some("delta"), notes = Seq("note"))) should equal (
+      DisplayTreeNode("WHOLE: delta (note)", Nil))
+  }
+
+  test("presentPiece - multiple notes") {
+    presentPiece(Atom(Bytes(2), None, notes = Seq("note 1", "note 2"))) should equal (
+      DisplayTreeNode("WHOLE (note 1; note 2)", Nil))
+  }
 }

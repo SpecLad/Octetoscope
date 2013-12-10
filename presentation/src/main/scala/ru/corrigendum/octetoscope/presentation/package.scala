@@ -33,13 +33,17 @@ package object presentation {
 
   private[presentation] def presentPiece(piece: Piece): DisplayTreeNode = {
     def helper(np: SubPiece): DisplayTreeNode = {
-      val displayText = np.piece.repr match {
-        case None => np.name
-        case Some(repr) => np.name + ": " + repr
-      }
+      val displayText = StringBuilder.newBuilder
+      displayText ++= np.name
+
+      for (repr <- np.piece.repr)
+        displayText ++= ": " ++= repr
+
+      if (np.piece.notes.nonEmpty)
+        np.piece.notes.addString(displayText, " (", "; ", ")")
 
       DisplayTreeNode(
-        displayText,
+        displayText.result(),
         np.piece match {
           case _: Atom => Nil
           case m: Molecule => m.children.map(helper)

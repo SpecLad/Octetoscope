@@ -44,17 +44,16 @@ class MainPresenter(strings: PresentationStrings,
 
         case CommandEvent(MainView.Command.Quit) => pub.dispose()
 
-        case CommandEvent(MainView.Command.Open) => {
+        case CommandEvent(MainView.Command.Open) =>
           pub.showFileOpenBox() match {
             case None =>
-            case Some(path) => {
+            case Some(path) =>
               val maybePiece = try {
                 dissectorDriver.dissect(path)
               } catch {
-                case ioe: IOException => {
+                case ioe: IOException =>
                   boxer.showMessageBox(strings.errorReadingFile(ioe.getMessage))
                   return
-                }
               }
 
               maybePiece match {
@@ -63,10 +62,7 @@ class MainPresenter(strings: PresentationStrings,
                 case Some(piece) =>
                   pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(tabHandler)
               }
-
-            }
           }
-        }
 
         case CommandEvent(_) => // workaround for bug SI-7206
       }

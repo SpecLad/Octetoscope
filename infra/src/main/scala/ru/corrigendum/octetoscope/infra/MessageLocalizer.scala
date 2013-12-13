@@ -27,7 +27,7 @@ import com.ibm.icu.text.MessageFormat
 object MessageLocalizer {
   def localize[T](iface: Class[T], translationMap: Map[String, Class[_ <: T]]): T = {
     val locale = ULocale.acceptLanguage(Array(ULocale.getDefault),
-      translationMap.keys.map(ULocale.forLanguageTag(_)).toArray, null)
+      translationMap.keys.map(ULocale.forLanguageTag).toArray, null)
 
     val transIface = translationMap.getOrElse(locale.toLanguageTag, iface)
 
@@ -35,7 +35,7 @@ object MessageLocalizer {
       meth <- transIface.getMethods
       ann = meth.getAnnotation(classOf[Translation])
       if ann ne null
-    } yield (meth.getName, meth.getAnnotation(classOf[Translation]).format())): _*)
+    } yield (meth.getName, ann.format())): _*)
 
     iface.cast(Proxy.newProxyInstance(transIface.getClassLoader, Array(transIface), new InvocationHandler {
       override def invoke(proxy: Any, method: Method, args: Array[AnyRef]): AnyRef =

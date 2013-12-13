@@ -20,8 +20,16 @@ package ru.corrigendum.octetoscope
 
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
+import java.awt.Color
 
 package object presentation {
+  private[presentation] val QualityColors = Map(
+    PieceQuality.Good -> Color.BLACK,
+    PieceQuality.Dubious -> new Color(200, 175, 0),
+    PieceQuality.Bad -> Color.RED,
+    PieceQuality.Broken -> Color.MAGENTA
+  )
+
   private[presentation] def presentVersionInfo(vi: VersionInfo): String = {
     "%s%s-g%s%s".format(
       vi.releaseVersion,
@@ -44,6 +52,7 @@ package object presentation {
 
       DisplayTreeNode(
         displayText.result(),
+        QualityColors(np.piece.quality),
         np.piece match {
           case _: Atom => Nil
           case m: Molecule => m.children.map(helper)

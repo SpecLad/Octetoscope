@@ -24,6 +24,8 @@ import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 
 class PackageSuite extends FunSuite {
+  import PackageSuite._
+
   test("presentVersionInfo") {
     val hash = "1234" * 10
     presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) should equal ("1.2-g1234123")
@@ -33,11 +35,12 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - atom - with value") {
-    presentPiece(Atom(Bytes(5), Some("alpha"))) should equal (DisplayTreeNode("WHOLE: alpha", Nil))
+    presentPiece(Atom(Bytes(5), Some("alpha"))) should equal (
+      DisplayTreeNode("WHOLE: alpha", GoodColor, Nil))
   }
 
   test("presentPiece - atom - without value") {
-    presentPiece(Atom(Bytes(2), None)) should equal (DisplayTreeNode("WHOLE", Nil))
+    presentPiece(Atom(Bytes(2), None)) should equal (DisplayTreeNode("WHOLE", GoodColor, Nil))
   }
 
   test("presentPiece - molecule") {
@@ -47,9 +50,9 @@ class PackageSuite extends FunSuite {
         SubPiece("two", Bytes(50), Atom(Bytes(10), None))))
 
     val displayed =
-      DisplayTreeNode("WHOLE: beta", Seq(
-        DisplayTreeNode("one: gamma", Nil),
-        DisplayTreeNode("two", Nil)
+      DisplayTreeNode("WHOLE: beta", GoodColor, Seq(
+        DisplayTreeNode("one: gamma", GoodColor, Nil),
+        DisplayTreeNode("two", GoodColor, Nil)
       ))
 
     presentPiece(molecule) should equal (displayed)
@@ -57,16 +60,26 @@ class PackageSuite extends FunSuite {
 
   test("presentPiece - without value - with note") {
     presentPiece(Atom(Bytes(2), None, notes = Seq("note"))) should equal (
-      DisplayTreeNode("WHOLE (note)", Nil))
+      DisplayTreeNode("WHOLE (note)", GoodColor, Nil))
   }
 
   test("presentPiece - with value - with note") {
     presentPiece(Atom(Bytes(2), Some("delta"), notes = Seq("note"))) should equal (
-      DisplayTreeNode("WHOLE: delta (note)", Nil))
+      DisplayTreeNode("WHOLE: delta (note)", GoodColor, Nil))
   }
 
   test("presentPiece - multiple notes") {
     presentPiece(Atom(Bytes(2), None, notes = Seq("note 1", "note 2"))) should equal (
-      DisplayTreeNode("WHOLE (note 1; note 2)", Nil))
+      DisplayTreeNode("WHOLE (note 1; note 2)", GoodColor, Nil))
   }
+
+  test("presentPiece - varying quality") {
+    for (quality <- PieceQuality.values)
+      presentPiece(Atom(Bytes(2), None, quality = quality)) should equal (
+        DisplayTreeNode("WHOLE", QualityColors(quality), Nil))
+  }
+}
+
+object PackageSuite {
+  private val GoodColor = QualityColors(PieceQuality.Good)
 }

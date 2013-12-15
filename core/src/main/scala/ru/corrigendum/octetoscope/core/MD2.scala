@@ -28,29 +28,29 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
   private object Header extends MoleculeBuilderDissector[HeaderValue] {
     // Quake II's struct dmdl_t.
     override def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) = {
-      val adder = new SequentialAdder(input, offset, builder)
+      val add = new SequentialAdder(input, offset, builder)
       val value = new HeaderValue
 
-      adder("Identification", asciiString(4))
-      adder("Version", sInt32L)
+      add("Identification", asciiString(4))
+      add("Version", sInt32L + CommonConstraints.positive)
 
-      adder("Skin width", sInt32L)
-      adder("Skin height", sInt32L)
-      adder("Frame size", sInt32L)
+      add("Skin width", sInt32L)
+      add("Skin height", sInt32L)
+      add("Frame size", sInt32L)
 
-      value.numSkins = adder("Number of skins", sInt32L)
-      adder("Number of vertices", sInt32L)
-      adder("Number of texture coordinates", sInt32L)
-      adder("Number of triangles", sInt32L)
-      adder("Number of OpenGL commands", sInt32L)
-      adder("Number of frames", sInt32L)
+      value.numSkins = add("Number of skins", sInt32L)
+      add("Number of vertices", sInt32L)
+      add("Number of texture coordinates", sInt32L)
+      add("Number of triangles", sInt32L)
+      add("Number of OpenGL commands", sInt32L)
+      add("Number of frames", sInt32L)
 
-      value.offSkins = adder("Offset of skins", sInt32L)
-      adder("Offset of texture coordinates", sInt32L)
-      adder("Offset of triangles", sInt32L)
-      adder("Offset of frames", sInt32L)
-      adder("Offset of OpenGL commands", sInt32L)
-      adder("File size", sInt32L)
+      value.offSkins = add("Offset of skins", sInt32L)
+      add("Offset of texture coordinates", sInt32L)
+      add("Offset of triangles", sInt32L)
+      add("Offset of frames", sInt32L)
+      add("Offset of OpenGL commands", sInt32L)
+      add("File size", sInt32L)
 
       value
     }
@@ -63,17 +63,17 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
 
   private class Skins(numSkins: Int) extends MoleculeBuilderDissector[Unit] {
     override def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
-      val adder = new SequentialAdder(input, offset, builder)
+      val add = new SequentialAdder(input, offset, builder)
 
       for (_ <- 0 until numSkins)
-        adder("Skin", asciiZString(64))
+        add("Skin", asciiZString(64))
     }
   }
 
   override def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
-    val adder = new RandomAdder(input, offset, builder)
-    val header = adder("Header", Bytes(0), Header)
-    adder("Skins", Bytes(header.offSkins), new Skins(header.numSkins))
+    val add = new RandomAdder(input, offset, builder)
+    val header = add("Header", Bytes(0), Header)
+    add("Skins", Bytes(header.offSkins), new Skins(header.numSkins))
     builder.setRepr("MD2")
   }
 }

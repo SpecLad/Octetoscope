@@ -74,6 +74,6 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
     val add = new RandomAdder(input, offset, builder)
     val header = add("Header", Bytes(0), Header)
     add("Skins", Bytes(header.offSkins), new Skins(header.numSkins))
-    builder.setRepr("MD2")
+    builder.setRepr("Quake II model")
   }
 }

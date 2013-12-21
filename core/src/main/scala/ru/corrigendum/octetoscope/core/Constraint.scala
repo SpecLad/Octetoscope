@@ -16,11 +16,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.core.mocks
+package ru.corrigendum.octetoscope.core
 
-import ru.corrigendum.octetoscope.core.Constraint
-
-object MockConstraint extends Constraint[String] {
-  override def check(value: String): Boolean = value.length > 1
-  override def note: String = "constrained"
+trait Constraint[-Value] {
+  def check(value: Value): Boolean
+  def note: String
 }

@@ -50,11 +50,6 @@ object SpecialDissectors {
     old: DissectorO[OldValue], transform: (Piece, OldValue) => (Piece, Option[NewValue])
   ): DissectorO[NewValue] = new TransformedO(old, transform)
 
-  trait Constraint[-Value] {
-    def check(value: Value): Boolean
-    def note: String
-  }
-
   def constrained[Value](
     dissector: Dissector[Value], constraint: Constraint[Value], quality: PieceQuality.Value
   ): Dissector[Value] = {

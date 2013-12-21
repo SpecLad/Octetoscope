@@ -55,7 +55,7 @@ object SpecialDissectors {
   ): Dissector[Value] = {
     def transform(piece: Piece, value: Value) =
       if (constraint.check(value)) (piece, value)
-      else (piece.impaired(quality).withNote(constraint.note), value)
+      else (piece.impaired(quality).withNote(constraint.note(quality)), value)
     transformed(dissector, transform)
   }
 
@@ -64,7 +64,7 @@ object SpecialDissectors {
   ): DissectorO[Value] = {
     def transform(piece: Piece, value: Value) =
       if (constraint.check(value)) (piece, Some(value))
-      else (piece.impaired(quality).withNote(constraint.note), Some(value))
+      else (piece.impaired(quality).withNote(constraint.note(quality)), Some(value))
     transformedO(dissector, transform)
   }
 
@@ -73,7 +73,7 @@ object SpecialDissectors {
   ): DissectorO[Value] = {
     def transform(piece: Piece, value: Value) =
       if (constraint.check(value)) (piece, Some(value))
-      else (piece.impaired(quality).withNote(constraint.note), None)
+      else (piece.impaired(quality).withNote(constraint.note(quality)), None)
     transformedO(dissector, transform)
   }
 }

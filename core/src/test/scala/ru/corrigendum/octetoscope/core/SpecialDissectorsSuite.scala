@@ -51,7 +51,7 @@ class SpecialDissectorsSuite extends FunSuite {
 
     val (piece, value) = constrained.dissect(blob)
 
-    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Dubious, Seq("constrained")))
+    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Dubious, Seq("constrained (Dubious)")))
     value should equal ("a")
   }
 
@@ -65,7 +65,7 @@ class SpecialDissectorsSuite extends FunSuite {
 
     val (piece, value) = constrained.dissect(blob)
 
-    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Bad, Seq("constrained", "constrained")))
+    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Bad, Seq("constrained (Bad)", "constrained (Dubious)")))
     value should equal ("a")
   }
 
@@ -111,7 +111,7 @@ class SpecialDissectorsSuite extends FunSuite {
 
     val (piece, value) = constrained.dissectO(blob)
 
-    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Dubious, Seq("constrained")))
+    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Dubious, Seq("constrained (Dubious)")))
     value should equal (Some("a"))
   }
 
@@ -125,7 +125,7 @@ class SpecialDissectorsSuite extends FunSuite {
 
     val (piece, value) = constrained.dissectO(blob)
 
-    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Bad, Seq("constrained", "constrained")))
+    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Bad, Seq("constrained (Bad)", "constrained (Dubious)")))
     value should equal (Some("a"))
   }
 
@@ -150,7 +150,7 @@ class SpecialDissectorsSuite extends FunSuite {
 
     val (piece, value) = constrained.dissectO(blob)
 
-    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Dubious, Seq("constrained")))
+    piece should equal (Atom(Bytes(1), Some("a"), PieceQuality.Dubious, Seq("constrained (Dubious)")))
     value should equal (None)
   }
 }

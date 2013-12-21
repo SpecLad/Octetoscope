@@ -20,5 +20,5 @@ package ru.corrigendum.octetoscope.core
 
 trait Constraint[-Value] {
   def check(value: Value): Boolean
-  def note: String
+  def note(quality: PieceQuality.Value): String
 }

@@ -23,6 +23,13 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder) {
   var internalOffset = InfoSize()
 
+  def apply[Value](name: String, dissector: DissectorO[Value]): Option[Value] = {
+    val (piece, value) = dissector.dissectO(blob, initialOffset + internalOffset)
+    builder.addChild(name, internalOffset, piece)
+    internalOffset += piece.size
+    value
+  }
+
   def apply[Value](name: String, dissector: Dissector[Value]): Value = {
     val (piece, value) = dissector.dissect(blob, initialOffset + internalOffset)
     builder.addChild(name, internalOffset, piece)

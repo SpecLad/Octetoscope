@@ -29,7 +29,7 @@ class AdderSuite extends FunSuite {
 
     val adder = new SequentialAdder(blob, Bytes(1), builder)
     adder("alpha", sInt32L) should equal (1)
-    adder("beta", sInt32L) should equal (2)
+    adder("beta", sInt32L.asInstanceOf[DissectorO[Int]]) should equal (Some(2))
 
     builder.build() should equal (Molecule(Bytes(8), None, Seq(
       SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("1"))),
@@ -43,7 +43,7 @@ class AdderSuite extends FunSuite {
 
     val adder = new RandomAdder(blob, Bytes(1), builder)
     adder("alpha", Bytes(0), sInt32L) should equal (3)
-    adder("beta", Bytes(5), sInt32L) should equal (4)
+    adder("beta", Bytes(5), sInt32L.asInstanceOf[DissectorO[Int]]) should equal (Some(4))
 
     builder.build() should equal (Molecule(Bytes(9), None, Seq(
       SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("3"))),

@@ -23,6 +23,13 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 // A dissector that may or may not return a value. The O is for Option.
 trait DissectorO[+Value] {
   def dissectO(input: Blob, offset: InfoSize = InfoSize()): (Piece, Option[Value])
+
+  def +?(constraint: Constraint[Value]): DissectorO[Value] =
+    SpecialDissectors.constrainedO(this, constraint, PieceQuality.Dubious)
+  def +(constraint: Constraint[Value]): DissectorO[Value] =
+    SpecialDissectors.constrainedO(this, constraint, PieceQuality.Bad)
+  def +!(constraint: Constraint[Value]): DissectorO[Value] =
+    SpecialDissectors.stronglyConstrainedO(this, constraint, PieceQuality.Bad)
 }
 
 // A dissector that will always return a value.
@@ -33,4 +40,9 @@ trait Dissector[+Value] extends DissectorO[Value] {
   }
 
   def dissect(input: Blob, offset: InfoSize = InfoSize()): (Piece, Value)
+
+  override def +?(constraint: Constraint[Value]): Dissector[Value] =
+    SpecialDissectors.constrained(this, constraint, PieceQuality.Dubious)
+  override def +(constraint: Constraint[Value]): Dissector[Value] =
+    SpecialDissectors.constrained(this, constraint, PieceQuality.Bad)
 }

@@ -22,8 +22,12 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import PrimitiveDissectors._
 import CommonConstraints._
 
-// MD2 dissection is based on the Quake II source code,
-// available at <https://github.com/id-Software/Quake-2>.
+/*
+  Quake II models (*.md2).
+
+  Dissection is based on the Quake II source code,
+  available at <https://github.com/id-Software/Quake-2>.
+*/
 
 object MD2 extends MoleculeBuilderDissector[Unit] {
   private object Header extends MoleculeBuilderDissector[HeaderValue] {

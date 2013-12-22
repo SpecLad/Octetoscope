@@ -18,16 +18,22 @@
 
 package ru.corrigendum.octetoscope.core
 
-trait Constraint[-Value] {
-  def check(value: Value): Boolean
-  def note(quality: PieceQuality.Value): String
-}
+import org.scalatest.FunSuite
+import org.scalatest.matchers.ShouldMatchers._
 
-trait ShouldMustConstraint[-Value] extends Constraint[Value] {
-  final override def note(quality: PieceQuality.Value): String =
-    if (quality.id <= PieceQuality.Dubious.id) shouldNote
-    else mustNote
+class ConstraintSuite extends FunSuite {
+  test("ShouldMustConstraint") {
+    val constraint = new ShouldMustConstraint[Nothing] {
+      override def shouldNote: String = "should"
+      override def mustNote: String = "must"
+      override def check(value: Nothing): Boolean = false
+    }
 
-  def shouldNote: String
-  def mustNote: String
+    // Doesn't really make sense to constrain with the Good quality,
+    // but let's test it anyway.
+    constraint.note(PieceQuality.Good) should equal ("should")
+    constraint.note(PieceQuality.Dubious) should equal ("should")
+    constraint.note(PieceQuality.Bad) should equal ("must")
+    constraint.note(PieceQuality.Broken) should equal ("must")
+  }
 }

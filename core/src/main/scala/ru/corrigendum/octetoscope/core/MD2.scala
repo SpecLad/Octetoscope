@@ -20,6 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import PrimitiveDissectors._
+import CommonConstraints._
 
 // MD2 dissection is based on the Quake II source code,
 // available at <https://github.com/id-Software/Quake-2>.
@@ -32,33 +33,39 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
       val value = new HeaderValue
 
       add("Identification", asciiString(4))
-      add("Version", sInt32L + CommonConstraints.positive)
+      add("Version", sInt32L)
 
-      add("Skin width", sInt32L)
-      add("Skin height", sInt32L)
+      /*
+        Quake II doesn't check every field below to be positive,
+        but the dissector does it anyway, because negative values make
+        no sense for them.
+      */
+
+      add("Skin width", sInt32L +! positive)
+      add("Skin height", sInt32L +! positive)
       add("Frame size", sInt32L)
 
-      value.numSkins = add("Number of skins", sInt32L)
-      add("Number of vertices", sInt32L)
-      add("Number of texture coordinates", sInt32L)
-      add("Number of triangles", sInt32L)
-      add("Number of OpenGL commands", sInt32L)
-      add("Number of frames", sInt32L)
+      value.numSkins = add("Number of skins", sInt32L +! positive)
+      add("Number of vertices", sInt32L +! positive)
+      add("Number of texture coordinates", sInt32L +! positive)
+      add("Number of triangles", sInt32L +! positive)
+      add("Number of OpenGL commands", sInt32L +! positive)
+      add("Number of frames", sInt32L +! positive)
 
-      value.offSkins = add("Offset of skins", sInt32L)
-      add("Offset of texture coordinates", sInt32L)
-      add("Offset of triangles", sInt32L)
-      add("Offset of frames", sInt32L)
-      add("Offset of OpenGL commands", sInt32L)
-      add("File size", sInt32L)
+      value.offSkins = add("Offset of skins", sInt32L +! nonNegative)
+      add("Offset of texture coordinates", sInt32L +! nonNegative)
+      add("Offset of triangles", sInt32L +! nonNegative)
+      add("Offset of frames", sInt32L +! nonNegative)
+      add("Offset of OpenGL commands", sInt32L +! nonNegative)
+      add("File size", sInt32L +! nonNegative)
 
       value
     }
   }
 
   private class HeaderValue {
-    var numSkins: Int = _
-    var offSkins: Int = _
+    var numSkins: Option[Int] = None
+    var offSkins: Option[Int] = None
   }
 
   private class Skins(numSkins: Int) extends MoleculeBuilderDissector[Unit] {
@@ -73,7 +80,10 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
   override def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
     val add = new RandomAdder(input, offset, builder)
     val header = add("Header", Bytes(0), Header)
-    add("Skins", Bytes(header.offSkins), new Skins(header.numSkins))
+
+    for (offSkins <- header.offSkins; numSkins <- header.numSkins)
+      add("Skins", Bytes(offSkins), new Skins(numSkins))
+
     builder.setRepr("Quake II model")
   }
 }

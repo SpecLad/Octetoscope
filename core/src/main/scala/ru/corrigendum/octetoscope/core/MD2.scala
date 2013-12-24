@@ -31,12 +31,16 @@ import CommonConstraints._
 
 object MD2 extends MoleculeBuilderDissector[Unit] {
   private object Header extends MoleculeBuilderDissector[HeaderValue] {
+    private val magicBytes = Array[Byte]('I', 'D', 'P', '2')
+
     // Quake II's struct dmdl_t.
-    override def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) = {
+    override def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder): HeaderValue = {
       val add = new SequentialAdder(input, offset, builder)
       val value = new HeaderValue
 
-      add("Identification", asciiString(4))
+      val correctMagic = add("Identification", magic(magicBytes, "IDP2")).isDefined
+      if (!correctMagic) return value
+
       add("Version", sInt32L)
 
       /*

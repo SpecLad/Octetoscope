@@ -68,4 +68,19 @@ object PrimitiveDissectors {
   }
 
   def asciiZString(length: Int): Dissector[String] = new AsciiZString(length)
+
+  private class Magic(expected: Array[Byte], interpretation: String) extends DissectorO[Unit] {
+    override def dissectO(input: Blob, offset: InfoSize): (Piece, Option[Unit]) = {
+      val Bytes(bo) = offset
+
+      if (input.slice(bo, bo + expected.length).toArray.sameElements(expected)) {
+        (Atom(Bytes(expected.length), Some(interpretation)), Some(()))
+      } else {
+        val note = "expected \"%s\" (0x%s)".format(interpretation, expected.map("%02x".format(_)).mkString)
+        (Atom(Bytes(expected.length), None, PieceQuality.Broken, Seq(note)), None)
+      }
+    }
+  }
+
+  def magic(expected: Array[Byte], interpretation: String): DissectorO[Unit] = new Magic(expected, interpretation)
 }

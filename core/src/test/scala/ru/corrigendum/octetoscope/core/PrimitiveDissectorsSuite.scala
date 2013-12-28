@@ -31,26 +31,21 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(sInt32L, "83754751", 83754751, -1, -2, -3, 4)
     verify(sInt32L, "-50462977", -50462977, -1, -2, -3, -4)
     verify(sInt32L, "-1", -1, -1, -1, -1, -1)
-
-    verifyWithPad(sInt32L, "67305985", 67305985, 1, 2, 3, 4)
   }
 
   test("AsciiString") {
     verify(asciiString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
-    verifyWithPad(asciiString(3), "\"efg\"", "efg", 'e'.toByte, 'f'.toByte, 'g'.toByte)
   }
 
   test("AsciiZString") {
     verify(asciiZString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
     verify(asciiZString(4), "\"abc\"", "abc", 'a'.toByte, 'b'.toByte, 'c'.toByte, 0)
     verify(asciiZString(4), "\"ab\"", "ab", 'a'.toByte, 'b'.toByte, 0, 'd'.toByte)
-    verifyWithPad(asciiZString(3), "\"ef\"", "ef", 'e'.toByte, 'f'.toByte, 0)
   }
 
   test("Magic") {
     val dissector = magic(Array[Byte](1, 2, 3), "123")
     verify(dissector, "123", (), 1, 2, 3)
-    verifyWithPad(dissector, "123", (), 1, 2, 3)
 
     dissector.dissectO(new ArrayBlob(Array[Byte](4, 5, 6))) should equal (
       Atom(Bytes(3), None, PieceQuality.Broken, Seq("expected \"123\" (0x010203)")),
@@ -61,22 +56,16 @@ class PrimitiveDissectorsSuite extends FunSuite {
 
 object PrimitiveDissectorsSuite {
   def verify[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
-    dissector.dissectO(new ArrayBlob(bytes.toArray)) should equal (
-      (
-        Atom(Bytes(bytes.size), Some(expectedRepr)),
-        Some(expectedValue)
+    for (padSize <- List(0, 1)) {
+      val pad = List.fill(padSize)((-1).toByte)
+      val paddedBytes = pad ++ bytes ++ pad
+      val blob = new ArrayBlob(paddedBytes.toArray)
+      dissector.dissectO(blob, Bytes(padSize)) should equal (
+        (
+          Atom(Bytes(bytes.size), Some(expectedRepr)),
+          Some(expectedValue)
+        )
       )
-    )
-  }
-
-  def verifyWithPad[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
-    val paddedBytes = (-1).toByte +: bytes :+ (-1).toByte
-    val blob = new ArrayBlob(paddedBytes.toArray)
-    dissector.dissectO(blob, Bytes(1)) should equal (
-      (
-        Atom(Bytes(bytes.size), Some(expectedRepr)),
-        Some(expectedValue)
-      )
-    )
+    }
   }
 }

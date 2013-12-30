@@ -20,6 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
+import org.scalatest.Inside._
 import PrimitiveDissectors._
 
 class PrimitiveDissectorsSuite extends FunSuite {
@@ -55,17 +56,28 @@ class PrimitiveDissectorsSuite extends FunSuite {
 }
 
 object PrimitiveDissectorsSuite {
-  def verify[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
+  def verifyGeneric[Value](
+    dissector: DissectorO[Value], expectedRepr: Option[String], expectedValue: Option[Value],
+    expectedQuality: PieceQuality.Value, expectedNumNotes: Int, bytes: Byte*
+  ) {
     for (padSize <- List(0, 1)) {
       val pad = List.fill(padSize)((-1).toByte)
       val paddedBytes = pad ++ bytes ++ pad
       val blob = new ArrayBlob(paddedBytes.toArray)
-      dissector.dissectO(blob, Bytes(padSize)) should equal (
-        (
-          Atom(Bytes(bytes.size), Some(expectedRepr)),
-          Some(expectedValue)
-        )
-      )
+      val (piece, value) = dissector.dissectO(blob, Bytes(padSize))
+
+      inside(piece) { case Atom(size_, repr, quality, notes) =>
+        size_ shouldBe Bytes(bytes.size)
+        repr shouldBe expectedRepr
+        quality shouldBe expectedQuality
+        notes should have size expectedNumNotes
+      }
+
+      value shouldBe expectedValue
     }
+  }
+
+  def verify[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
+    verifyGeneric(dissector, Some(expectedRepr), Some(expectedValue), PieceQuality.Good, 0, bytes: _*)
   }
 }

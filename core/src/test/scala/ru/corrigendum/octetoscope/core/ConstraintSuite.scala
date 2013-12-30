@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 
 class ConstraintSuite extends FunSuite {
   test("ShouldMustConstraint") {

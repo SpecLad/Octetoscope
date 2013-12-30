@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 
 import mocks.MockView
 import org.scalatest.{BeforeAndAfter, FunSuite}

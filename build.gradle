@@ -21,7 +21,7 @@ ext {
   scalaVersion = "${scalaMajorVersion}.3"
   scalaLibraryDep = "org.scala-lang:scala-library:${scalaVersion}"
 
-  scalaTestVersion = '1.9.2'
+  scalaTestVersion = '2.0'
   scalaTestDep = "org.scalatest:scalatest_${scalaMajorVersion}:${scalaTestVersion}"
 
   icuVersion = '51.1'

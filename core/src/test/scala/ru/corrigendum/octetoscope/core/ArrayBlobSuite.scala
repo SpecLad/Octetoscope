@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 import java.util
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 

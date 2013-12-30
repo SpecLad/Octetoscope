@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.presentation
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 

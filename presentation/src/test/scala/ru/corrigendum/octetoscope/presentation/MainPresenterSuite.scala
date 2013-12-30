@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.presentation
 import ru.corrigendum.octetoscope.presentation.mocks.{MockDissectorDriver, MockDialogBoxer, MockMainView}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 import ru.corrigendum.octetoscope.core.{Bytes, Atom, VersionInfo}
 import java.io.{IOException, File}

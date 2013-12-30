@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.core
 
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 import org.scalatest.FunSuite
 import ru.corrigendum.octetoscope.core.mocks.{MockDissector, MockBinaryReader}
 import java.nio.charset.StandardCharsets

@@ -23,14 +23,14 @@ import org.scalatest.Matchers._
 
 class CommonConstraintsSuite extends FunSuite {
   test("nonNegative") {
-    CommonConstraints.nonNegative[Double].check(5.0) should equal (true)
-    CommonConstraints.nonNegative[Int].check(0) should equal (true)
-    CommonConstraints.nonNegative[Long].check(-1L) should equal (false)
+    CommonConstraints.nonNegative[Double].check(5.0) shouldBe true
+    CommonConstraints.nonNegative[Int].check(0) shouldBe true
+    CommonConstraints.nonNegative[Long].check(-1L) shouldBe false
   }
 
   test("positive") {
-    CommonConstraints.positive[Short].check(4) should equal (true)
-    CommonConstraints.positive[Byte].check(0) should equal (false)
-    CommonConstraints.positive[Float].check(-2.0f) should equal (false)
+    CommonConstraints.positive[Short].check(4) shouldBe true
+    CommonConstraints.positive[Byte].check(0) shouldBe false
+    CommonConstraints.positive[Float].check(-2.0f) shouldBe false
   }
 }

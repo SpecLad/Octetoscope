@@ -29,13 +29,13 @@ class DissectorDriverSuite extends FunSuite {
   test("dissect empty") {
     val reader = new MockBinaryReader(Blob.empty)
     val driver = new DissectorDriverImpl(reader, MockDissector)
-    driver.dissect(DissectorDriverSuite.FakePath) should equal (None)
+    driver.dissect(DissectorDriverSuite.FakePath) shouldBe None
   }
 
   test("dissect nonempty") {
     val reader = new MockBinaryReader(new ArrayBlob("magic".getBytes(StandardCharsets.US_ASCII)))
     val driver = new DissectorDriverImpl(reader, MockDissector)
-    driver.dissect(DissectorDriverSuite.FakePath) should equal (Some(Atom(Bytes(5), Some("magic"))))
+    driver.dissect(DissectorDriverSuite.FakePath) shouldBe Some(Atom(Bytes(5), Some("magic")))
   }
 }
 

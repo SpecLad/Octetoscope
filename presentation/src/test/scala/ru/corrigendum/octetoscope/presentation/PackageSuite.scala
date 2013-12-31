@@ -28,19 +28,18 @@ class PackageSuite extends FunSuite {
 
   test("presentVersionInfo") {
     val hash = "1234" * 10
-    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) should equal ("1.2-g1234123")
-    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = false)) should equal ("1.2+34-g1234123")
-    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = true)) should equal ("1.2-g1234123-dirty")
-    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = true)) should equal ("1.2+34-g1234123-dirty")
+    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) shouldBe "1.2-g1234123"
+    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = false)) shouldBe "1.2+34-g1234123"
+    presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = true)) shouldBe "1.2-g1234123-dirty"
+    presentVersionInfo(VersionInfo("1.2", 34, hash, dirty = true)) shouldBe "1.2+34-g1234123-dirty"
   }
 
   test("presentPiece - atom - with value") {
-    presentPiece(Atom(Bytes(5), Some("alpha"))) should equal (
-      DisplayTreeNode("WHOLE: alpha", GoodColor, Nil))
+    presentPiece(Atom(Bytes(5), Some("alpha"))) shouldBe DisplayTreeNode("WHOLE: alpha", GoodColor, Nil)
   }
 
   test("presentPiece - atom - without value") {
-    presentPiece(Atom(Bytes(2), None)) should equal (DisplayTreeNode("WHOLE", GoodColor, Nil))
+    presentPiece(Atom(Bytes(2), None)) shouldBe DisplayTreeNode("WHOLE", GoodColor, Nil)
   }
 
   test("presentPiece - molecule") {
@@ -55,28 +54,28 @@ class PackageSuite extends FunSuite {
         DisplayTreeNode("two", GoodColor, Nil)
       ))
 
-    presentPiece(molecule) should equal (displayed)
+    presentPiece(molecule) shouldBe displayed
   }
 
   test("presentPiece - without value - with note") {
-    presentPiece(Atom(Bytes(2), None, notes = Seq("note"))) should equal (
-      DisplayTreeNode("WHOLE (note)", GoodColor, Nil))
+    presentPiece(Atom(Bytes(2), None, notes = Seq("note"))) shouldBe
+      DisplayTreeNode("WHOLE (note)", GoodColor, Nil)
   }
 
   test("presentPiece - with value - with note") {
-    presentPiece(Atom(Bytes(2), Some("delta"), notes = Seq("note"))) should equal (
-      DisplayTreeNode("WHOLE: delta (note)", GoodColor, Nil))
+    presentPiece(Atom(Bytes(2), Some("delta"), notes = Seq("note"))) shouldBe
+      DisplayTreeNode("WHOLE: delta (note)", GoodColor, Nil)
   }
 
   test("presentPiece - multiple notes") {
-    presentPiece(Atom(Bytes(2), None, notes = Seq("note 1", "note 2"))) should equal (
-      DisplayTreeNode("WHOLE (note 1; note 2)", GoodColor, Nil))
+    presentPiece(Atom(Bytes(2), None, notes = Seq("note 1", "note 2"))) shouldBe
+      DisplayTreeNode("WHOLE (note 1; note 2)", GoodColor, Nil)
   }
 
   test("presentPiece - varying quality") {
     for (quality <- PieceQuality.values)
-      presentPiece(Atom(Bytes(2), None, quality = quality)) should equal (
-        DisplayTreeNode("WHOLE", QualityColors(quality), Nil))
+      presentPiece(Atom(Bytes(2), None, quality = quality)) shouldBe
+        DisplayTreeNode("WHOLE", QualityColors(quality), Nil)
   }
 }
 

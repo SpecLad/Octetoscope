@@ -23,16 +23,16 @@ import org.scalatest.Matchers._
 
 class PieceSuite extends FunSuite {
   test("impaired") {
-    Atom(InfoSize(), None, PieceQuality.Dubious).impaired(PieceQuality.Bad).quality should equal (PieceQuality.Bad)
-    Atom(InfoSize(), None, PieceQuality.Bad).impaired(PieceQuality.Dubious).quality should equal (PieceQuality.Bad)
+    Atom(InfoSize(), None, PieceQuality.Dubious).impaired(PieceQuality.Bad).quality shouldBe PieceQuality.Bad
+    Atom(InfoSize(), None, PieceQuality.Bad).impaired(PieceQuality.Dubious).quality shouldBe PieceQuality.Bad
     Molecule(InfoSize(), None, Seq(), PieceQuality.Dubious)
-      .impaired(PieceQuality.Bad).quality should equal (PieceQuality.Bad)
+      .impaired(PieceQuality.Bad).quality shouldBe PieceQuality.Bad
     Molecule(InfoSize(), None, Seq(), PieceQuality.Bad)
-      .impaired(PieceQuality.Dubious).quality should equal (PieceQuality.Bad)
+      .impaired(PieceQuality.Dubious).quality shouldBe PieceQuality.Bad
   }
 
   test("withNote") {
-    Atom(InfoSize(), None, notes = Seq("foo")).withNote("bar").notes should equal (Seq("foo", "bar"))
-    Molecule(InfoSize(), None, Seq(), notes = Seq("foo")).withNote("bar").notes should equal (Seq("foo", "bar"))
+    Atom(InfoSize(), None, notes = Seq("foo")).withNote("bar").notes shouldBe Seq("foo", "bar")
+    Molecule(InfoSize(), None, Seq(), notes = Seq("foo")).withNote("bar").notes shouldBe Seq("foo", "bar")
   }
 }

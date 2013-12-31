@@ -23,23 +23,23 @@ import org.scalatest.Matchers._
 
 class OffsetSuite extends FunSuite {
   test("totalBits") {
-    Bytes(0).totalBits should equal (0)
-    Bytes(3).totalBits should equal (24)
+    Bytes(0).totalBits shouldBe 0
+    Bytes(3).totalBits shouldBe 24
   }
 
   test("plus") {
-    (Bytes(4) + InfoSize()) should equal (Bytes(4))
-    (Bytes(4) + Bytes(1)) should equal (Bytes(5))
+    (Bytes(4) + InfoSize()) shouldBe Bytes(4)
+    (Bytes(4) + Bytes(1)) shouldBe Bytes(5)
   }
 
   test("minus") {
-    (Bytes(4) - Bytes(4)) should equal (InfoSize())
-    (Bytes(8) - Bytes(4)) should equal (Bytes(4))
+    (Bytes(4) - Bytes(4)) shouldBe InfoSize()
+    (Bytes(8) - Bytes(4)) shouldBe Bytes(4)
   }
 
   test("compare") {
     Bytes(5) should be < Bytes(7)
     Bytes(5) should be > Bytes(3)
-    Bytes(5).compareTo(Bytes(5)) should equal (0)
+    Bytes(5).compareTo(Bytes(5)) shouldBe 0
   }
 }

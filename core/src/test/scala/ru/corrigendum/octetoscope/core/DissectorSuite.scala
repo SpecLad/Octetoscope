@@ -29,8 +29,8 @@ class DissectorSuite extends FunSuite {
     val result = MockDissector.dissect(blob)
     val resultO = MockDissector.dissectO(blob)
 
-    resultO._1 should equal (result._1)
-    resultO._2 should equal (Some(result._2))
+    resultO._1 shouldBe result._1
+    resultO._2 shouldBe Some(result._2)
   }
 
   test("MoleculeBuilderDissector to Dissector") {
@@ -41,13 +41,12 @@ class DissectorSuite extends FunSuite {
       }
     }
 
-    MoleculeBuilderDissector.toDissector(mbd).dissect(Blob.empty) should equal (
+    MoleculeBuilderDissector.toDissector(mbd).dissect(Blob.empty) shouldBe
       (
         Molecule(Bytes(2), None, Seq(
           SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
         )),
         60
       )
-    )
   }
 }

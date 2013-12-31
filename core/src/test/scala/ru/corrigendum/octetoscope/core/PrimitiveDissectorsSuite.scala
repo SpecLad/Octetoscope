@@ -48,7 +48,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
     val dissector = magic(Array[Byte](1, 2, 3), "123")
     verify(dissector, "123", (), 1, 2, 3)
 
-    dissector.dissectO(new ArrayBlob(Array[Byte](4, 5, 6))) should equal (
+    dissector.dissectO(new ArrayBlob(Array[Byte](4, 5, 6))) shouldBe (
       Atom(Bytes(3), None, PieceQuality.Broken, Seq("expected \"123\" (0x010203)")),
       None
     )

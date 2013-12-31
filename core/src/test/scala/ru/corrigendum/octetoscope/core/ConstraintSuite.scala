@@ -31,9 +31,9 @@ class ConstraintSuite extends FunSuite {
 
     // Doesn't really make sense to constrain with the Good quality,
     // but let's test it anyway.
-    constraint.note(PieceQuality.Good) should equal ("should")
-    constraint.note(PieceQuality.Dubious) should equal ("should")
-    constraint.note(PieceQuality.Bad) should equal ("must")
-    constraint.note(PieceQuality.Broken) should equal ("must")
+    constraint.note(PieceQuality.Good) shouldBe "should"
+    constraint.note(PieceQuality.Dubious) shouldBe "should"
+    constraint.note(PieceQuality.Bad) shouldBe "must"
+    constraint.note(PieceQuality.Broken) shouldBe "must"
   }
 }

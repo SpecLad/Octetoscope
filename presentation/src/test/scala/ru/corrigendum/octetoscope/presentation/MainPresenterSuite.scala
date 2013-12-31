@@ -41,22 +41,22 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("closing the window") {
     view.trigger(MainView.ClosedEvent)
-    view should be ('disposed)
+    view shouldBe 'disposed
   }
 
   test("initialization") {
-    view should be ('visible)
-    view.title should equal ("Blarf")
+    view shouldBe 'visible
+    view.title shouldBe "Blarf"
   }
 
   test("quit command") {
     view.trigger(MainView.CommandEvent(MainView.Command.Quit))
-    view should be ('disposed)
+    view shouldBe 'disposed
   }
 
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
-    boxer.messages should equal (List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours))))
+    boxer.messages shouldBe List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours)))
   }
 
   test("open command - cancelled") {
@@ -73,7 +73,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs should have size 0
-    boxer.messages should equal (List(strings.errorReadingFile(exception.getMessage)))
+    boxer.messages shouldBe List(strings.errorReadingFile(exception.getMessage))
   }
 
   test("open command - empty") {
@@ -81,7 +81,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs should have size 0
-    boxer.messages should equal (List(strings.cantDissectEmptyFile()))
+    boxer.messages shouldBe List(strings.cantDissectEmptyFile())
   }
 
   test("open command - successful") {
@@ -90,9 +90,9 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs should have size 1
-    view.tabs.head.title should equal ("cadabra")
-    view.tabs.head.toolTip should equal (MainPresenterSuite.FakePath.toString)
-    view.tabs.head.tree should equal (presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath).get))
+    view.tabs.head.title shouldBe "cadabra"
+    view.tabs.head.toolTip shouldBe MainPresenterSuite.FakePath.toString
+    view.tabs.head.tree shouldBe presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath).get)
   }
 
   test("tab closing") {

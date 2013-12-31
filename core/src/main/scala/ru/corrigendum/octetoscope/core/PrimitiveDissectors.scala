@@ -39,14 +39,17 @@ object PrimitiveDissectors {
 
   abstract private class AsciiStringGeneric(length: Int) extends Dissector[String] {
     protected def findLength(input: Blob, byteOffset: Long): Int
+    protected def assess(value: String): (PieceQuality.Value, Seq[String]) =
+      (PieceQuality.Good, Nil)
 
     final override def dissect(input: Blob, offset: InfoSize) = {
       val Bytes(bo) = offset
 
       val value = new String(input.slice(bo, bo + findLength(input, bo)).toArray,
         StandardCharsets.US_ASCII)
+      val (quality, notes) = assess(value)
 
-      (Atom(Bytes(length), Some("\"" + value + "\"")), value)
+      (Atom(Bytes(length), Some("\"" + value + "\""), quality, notes), value)
     }
   }
 
@@ -65,6 +68,10 @@ object PrimitiveDissectors {
 
       actualLen
     }
+
+    override protected def assess(value: String): (PieceQuality.Value, Seq[String]) =
+      if (value.length < length) super.assess(value)
+      else (PieceQuality.Bad, Seq("missing NUL terminator"))
   }
 
   def asciiZString(length: Int): Dissector[String] = new AsciiZString(length)

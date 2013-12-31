@@ -39,9 +39,9 @@ class PrimitiveDissectorsSuite extends FunSuite {
   }
 
   test("AsciiZString") {
-    verify(asciiZString(4), "\"abcd\"", "abcd", 'a', 'b', 'c', 'd')
     verify(asciiZString(4), "\"abc\"", "abc", 'a', 'b', 'c', 0)
     verify(asciiZString(4), "\"ab\"", "ab", 'a', 'b', 0, 'd')
+    verifyBad(asciiZString(4), "\"abcd\"", "abcd", 'a', 'b', 'c', 'd')
   }
 
   test("Magic") {
@@ -79,5 +79,9 @@ object PrimitiveDissectorsSuite {
 
   def verify[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
     verifyGeneric(dissector, Some(expectedRepr), Some(expectedValue), PieceQuality.Good, 0, bytes: _*)
+  }
+
+  def verifyBad[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
+    verifyGeneric(dissector, Some(expectedRepr), Some(expectedValue), PieceQuality.Bad, 1, bytes: _*)
   }
 }

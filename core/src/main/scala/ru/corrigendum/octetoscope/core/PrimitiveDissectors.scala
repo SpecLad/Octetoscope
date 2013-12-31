@@ -38,7 +38,7 @@ object PrimitiveDissectors {
   def sInt32L: Dissector[Int] = SInt32L
 
   abstract private class AsciiStringGeneric(length: Int) extends Dissector[String] {
-    def findLength(input: Blob, byteOffset: Long): Int
+    protected def findLength(input: Blob, byteOffset: Long): Int
 
     final override def dissect(input: Blob, offset: InfoSize) = {
       val Bytes(bo) = offset
@@ -51,13 +51,13 @@ object PrimitiveDissectors {
   }
 
   private class AsciiString(length: Int) extends AsciiStringGeneric(length) {
-    override def findLength(input: Blob, byteOffset: Long): Int = length
+    override protected def findLength(input: Blob, byteOffset: Long): Int = length
   }
 
   def asciiString(length: Int): Dissector[String] = new AsciiString(length)
 
   private class AsciiZString(length: Int) extends AsciiStringGeneric(length) {
-    def findLength(input: Blob, byteOffset: Long): Int = {
+    override protected def findLength(input: Blob, byteOffset: Long): Int = {
       var actualLen = 0
 
       while (actualLen < length && input(byteOffset + actualLen) != 0)

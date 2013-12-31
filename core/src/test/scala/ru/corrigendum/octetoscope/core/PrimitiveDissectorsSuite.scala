@@ -35,13 +35,13 @@ class PrimitiveDissectorsSuite extends FunSuite {
   }
 
   test("AsciiString") {
-    verify(asciiString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
+    verify(asciiString(4), "\"abcd\"", "abcd", 'a', 'b', 'c', 'd')
   }
 
   test("AsciiZString") {
-    verify(asciiZString(4), "\"abcd\"", "abcd", 'a'.toByte, 'b'.toByte, 'c'.toByte, 'd'.toByte)
-    verify(asciiZString(4), "\"abc\"", "abc", 'a'.toByte, 'b'.toByte, 'c'.toByte, 0)
-    verify(asciiZString(4), "\"ab\"", "ab", 'a'.toByte, 'b'.toByte, 0, 'd'.toByte)
+    verify(asciiZString(4), "\"abcd\"", "abcd", 'a', 'b', 'c', 'd')
+    verify(asciiZString(4), "\"abc\"", "abc", 'a', 'b', 'c', 0)
+    verify(asciiZString(4), "\"ab\"", "ab", 'a', 'b', 0, 'd')
   }
 
   test("Magic") {

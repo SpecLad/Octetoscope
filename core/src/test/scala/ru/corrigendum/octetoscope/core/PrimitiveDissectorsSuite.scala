@@ -26,7 +26,7 @@ import PrimitiveDissectors._
 class PrimitiveDissectorsSuite extends FunSuite {
   import PrimitiveDissectorsSuite._
 
-  test("SInt32L") {
+  test("sInt32L") {
     verify(sInt32L, "0", 0, 0, 0, 0, 0)
     verify(sInt32L, "67305985", 67305985, 1, 2, 3, 4)
     verify(sInt32L, "83754751", 83754751, -1, -2, -3, 4)
@@ -34,17 +34,17 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(sInt32L, "-1", -1, -1, -1, -1, -1)
   }
 
-  test("AsciiString") {
+  test("asciiString") {
     verify(asciiString(4), "\"abcd\"", "abcd", 'a', 'b', 'c', 'd')
   }
 
-  test("AsciiZString") {
+  test("asciiZString") {
     verify(asciiZString(4), "\"abc\"", "abc", 'a', 'b', 'c', 0)
     verify(asciiZString(4), "\"ab\"", "ab", 'a', 'b', 0, 'd')
     verifyBad(asciiZString(4), "\"abcd\"", "abcd", 'a', 'b', 'c', 'd')
   }
 
-  test("Magic") {
+  test("magic") {
     val dissector = magic(Array[Byte](1, 2, 3), "123")
     verify(dissector, "123", (), 1, 2, 3)
 

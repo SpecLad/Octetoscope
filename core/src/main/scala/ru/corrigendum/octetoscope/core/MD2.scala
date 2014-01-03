@@ -41,7 +41,8 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
       val correctMagic = add("Identification", magic(magicBytes, "IDP2")).isDefined
       if (!correctMagic) return value
 
-      add("Version", sInt32L)
+      val correctVersion = add("Version", sInt32L +! equalTo(8, "ALIAS_VERSION")).isDefined
+      if (!correctVersion) return value
 
       /*
         Quake II doesn't check every field below to be positive,

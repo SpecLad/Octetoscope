@@ -48,14 +48,19 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
         Quake II doesn't check every field below to be positive,
         but the dissector does it anyway, because negative values make
         no sense for them.
+
+        The "no more than" checks only produce warnings, because they're
+        engine limitations and not imposed by the format itself. Source
+        ports, for example, could omit these checks and support a wider
+        range of values.
       */
 
       add("Skin width", sInt32L +! positive)
-      add("Skin height", sInt32L +! positive)
+      add("Skin height", sInt32L +! positive +? noMoreThan(480, "MAX_LBM_HEIGHT"))
       add("Frame size", sInt32L)
 
       value.numSkins = add("Number of skins", sInt32L +! positive)
-      add("Number of vertices", sInt32L +! positive)
+      add("Number of vertices", sInt32L +! positive +? noMoreThan(2048, "MAX_VERTS"))
       add("Number of texture coordinates", sInt32L +! positive)
       add("Number of triangles", sInt32L +! positive)
       add("Number of OpenGL commands", sInt32L +! positive)

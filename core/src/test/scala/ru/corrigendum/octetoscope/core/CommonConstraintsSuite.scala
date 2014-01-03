@@ -33,4 +33,12 @@ class CommonConstraintsSuite extends FunSuite {
     CommonConstraints.positive[Byte].check(0) shouldBe false
     CommonConstraints.positive[Float].check(-2.0f) shouldBe false
   }
+
+  test("equalTo") {
+    val c = CommonConstraints.equalTo(5, "FIVE")
+    c.check(5) shouldBe true
+    c.check(3) shouldBe false
+    c.shouldNote should (include ("5") and include ("FIVE"))
+    c.mustNote should (include ("5") and include ("FIVE"))
+  }
 }

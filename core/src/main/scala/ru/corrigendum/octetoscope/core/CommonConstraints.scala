@@ -30,4 +30,10 @@ private object CommonConstraints {
     def shouldNote: String = "should be positive"
     def mustNote: String = "must be positive"
   }
+
+  def equalTo[T](expected: T, meaning: String) = new ShouldMustConstraint[T] {
+    override def shouldNote: String = "should equal %s (%s)".format(expected, meaning)
+    override def mustNote: String = "must equal %s (%s)".format(expected, meaning)
+    override def check(value: T): Boolean = value == expected
+  }
 }

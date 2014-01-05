@@ -61,13 +61,13 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
 
       value.numSkins = add("Number of skins", sInt32L +! positive)
       add("Number of vertices", sInt32L +! positive +? noMoreThan(2048, "MAX_VERTS"))
-      add("Number of texture coordinates", sInt32L +! positive)
+      value.numTexCoords = add("Number of texture coordinates", sInt32L +! positive)
       add("Number of triangles", sInt32L +! positive)
       add("Number of OpenGL commands", sInt32L +! positive)
       add("Number of frames", sInt32L +! positive)
 
       value.offSkins = add("Offset of skins", sInt32L +! nonNegative)
-      add("Offset of texture coordinates", sInt32L +! nonNegative)
+      value.offTexCoords = add("Offset of texture coordinates", sInt32L +! nonNegative)
       add("Offset of triangles", sInt32L +! nonNegative)
       add("Offset of frames", sInt32L +! nonNegative)
       add("Offset of OpenGL commands", sInt32L +! nonNegative)
@@ -79,7 +79,9 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
 
   private class HeaderValue {
     var numSkins: Option[Int] = None
+    var numTexCoords: Option[Int] = None
     var offSkins: Option[Int] = None
+    var offTexCoords: Option[Int] = None
   }
 
   private class Skins(numSkins: Int) extends MoleculeBuilderDissector[Unit] {
@@ -91,12 +93,31 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
     }
   }
 
+  private class TexCoords(numTexCoords: Int) extends MoleculeBuilderDissector[Unit] {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+      val add = new SequentialAdder(input, offset, builder)
+
+      for (_ <- 0 until numTexCoords)
+        add("Texture coordinate pair", new MoleculeBuilderDissector[Unit]{
+          def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+            val add = new SequentialAdder(input, offset, builder)
+            val s = add("s", sInt16L)
+            val t = add("t", sInt16L)
+            builder.setRepr("(%d, %d)".format(s, t))
+          }
+        })
+    }
+  }
+
   override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
     val add = new RandomAdder(input, offset, builder)
     val header = add("Header", Bytes(0), Header)
 
     for (offSkins <- header.offSkins; numSkins <- header.numSkins)
       add("Skins", Bytes(offSkins), new Skins(numSkins))
+
+    for (offTexCoords <- header.offTexCoords; numTexCoords <- header.numTexCoords)
+      add("Texture coordinates", Bytes(offTexCoords), new TexCoords(numTexCoords))
 
     builder.setRepr("Quake II model")
   }

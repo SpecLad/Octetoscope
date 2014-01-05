@@ -26,6 +26,16 @@ import PrimitiveDissectors._
 class PrimitiveDissectorsSuite extends FunSuite {
   import PrimitiveDissectorsSuite._
 
+  test("sInt16L") {
+    verify(sInt16L, "-32768", -32768, 0, -128)
+    verify(sInt16L, "-257", -257, -1, -2)
+    verify(sInt16L, "-1", -1, -1, -1)
+    verify(sInt16L, "0", 0, 0, 0)
+    verify(sInt16L, "513", 513, 1, 2)
+    verify(sInt16L, "767", 767, -1, 2)
+    verify(sInt16L, "32767", 32767, -1, 127)
+  }
+
   test("sInt32L") {
     verify(sInt32L, "0", 0, 0, 0, 0, 0)
     verify(sInt32L, "67305985", 67305985, 1, 2, 3, 4)

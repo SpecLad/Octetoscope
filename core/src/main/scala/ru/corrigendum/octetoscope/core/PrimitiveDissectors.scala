@@ -22,6 +22,19 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import java.nio.charset.StandardCharsets
 
 object PrimitiveDissectors {
+  private object SInt16L extends Dissector[Short] {
+    override def dissect(input: Blob, offset: InfoSize) = {
+      val Bytes(bo) = offset
+
+      val value = ((input(bo) & 0xFF) |
+        ((input(bo + 1) & 0xFF) << 8)).toShort
+
+      (Atom(Bytes(2), Some(value.toString)), value)
+    }
+  }
+
+  def sInt16L: Dissector[Short] = SInt16L
+
   private object SInt32L extends Dissector[Int] {
     override def dissect(input: Blob, offset: InfoSize) = {
       val Bytes(bo) = offset

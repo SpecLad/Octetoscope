@@ -37,11 +37,13 @@ class PrimitiveDissectorsSuite extends FunSuite {
   }
 
   test("sInt32L") {
+    verify(sInt32L, "-2147483648", -2147483648, 0, 0, 0, -128)
+    verify(sInt32L, "-50462977", -50462977, -1, -2, -3, -4)
+    verify(sInt32L, "-1", -1, -1, -1, -1, -1)
     verify(sInt32L, "0", 0, 0, 0, 0, 0)
     verify(sInt32L, "67305985", 67305985, 1, 2, 3, 4)
     verify(sInt32L, "83754751", 83754751, -1, -2, -3, 4)
-    verify(sInt32L, "-50462977", -50462977, -1, -2, -3, -4)
-    verify(sInt32L, "-1", -1, -1, -1, -1, -1)
+    verify(sInt32L, "2147483647", 2147483647, -1, -1, -1, 127)
   }
 
   test("asciiString") {

@@ -34,7 +34,7 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
     private val magicBytes = Array[Byte]('I', 'D', 'P', '2')
 
     // Quake II's struct dmdl_t.
-    override def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder): HeaderValue = {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder): HeaderValue = {
       val add = new SequentialAdder(input, offset, builder)
       val value = new HeaderValue
 
@@ -83,7 +83,7 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
   }
 
   private class Skins(numSkins: Int) extends MoleculeBuilderDissector[Unit] {
-    override def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
 
       for (_ <- 0 until numSkins)
@@ -91,7 +91,7 @@ object MD2 extends MoleculeBuilderDissector[Unit] {
     }
   }
 
-  override def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+  override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
     val add = new RandomAdder(input, offset, builder)
     val header = add("Header", Bytes(0), Header)
 

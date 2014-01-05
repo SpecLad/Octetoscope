@@ -33,15 +33,15 @@ class DissectorSuite extends FunSuite {
     resultO._2 shouldBe Some(result._2)
   }
 
-  test("MoleculeBuilderDissector to Dissector") {
+  test("MoleculeBuilderDissector.dissect") {
     val mbd = new MoleculeBuilderDissector[Int] {
-      def dissect(input: Blob, offset: InfoSize, builder: MoleculeBuilder) = {
+      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder) = {
         builder.addChild("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
         60
       }
     }
 
-    MoleculeBuilderDissector.toDissector(mbd).dissect(Blob.empty) shouldBe
+    mbd.dissect(Blob.empty) shouldBe
       (
         Molecule(Bytes(2), None, Seq(
           SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))

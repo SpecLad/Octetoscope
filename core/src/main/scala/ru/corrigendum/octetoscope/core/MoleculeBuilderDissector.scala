@@ -21,12 +21,23 @@ package ru.corrigendum.octetoscope.core
 import scala.language.implicitConversions
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-trait MoleculeBuilderDissector[+Value] extends Dissector[Value] {
+trait MoleculeBuilderDissector[Value] extends Dissector[Value] {
   final override def dissect(input: Blob, offset: InfoSize): (Piece, Value) = {
     val builder = new MoleculeBuilder
-    val value = dissectMB(input, offset, builder)
+    val value = defaultValue
+    dissectMB(input, offset, builder, value)
     (builder.build(), value)
   }
 
-  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Value
+  def defaultValue: Value
+  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value)
+}
+
+trait MoleculeBuilderUnitDissector extends MoleculeBuilderDissector[Unit] {
+  final override def defaultValue = ()
+  final override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
+    dissectMBU(input, offset, builder)
+  }
+
+  def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder)
 }

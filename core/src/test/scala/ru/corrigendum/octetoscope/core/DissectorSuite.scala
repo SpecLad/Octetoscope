@@ -34,19 +34,38 @@ class DissectorSuite extends FunSuite {
   }
 
   test("MoleculeBuilderDissector.dissect") {
-    val mbd = new MoleculeBuilderDissector[Int] {
-      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder) = {
+    case class Value(var i: Int)
+
+    val mbd = new MoleculeBuilderDissector[Value] {
+      override def defaultValue: Value = Value(1)
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
+        value.i shouldBe 1
+        value.i = 2
         builder.addChild("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
-        60
       }
     }
 
-    mbd.dissect(Blob.empty) shouldBe
-      (
-        Molecule(Bytes(2), None, Seq(
-          SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
-        )),
-        60
-      )
+    mbd.dissect(Blob.empty) shouldBe (
+      Molecule(Bytes(2), None, Seq(
+        SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
+      )),
+      Value(2)
+    )
+  }
+
+  test("MoleculeBuilderUnitDissector.dissectMB") {
+    val mbud = new MoleculeBuilderUnitDissector {
+      override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+        builder.addChild("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
+      }
+    }
+
+    val builder = new MoleculeBuilder
+    mbud.dissectMB(Blob.empty, InfoSize(), builder, ())
+
+    builder.build() shouldBe
+      Molecule(Bytes(2), None, Seq(
+        SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
+      ))
   }
 }

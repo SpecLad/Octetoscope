@@ -21,6 +21,7 @@ package ru.corrigendum.octetoscope.core
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class AdderSuite extends FunSuite {
   test("sequential adder") {
@@ -35,6 +36,25 @@ class AdderSuite extends FunSuite {
       SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("1"))),
       SubPiece("beta", Bytes(4), Atom(Bytes(4), Some("2")))
     ))
+  }
+
+  test("sequential adder - throw") {
+    val builder = new MoleculeBuilder
+    val adder = new SequentialAdder(Blob.empty, InfoSize(), builder)
+
+    an [IndexOutOfBoundsException] should be thrownBy
+      adder("alpha", new DissectorO[Unit] {
+        override def dissectO(input: Blob, offset: InfoSize): (Piece, Option[Unit]) = throw new IndexOutOfBoundsException
+      })
+
+    an [IndexOutOfBoundsException] should be thrownBy
+      adder("beta", new Dissector[Unit] {
+        override def dissect(input: Blob, offset: InfoSize): (Piece, Unit) = throw new IndexOutOfBoundsException
+      })
+
+    builder.build().notes should have size 2
+    builder.build().notes.head should include ("\"alpha\"")
+    builder.build().notes.last should include ("\"beta\"")
   }
 
   test("random adder") {

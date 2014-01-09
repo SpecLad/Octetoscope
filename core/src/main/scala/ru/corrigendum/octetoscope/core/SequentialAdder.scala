@@ -23,15 +23,24 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder) {
   var internalOffset = InfoSize()
 
+  private def handleOutOfBounds[T](name: String, body: => T) =
+    try {
+      body
+    } catch {
+      case e: IndexOutOfBoundsException =>
+        builder.addNote("truncated at \"%s\"".format(name))
+        throw e
+    }
+
   def apply[Value](name: String, dissector: DissectorO[Value]): Option[Value] = {
-    val (piece, value) = dissector.dissectO(blob, initialOffset + internalOffset)
+    val (piece, value) = handleOutOfBounds(name, dissector.dissectO(blob, initialOffset + internalOffset))
     builder.addChild(name, internalOffset, piece)
     internalOffset += piece.size
     value
   }
 
   def apply[Value](name: String, dissector: Dissector[Value]): Value = {
-    val (piece, value) = dissector.dissect(blob, initialOffset + internalOffset)
+    val (piece, value) = handleOutOfBounds(name, dissector.dissect(blob, initialOffset + internalOffset))
     builder.addChild(name, internalOffset, piece)
     internalOffset += piece.size
     value

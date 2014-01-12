@@ -25,12 +25,20 @@ trait MoleculeBuilderDissector[Value] extends Dissector[Value] {
   final override def dissect(input: Blob, offset: InfoSize): (Piece, Value) = {
     val builder = new MoleculeBuilder
     val value = defaultValue
-    dissectMB(input, offset, builder, value)
+    try {
+      dissectMB(input, offset, builder, value)
+    } catch {
+      case _: MoleculeBuilderDissector.Stop =>
+    }
     (builder.build(), value)
   }
 
   def defaultValue: Value
   def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value)
+}
+
+object MoleculeBuilderDissector {
+  class Stop(cause: Throwable) extends Exception(cause)
 }
 
 trait MoleculeBuilderUnitDissector extends MoleculeBuilderDissector[Unit] {

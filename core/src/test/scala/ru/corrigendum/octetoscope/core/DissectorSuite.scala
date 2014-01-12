@@ -68,4 +68,15 @@ class DissectorSuite extends FunSuite {
         SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
       ))
   }
+
+  test("MoleculeBuilderDissector - stop") {
+    val stopper = new MoleculeBuilderDissector[Unit] {
+      override def defaultValue = Unit
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
+        throw new MoleculeBuilderDissector.Stop(null)
+      }
+    }
+
+    noException should be thrownBy stopper.dissect(Blob.empty)
+  }
 }

@@ -28,8 +28,9 @@ class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuil
       body
     } catch {
       case e: IndexOutOfBoundsException =>
+        builder.impair(PieceQuality.Broken)
         builder.addNote("truncated at \"%s\"".format(name))
-        throw e
+        throw new MoleculeBuilderDissector.Stop(e)
     }
 
   def apply[Value](name: String, dissector: DissectorO[Value]): Option[Value] = {

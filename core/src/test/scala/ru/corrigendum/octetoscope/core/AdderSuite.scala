@@ -38,23 +38,33 @@ class AdderSuite extends FunSuite {
     ))
   }
 
-  test("sequential adder - throw") {
+  def sequentialAdderThrowTest(invokeAdder: SequentialAdder => Unit) {
     val builder = new MoleculeBuilder
     val adder = new SequentialAdder(Blob.empty, InfoSize(), builder)
 
-    an [IndexOutOfBoundsException] should be thrownBy
+    val exc = the [MoleculeBuilderDissector.Stop] thrownBy invokeAdder(adder)
+    exc.getCause shouldBe an [IndexOutOfBoundsException]
+
+    val result = builder.build()
+    result.quality shouldBe PieceQuality.Broken
+    result.notes should have size 1
+    result.notes.head should include ("\"alpha\"")
+  }
+
+  test("sequential adder - throw - DissectorO") {
+    sequentialAdderThrowTest { adder =>
       adder("alpha", new DissectorO[Unit] {
         override def dissectO(input: Blob, offset: InfoSize): (Piece, Option[Unit]) = throw new IndexOutOfBoundsException
       })
+    }
+  }
 
-    an [IndexOutOfBoundsException] should be thrownBy
-      adder("beta", new Dissector[Unit] {
+  test("sequential adder - throw - Dissector") {
+    sequentialAdderThrowTest { adder =>
+      adder("alpha", new Dissector[Unit] {
         override def dissect(input: Blob, offset: InfoSize): (Piece, Unit) = throw new IndexOutOfBoundsException
       })
-
-    builder.build().notes should have size 2
-    builder.build().notes.head should include ("\"alpha\"")
-    builder.build().notes.last should include ("\"beta\"")
+    }
   }
 
   test("random adder") {

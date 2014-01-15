@@ -28,7 +28,10 @@ trait MoleculeBuilderDissector[Value] extends Dissector[Value] {
     try {
       dissectMB(input, offset, builder, value)
     } catch {
-      case _: MoleculeBuilderDissector.Stop =>
+      case trunc: MoleculeBuilderDissector.TruncatedException =>
+        if (!builder.hasChildren) throw trunc.getCause
+        builder.impair(PieceQuality.Broken)
+        builder.addNote("truncated at \"%s\"".format(trunc.subPieceName))
     }
     (builder.build(), value)
   }
@@ -38,7 +41,7 @@ trait MoleculeBuilderDissector[Value] extends Dissector[Value] {
 }
 
 object MoleculeBuilderDissector {
-  class Stop(cause: Throwable) extends Exception(cause)
+  class TruncatedException(cause: Throwable, val subPieceName: String) extends Exception(cause)
 }
 
 trait MoleculeBuilderUnitDissector extends MoleculeBuilderDissector[Unit] {

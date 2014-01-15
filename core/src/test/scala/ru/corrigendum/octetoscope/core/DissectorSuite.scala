@@ -69,14 +69,39 @@ class DissectorSuite extends FunSuite {
       ))
   }
 
-  test("MoleculeBuilderDissector - stop") {
-    val stopper = new MoleculeBuilderDissector[Unit] {
+  test("MoleculeBuilderDissector - truncated - empty") {
+    val cause = new IndexOutOfBoundsException
+
+    val truncated = new MoleculeBuilderDissector[Unit] {
       override def defaultValue = Unit
       override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
-        throw new MoleculeBuilderDissector.Stop(null)
+        throw new MoleculeBuilderDissector.TruncatedException(cause, "alpha")
       }
     }
 
-    noException should be thrownBy stopper.dissect(Blob.empty)
+    val exc = the [IndexOutOfBoundsException] thrownBy truncated.dissect(Blob.empty)
+    exc should be theSameInstanceAs cause
+  }
+
+  test("MoleculeBuilderDissector - truncated - non-empty") {
+    case class Value(var i: Int)
+
+    val child = Atom(Bytes(1), None)
+
+    val truncated = new MoleculeBuilderDissector[Value] {
+      override def defaultValue = Value(0)
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
+        value.i = 1
+        builder.addChild("alpha", InfoSize(), child)
+        throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "beta")
+      }
+    }
+
+    val (molecule, value) = truncated.dissect(Blob.empty)
+    molecule.children shouldBe Seq(SubPiece("alpha", InfoSize(), child))
+    molecule.quality shouldBe PieceQuality.Broken
+    molecule.notes should have size 1
+    molecule.notes.head should include ("\"beta\"")
+    value.i shouldBe 1
   }
 }

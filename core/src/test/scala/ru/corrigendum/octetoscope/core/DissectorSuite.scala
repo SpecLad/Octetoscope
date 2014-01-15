@@ -20,6 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
+import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.mocks.MockDissector
 
@@ -100,8 +101,7 @@ class DissectorSuite extends FunSuite {
     val (molecule, value) = truncated.dissect(Blob.empty)
     molecule.children shouldBe Seq(SubPiece("alpha", InfoSize(), child))
     molecule.quality shouldBe PieceQuality.Broken
-    molecule.notes should have size 1
-    molecule.notes.head should include ("\"beta\"")
+    molecule.notes.loneElement should include ("\"beta\"")
     value.i shouldBe 1
   }
 }

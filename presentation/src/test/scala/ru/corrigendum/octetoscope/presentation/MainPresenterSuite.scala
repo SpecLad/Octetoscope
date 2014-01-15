@@ -22,6 +22,7 @@ import ru.corrigendum.octetoscope.presentation.mocks.{MockDissectorDriver, MockD
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
 import org.scalatest.Matchers._
+import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 import ru.corrigendum.octetoscope.core.{Bytes, Atom, VersionInfo}
 import java.io.{IOException, File}
@@ -89,10 +90,10 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     dissectorDriver.result = Some(MainPresenterSuite.FakePiece)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.tabs should have size 1
-    view.tabs.head.title shouldBe "cadabra"
-    view.tabs.head.toolTip shouldBe MainPresenterSuite.FakePath.toString
-    view.tabs.head.tree shouldBe presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath).get)
+    val tab = view.tabs.loneElement
+    tab.title shouldBe "cadabra"
+    tab.toolTip shouldBe MainPresenterSuite.FakePath.toString
+    tab.tree shouldBe presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath).get)
   }
 
   test("tab closing") {

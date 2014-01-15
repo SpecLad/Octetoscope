@@ -24,12 +24,14 @@ class MoleculeBuilder {
   private[this] var length: InfoSize = InfoSize()
   private[this] var quality: PieceQuality.Value = PieceQuality.Good
   private[this] val notes = Seq.newBuilder[String]
+  private[this] var hasChildren_ = false
 
   def setRepr(repr: String) { this.repr = Some(repr) }
 
   def addChild(name: String, offset: InfoSize, piece: Piece) {
     childrenBuilder += SubPiece(name, offset, piece)
     length = List(length, offset + piece.size).max
+    hasChildren_ = true
   }
 
   def impair(newQuality: PieceQuality.Value) {
@@ -40,4 +42,6 @@ class MoleculeBuilder {
   def addNote(note: String) { notes += note }
 
   def build(): Molecule = Molecule(length, repr, childrenBuilder.result(), quality, notes.result())
+
+  def hasChildren: Boolean = hasChildren_
 }

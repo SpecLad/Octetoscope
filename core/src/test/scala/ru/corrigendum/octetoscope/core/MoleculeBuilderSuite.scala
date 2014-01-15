@@ -29,6 +29,7 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("default") {
+    builder.hasChildren shouldBe false
     builder.build() shouldBe Molecule(InfoSize(), None, Seq())
   }
 
@@ -43,6 +44,8 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
     val gamma = SubPiece("gamma", Bytes(1), Atom(Bytes(1), None))
 
     builder.addChild(alpha.name, alpha.offset, alpha.piece)
+    builder.hasChildren shouldBe true
+
     builder.addChild(beta.name, beta.offset, beta.piece)
     builder.addChild(gamma.name, gamma.offset, gamma.piece)
 

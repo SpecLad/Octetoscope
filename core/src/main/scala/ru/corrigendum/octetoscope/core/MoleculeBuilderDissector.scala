@@ -22,7 +22,7 @@ import scala.language.implicitConversions
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 trait MoleculeBuilderDissector[Value] extends Dissector[Value] {
-  final override def dissect(input: Blob, offset: InfoSize): (Piece, Value) = {
+  final override def dissect(input: Blob, offset: InfoSize): (Molecule, Value) = {
     val builder = new MoleculeBuilder
     val value = defaultValue
     try {

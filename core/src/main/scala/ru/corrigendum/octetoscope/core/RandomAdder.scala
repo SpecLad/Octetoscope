@@ -22,7 +22,15 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class RandomAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder) {
   def apply[Value](name: String, offset: InfoSize, dissector: MoleculeBuilderDissector[Value]): Value = {
-    val (piece, value) = dissector.dissect(blob, initialOffset + offset)
+    val (piece, value) = try {
+       dissector.dissect(blob, initialOffset + offset)
+    } catch {
+      case _: IndexOutOfBoundsException =>
+        builder.impair(PieceQuality.Broken)
+        builder.addNote("\"%s\" is out of bounds".format(name))
+        return dissector.defaultValue
+    }
+
     builder.addChild(name, offset, piece)
     value
   }

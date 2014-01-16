@@ -20,6 +20,8 @@ package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
+import org.scalatest.Inside._
+import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
@@ -85,5 +87,29 @@ class AdderSuite extends FunSuite {
         SubPiece("alpha", Bytes(0), Atom(Bytes(1), None))
       )))
     ))
+  }
+
+  test("random adder - throw") {
+    val builder = new MoleculeBuilder
+
+    case class Value(var i: Int)
+
+    val dissector = new MoleculeBuilderDissector[Value] {
+      def defaultValue: Value = Value(0)
+      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
+        value.i = 1
+        throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "alpha")
+      }
+    }
+
+    val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
+    adder("omega", Bytes(2), dissector) shouldBe Value(0)
+
+    inside(builder.build()) { case Molecule(size_, _, children, quality, notes) =>
+      size_ shouldBe InfoSize()
+      children shouldBe empty
+      quality shouldBe PieceQuality.Broken
+      notes.loneElement should include ("\"omega\"")
+    }
   }
 }

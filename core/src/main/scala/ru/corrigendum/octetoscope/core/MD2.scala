@@ -62,9 +62,9 @@ object MD2 extends MoleculeBuilderUnitDissector {
 
       value.numSkins = add("Number of skins", sInt32L +! positive)
       add("Number of vertices", sInt32L +! positive +? noMoreThan(2048, "MAX_VERTS"))
-      value.numTexCoords = add("Number of texture coordinates", sInt32L +! positive)
+      value.numTexCoords = add("Number of texture coordinate pairs", sInt32L +! positive)
       add("Number of triangles", sInt32L +! positive)
-      add("Number of OpenGL commands", sInt32L +! positive)
+      add("Number of OpenGL command words", sInt32L +! positive)
       add("Number of frames", sInt32L +! positive)
 
       value.offSkins = add("Offset of skins", sInt32L +! nonNegative)

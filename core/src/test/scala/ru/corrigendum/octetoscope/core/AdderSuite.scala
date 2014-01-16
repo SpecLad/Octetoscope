@@ -64,16 +64,26 @@ class AdderSuite extends FunSuite {
   }
 
   test("random adder") {
-    val blob = new ArrayBlob(Array[Byte](-1, 3, 0, 0, 0, -1, 4, 0, 0, 0, -1))
     val builder = new MoleculeBuilder
 
-    val adder = new RandomAdder(blob, Bytes(1), builder)
-    adder("alpha", Bytes(0), sInt32L) shouldBe 3
-    adder("beta", Bytes(5), sInt32L.asInstanceOf[DissectorO[Int]]) shouldBe Some(4)
+    case class Value(var i: Int)
 
-    builder.build() shouldBe Molecule(Bytes(9), None, Seq(
-      SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("3"))),
-      SubPiece("beta", Bytes(5), Atom(Bytes(4), Some("4")))
+    val dissector = new MoleculeBuilderDissector[Value] {
+      def defaultValue: Value = Value(0)
+      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
+        value.i = 1
+        offset shouldBe Bytes(3)
+        builder.addChild("alpha", Bytes(0), Atom(Bytes(1), None))
+      }
+    }
+
+    val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
+    adder("omega", Bytes(2), dissector) shouldBe Value(1)
+
+    builder.build() shouldBe Molecule(Bytes(3), None, Seq(
+      SubPiece("omega", Bytes(2), Molecule(Bytes(1), None, Seq(
+        SubPiece("alpha", Bytes(0), Atom(Bytes(1), None))
+      )))
     ))
   }
 }

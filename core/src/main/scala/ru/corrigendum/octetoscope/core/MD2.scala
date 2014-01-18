@@ -100,8 +100,13 @@ object MD2 extends MoleculeBuilderUnitDissector {
   private object Triangle extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
-      add("Vertex indices", array(3, "Index", sInt16L))
-      add("Texture coordinate pair indices", array(3, "Index", sInt16L))
+      def formatSeq(elements: Seq[Any]) = elements.mkString("(", ", ", ")")
+
+      val vi = add("Vertex indices", collectingArray(3, "Index", sInt16L))
+      val ti = add("Texture coordinate pair indices", collectingArray(3, "Index", sInt16L))
+
+      if (vi.length == 3 && ti.length == 3)
+        builder.setRepr(formatSeq((vi, ti).zipped.map(_ + "/" + _)))
     }
   }
 

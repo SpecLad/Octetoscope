@@ -20,6 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import PrimitiveDissectors._
+import CompoundDissectors._
 import CommonConstraints._
 
 /*
@@ -83,28 +84,12 @@ object MD2 extends MoleculeBuilderUnitDissector {
     var offTexCoords: Option[Int] = None
   }
 
-  private class Skins(numSkins: Int) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+  private object TexCoordPair extends MoleculeBuilderUnitDissector {
+    def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
-
-      for (_ <- 0 until numSkins)
-        add("Skin", asciiZString(64))
-    }
-  }
-
-  private class TexCoords(numTexCoords: Int) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
-      val add = new SequentialAdder(input, offset, builder)
-
-      for (_ <- 0 until numTexCoords)
-        add("Texture coordinate pair", new MoleculeBuilderUnitDissector {
-          def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
-            val add = new SequentialAdder(input, offset, builder)
-            val s = add("s", sInt16L)
-            val t = add("t", sInt16L)
-            builder.setRepr("(%d, %d)".format(s, t))
-          }
-        })
+      val s = add("s", sInt16L)
+      val t = add("t", sInt16L)
+      builder.setRepr("(%d, %d)".format(s, t))
     }
   }
 
@@ -113,10 +98,10 @@ object MD2 extends MoleculeBuilderUnitDissector {
     val header = add("Header", Bytes(0), Header)
 
     for (offSkins <- header.offSkins; numSkins <- header.numSkins)
-      add("Skins", Bytes(offSkins), new Skins(numSkins))
+      add("Skins", Bytes(offSkins), array(numSkins, "Skin", asciiZString(64)))
 
     for (offTexCoords <- header.offTexCoords; numTexCoords <- header.numTexCoords)
-      add("Texture coordinates", Bytes(offTexCoords), new TexCoords(numTexCoords))
+      add("Texture coordinates", Bytes(offTexCoords), array(numTexCoords, "Texture coordinate pair", TexCoordPair))
 
     builder.setRepr("Quake II model")
   }

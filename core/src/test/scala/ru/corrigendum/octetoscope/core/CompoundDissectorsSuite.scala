@@ -25,15 +25,23 @@ import PrimitiveDissectors._
 import CompoundDissectors._
 
 class CompoundDissectorsSuite extends FunSuite {
-  test("array") {
+  def arrayTest[T](dissector: Dissector[T], value: T) {
     val blob = new ArrayBlob("afoobarbazb".getBytes(StandardCharsets.US_ASCII))
 
-    array(3, "Item", asciiString(3)).dissect(blob, Bytes(1)) shouldBe (
+    dissector.dissect(blob, Bytes(1)) shouldBe (
       Molecule(Bytes(9), None, Seq(
         SubPiece("Item #0", Bytes(0), Atom(Bytes(3), Some("\"foo\""))),
         SubPiece("Item #1", Bytes(3), Atom(Bytes(3), Some("\"bar\""))),
         SubPiece("Item #2", Bytes(6), Atom(Bytes(3), Some("\"baz\"")))
       )),
-      ())
+      value)
+  }
+
+  test("array") {
+    arrayTest(array(3, "Item", asciiString(3)), ())
+  }
+
+  test("collectingArray") {
+    arrayTest(collectingArray(3, "Item", asciiString(3)), Seq("foo", "bar", "baz"))
   }
 }

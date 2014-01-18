@@ -33,15 +33,26 @@ object CompoundDissectors {
   def array(size: Int, itemName: String, itemDissector: DissectorO[Any]): MoleculeBuilderUnitDissector =
     new Array(size, itemName, itemDissector)
 
-  private class CollectingArray[T](size: Int, itemName: String, itemDissector: Dissector[T]) extends MoleculeBuilderDissector[mutable.Buffer[T]] {
+  private class CollectingArray[T](
+    size: Int, itemName: String, itemDissector: Dissector[T], reprFuncMaybe: Option[Seq[T] => String]
+  ) extends MoleculeBuilderDissector[mutable.Buffer[T]] {
     override def defaultValue: mutable.Buffer[T] = new mutable.ArrayBuffer[T](size)
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: mutable.Buffer[T]) {
       val add = new SequentialAdder(input, offset, builder)
 
       for (i <- 0 until size) value += add("%s #%d".format(itemName, i), itemDissector)
+
+      reprFuncMaybe.foreach(f => builder.setRepr(f(value)))
     }
   }
 
-  def collectingArray[T](size: Int, itemName: String, itemDissector: Dissector[T]): MoleculeBuilderDissector[mutable.Buffer[T]] =
-    new CollectingArray[T](size, itemName, itemDissector)
+  def collectingArray[T](
+    size: Int, itemName: String, itemDissector: Dissector[T]
+  ): MoleculeBuilderDissector[mutable.Buffer[T]] =
+    new CollectingArray[T](size, itemName, itemDissector, None)
+
+  def collectingArray[T](
+    size: Int, itemName: String, itemDissector: Dissector[T], reprFunc: Seq[T] => String
+  ): MoleculeBuilderDissector[mutable.Buffer[T]] =
+    new CollectingArray[T](size, itemName, itemDissector, Some(reprFunc))
 }

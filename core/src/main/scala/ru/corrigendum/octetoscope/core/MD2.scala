@@ -31,12 +31,12 @@ import CommonConstraints._
 */
 
 object MD2 extends MoleculeBuilderUnitDissector {
+  // Quake II's struct dmdl_t.
   private object Header extends MoleculeBuilderDissector[HeaderValue] {
     private val magicBytes = Array[Byte]('I', 'D', 'P', '2')
 
     override def defaultValue = new HeaderValue
 
-    // Quake II's struct dmdl_t.
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: HeaderValue) {
       val add = new SequentialAdder(input, offset, builder)
 
@@ -84,6 +84,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
     var offTexCoords: Option[Int] = None
   }
 
+  // Quake II's struct dstvert_t.
   private object TexCoordPair extends MoleculeBuilderUnitDissector {
     def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)

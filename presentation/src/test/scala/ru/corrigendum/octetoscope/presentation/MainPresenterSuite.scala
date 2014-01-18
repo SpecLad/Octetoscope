@@ -66,7 +66,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.tabs should have size 0
   }
 
-  test("open command - exception") {
+  test("open command - IOException") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
     val exception = new IOException("whatever")
     dissectorDriver.exception = Some(exception)
@@ -77,28 +77,30 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     boxer.messages shouldBe List(strings.errorReadingFile(exception.getMessage))
   }
 
-  test("open command - empty") {
+  test("open command - IndexOutOfBoundsException") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
+    dissectorDriver.exception = Some(new IndexOutOfBoundsException)
+
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs should have size 0
-    boxer.messages shouldBe List(strings.cantDissectEmptyFile())
+    boxer.messages shouldBe List(strings.fileTooSmallToDissect())
   }
 
   test("open command - successful") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
-    dissectorDriver.result = Some(MainPresenterSuite.FakePiece)
+    dissectorDriver.result = MainPresenterSuite.FakePiece
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     val tab = view.tabs.loneElement
     tab.title shouldBe "cadabra"
     tab.toolTip shouldBe MainPresenterSuite.FakePath.toString
-    tab.tree shouldBe presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath).get)
+    tab.tree shouldBe presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath))
   }
 
   test("tab closing") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
-    dissectorDriver.result = Some(MainPresenterSuite.FakePiece)
+    dissectorDriver.result = MainPresenterSuite.FakePiece
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs.head.trigger(MainView.TabClosedEvent)

@@ -21,5 +21,5 @@ package ru.corrigendum.octetoscope.core
 import java.io.File
 
 trait DissectorDriver {
-  def dissect(path: File): Option[Piece]
+  def dissect(path: File): Piece
 }

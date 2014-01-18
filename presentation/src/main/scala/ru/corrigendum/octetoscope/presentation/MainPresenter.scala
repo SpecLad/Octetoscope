@@ -48,20 +48,18 @@ class MainPresenter(strings: PresentationStrings,
           pub.showFileOpenBox() match {
             case None =>
             case Some(path) =>
-              val maybePiece = try {
+              val piece = try {
                 dissectorDriver.dissect(path)
               } catch {
                 case ioe: IOException =>
                   boxer.showMessageBox(strings.errorReadingFile(ioe.getMessage))
                   return
+                case _: IndexOutOfBoundsException =>
+                  boxer.showMessageBox(strings.fileTooSmallToDissect())
+                  return
               }
 
-              maybePiece match {
-                case None =>
-                  boxer.showMessageBox(strings.cantDissectEmptyFile())
-                case Some(piece) =>
-                  pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(tabHandler)
-              }
+              pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(tabHandler)
           }
 
         case CommandEvent(_) => // workaround for bug SI-7206

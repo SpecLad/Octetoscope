@@ -102,8 +102,8 @@ object MD2 extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(input, offset, builder)
       def formatSeq(elements: Seq[Any]) = elements.mkString("(", ", ", ")")
 
-      val vi = add("Vertex indices", collectingArray(3, "Index", sInt16L))
-      val ti = add("Texture coordinate pair indices", collectingArray(3, "Index", sInt16L))
+      val vi = add("Vertex indices", collectingArray(3, "Index", sInt16L, formatSeq))
+      val ti = add("Texture coordinate pair indices", collectingArray(3, "Index", sInt16L, formatSeq))
 
       if (vi.length == 3 && ti.length == 3)
         builder.setRepr(formatSeq((vi, ti).zipped.map(_ + "/" + _)))

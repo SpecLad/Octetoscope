@@ -64,13 +64,13 @@ object MD2 extends MoleculeBuilderUnitDissector {
       value.numSkins = add("Number of skins", sInt32L +! positive)
       add("Number of vertices", sInt32L +! positive +? noMoreThan(2048, "MAX_VERTS"))
       value.numTexCoords = add("Number of texture coordinate pairs", sInt32L +! positive)
-      add("Number of triangles", sInt32L +! positive)
+      value.numTriangles = add("Number of triangles", sInt32L +! positive)
       add("Number of OpenGL command words", sInt32L +! positive)
       add("Number of frames", sInt32L +! positive)
 
       value.offSkins = add("Offset of skins", sInt32L +! nonNegative)
       value.offTexCoords = add("Offset of texture coordinates", sInt32L +! nonNegative)
-      add("Offset of triangles", sInt32L +! nonNegative)
+      value.offTriangles = add("Offset of triangles", sInt32L +! nonNegative)
       add("Offset of frames", sInt32L +! nonNegative)
       add("Offset of OpenGL commands", sInt32L +! nonNegative)
       add("File size", sInt32L +! nonNegative)
@@ -82,15 +82,26 @@ object MD2 extends MoleculeBuilderUnitDissector {
     var numTexCoords: Option[Int] = None
     var offSkins: Option[Int] = None
     var offTexCoords: Option[Int] = None
+    var numTriangles: Option[Int] = None
+    var offTriangles: Option[Int] = None
   }
 
   // Quake II's struct dstvert_t.
   private object TexCoordPair extends MoleculeBuilderUnitDissector {
-    def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
       val s = add("s", sInt16L)
       val t = add("t", sInt16L)
       builder.setRepr("(%d, %d)".format(s, t))
+    }
+  }
+
+  // Quake II's struct dtriangle_t
+  private object Triangle extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+      val add = new SequentialAdder(input, offset, builder)
+      add("Vertex indices", array(3, "Index", sInt16L))
+      add("Texture coordinate pair indices", array(3, "Index", sInt16L))
     }
   }
 
@@ -103,6 +114,9 @@ object MD2 extends MoleculeBuilderUnitDissector {
 
     for (offTexCoords <- header.offTexCoords; numTexCoords <- header.numTexCoords)
       add("Texture coordinates", Bytes(offTexCoords), array(numTexCoords, "Texture coordinate pair", TexCoordPair))
+
+    for (offTriangles <- header.offTriangles; numTriangles <- header.numTriangles)
+      add("Triangles", Bytes(offTriangles), array(numTriangles, "Triangle", Triangle))
 
     builder.setRepr("Quake II model")
   }

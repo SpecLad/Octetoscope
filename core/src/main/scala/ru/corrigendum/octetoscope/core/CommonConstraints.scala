@@ -19,6 +19,26 @@
 package ru.corrigendum.octetoscope.core
 
 private object CommonConstraints {
+  private object AnyConstraint extends Constraint[Any] {
+    override def check(value: Any): Boolean = true
+    override def note(quality: PieceQuality.Value): String =
+      throw new IllegalStateException("note requested for the any constraint")
+  }
+
+  /*
+    Constraint that always passes.
+
+    This is handy when you want to apply a real constraint, but it
+    depends on data that is not always available. Instead of complicating
+    code at the point of use:
+      if (haveData) dissector + realConstraint(data) else dissector
+    you can create the constraint beforehand:
+      constraint = if (haveData) realConstraint(data) else any
+    and then at the point of use you'll have simply:
+     dissector + constraint
+   */
+  def any: Constraint[Any] = AnyConstraint
+
   def nonNegative[T](implicit arithm: Numeric[T]) = new ShouldMustConstraint[T] {
     override def check(value: T): Boolean = arithm.signum(value) >= 0
     def shouldNote: String = "should be non-negative"

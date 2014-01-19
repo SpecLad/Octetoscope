@@ -41,14 +41,14 @@ private object CommonConstraints {
 
   def nonNegative[T](implicit arithm: Numeric[T]) = new ShouldMustConstraint[T] {
     override def check(value: T): Boolean = arithm.signum(value) >= 0
-    def shouldNote: String = "should be non-negative"
-    def mustNote: String = "must be non-negative"
+    override def shouldNote: String = "should be non-negative"
+    override def mustNote: String = "must be non-negative"
   }
 
   def positive[T](implicit arithm: Numeric[T]) = new ShouldMustConstraint[T] {
     override def check(value: T): Boolean = arithm.signum(value) > 0
-    def shouldNote: String = "should be positive"
-    def mustNote: String = "must be positive"
+    override def shouldNote: String = "should be positive"
+    override def mustNote: String = "must be positive"
   }
 
   def equalTo[T](expected: T, meaning: String) = new ShouldMustConstraint[T] {

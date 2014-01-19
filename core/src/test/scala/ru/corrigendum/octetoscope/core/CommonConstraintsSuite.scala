@@ -50,4 +50,13 @@ class CommonConstraintsSuite extends FunSuite {
     c.shouldNote should (include ("-2") and include ("MINUS TWO"))
     c.mustNote should (include ("-2") and include ("MINUS TWO"))
   }
+
+  test("lessThan") {
+    val c = CommonConstraints.lessThan(1, "ONE")
+    c.check(0) shouldBe true
+    c.check(1) shouldBe false
+    c.check(4) shouldBe false
+    c.shouldNote should (include ("1") and include ("ONE"))
+    c.mustNote should (include ("1") and include ("ONE"))
+  }
 }

@@ -42,4 +42,10 @@ private object CommonConstraints {
     override def mustNote: String = "must be no more than %s (%s)".format(limit, meaning)
     override def check(value: T): Boolean = ord.lteq(value, limit)
   }
+
+  def lessThan[T](limit: T, meaning: String)(implicit ord: Ordering[T]) = new ShouldMustConstraint[T] {
+    override def shouldNote: String = "should be less than %s (%s)".format(limit, meaning)
+    override def mustNote: String = "must be less than %s (%s)".format(limit, meaning)
+    override def check(value: T): Boolean = ord.lt(value, limit)
+  }
 }

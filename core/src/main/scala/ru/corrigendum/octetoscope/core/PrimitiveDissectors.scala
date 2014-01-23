@@ -20,6 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import java.nio.charset.StandardCharsets
+import java.util.Locale
 
 object PrimitiveDissectors {
   private object SInt16L extends Dissector[Short] {
@@ -35,20 +36,38 @@ object PrimitiveDissectors {
 
   def sInt16L: Dissector[Short] = SInt16L
 
+  private def readInt32L(input: Blob, offset: InfoSize) = {
+    val Bytes(bo) = offset
+    (input(bo) & 0xFF) |
+      ((input(bo + 1) & 0xFF) << 8) |
+      ((input(bo + 2) & 0xFF) << 16) |
+      ((input(bo + 3) & 0xFF) << 24)
+  }
+
   private object SInt32L extends Dissector[Int] {
     override def dissect(input: Blob, offset: InfoSize) = {
-      val Bytes(bo) = offset
-
-      val value = (input(bo) & 0xFF) |
-        ((input(bo + 1) & 0xFF) << 8) |
-        ((input(bo + 2) & 0xFF) << 16) |
-        ((input(bo + 3) & 0xFF) << 24)
+      val value = readInt32L(input, offset)
 
       (Atom(Bytes(4), Some(value.toString)), value)
     }
   }
 
   def sInt32L: Dissector[Int] = SInt32L
+
+  private object Float32L extends Dissector[Float] {
+    override def dissect(input: Blob, offset: InfoSize) = {
+      val int = readInt32L(input, offset)
+      val float = java.lang.Float.intBitsToFloat(int)
+
+      if (float.isNaN)
+        (Atom(Bytes(4), Some("%sNaN(0x%06x)".format(if (int < 0) "-" else "", int & 0x7FFFFF))), Float.NaN)
+      else
+        // 9 digits is the minimum number to ensure uniqueness
+        (Atom(Bytes(4), Some("%.9g".formatLocal(Locale.ROOT, float))), float)
+    }
+  }
+
+  def float32L: Dissector[Float] = Float32L
 
   abstract private class AsciiStringGeneric(length: Int) extends Dissector[String] {
     protected def findLength(input: Blob, byteOffset: Long): Int

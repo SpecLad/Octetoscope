@@ -23,6 +23,16 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 
 object PrimitiveDissectors {
+  private object SInt8 extends Dissector[Byte] {
+    override def dissect(input: Blob, offset: InfoSize): (Piece, Byte) = {
+      val Bytes(bo) = offset
+      val value = input(bo)
+      (Atom(Bytes(1), Some(value.toString)), value)
+    }
+  }
+
+  def sInt8: Dissector[Byte] = SInt8
+
   private object SInt16L extends Dissector[Short] {
     override def dissect(input: Blob, offset: InfoSize) = {
       val Bytes(bo) = offset

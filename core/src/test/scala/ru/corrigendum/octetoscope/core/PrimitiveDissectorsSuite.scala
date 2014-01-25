@@ -27,6 +27,15 @@ import PrimitiveDissectors._
 class PrimitiveDissectorsSuite extends FunSuite {
   import PrimitiveDissectorsSuite._
 
+  test("sInt8") {
+    verify(sInt8, "-128", -128, -128)
+    verify(sInt8, "-100", -100, -100)
+    verify(sInt8, "-1", -1, -1)
+    verify(sInt8, "0", 0, 0)
+    verify(sInt8, "1", 1, 1)
+    verify(sInt8, "127", 127, 127)
+  }
+
   test("sInt16L") {
     verify(sInt16L, "-32768", -32768, 0, -128)
     verify(sInt16L, "-257", -257, -1, -2)

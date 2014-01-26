@@ -33,6 +33,17 @@ object PrimitiveDissectors {
 
   def sInt8: Dissector[Byte] = SInt8
 
+  private object UInt8 extends Dissector[Short] {
+    override def dissect(input: Blob, offset: InfoSize): (Piece, Short) = {
+      val Bytes(bo) = offset
+      val byte = input(bo)
+      val value = if (byte >= 0) byte else 256 + byte
+      (Atom(Bytes(1), Some(value.toString)), value.toShort)
+    }
+  }
+
+  def uInt8: Dissector[Short] = UInt8
+
   private object SInt16L extends Dissector[Short] {
     override def dissect(input: Blob, offset: InfoSize) = {
       val Bytes(bo) = offset

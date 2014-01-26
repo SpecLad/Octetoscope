@@ -36,6 +36,14 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(sInt8, "127", 127, 127)
   }
 
+  test("uInt8") {
+    verify(uInt8, "0", 0, 0)
+    verify(uInt8, "1", 1, 1)
+    verify(uInt8, "127", 127, 127)
+    verify(uInt8, "128", 128, -128)
+    verify(uInt8, "255", 255, -1)
+  }
+
   test("sInt16L") {
     verify(sInt16L, "-32768", -32768, 0, -128)
     verify(sInt16L, "-257", -257, -1, -2)

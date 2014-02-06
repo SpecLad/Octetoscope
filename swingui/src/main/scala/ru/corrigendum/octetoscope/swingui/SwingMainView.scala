@@ -93,6 +93,7 @@ private class SwingMainView(strings: UIStrings) extends SwingView with MainView 
 
     tabPane.addTab(null, null, new JScrollPane(tree), toolTip)
     tabPane.setTabComponentAt(tabPane.getTabCount - 1, tab.component)
+    tabPane.setSelectedIndex(tabPane.getTabCount - 1)
 
     tab
   }

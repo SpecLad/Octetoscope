@@ -22,6 +22,7 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import PrimitiveDissectors._
 import CompoundDissectors._
 import CommonConstraints._
+import ru.corrigendum.octetoscope.core.Common.Vector3
 
 /*
   Quake II models (*.md2).
@@ -66,12 +67,12 @@ object MD2 extends MoleculeBuilderUnitDissector {
       value.numTexCoords = add("Number of texture coordinate pairs", sInt32L +! positive)
       value.numTriangles = add("Number of triangles", sInt32L +! positive)
       add("Number of OpenGL command words", sInt32L +! positive)
-      add("Number of frames", sInt32L +! positive)
+      value.numFrames = add("Number of frames", sInt32L +! positive)
 
       value.offSkins = add("Offset of skins", sInt32L +! nonNegative)
       value.offTexCoords = add("Offset of texture coordinates", sInt32L +! nonNegative)
       value.offTriangles = add("Offset of triangles", sInt32L +! nonNegative)
-      add("Offset of frames", sInt32L +! nonNegative)
+      value.offFrames = add("Offset of frames", sInt32L +! nonNegative)
       add("Offset of OpenGL commands", sInt32L +! nonNegative)
       add("File size", sInt32L +! nonNegative)
     }
@@ -82,9 +83,11 @@ object MD2 extends MoleculeBuilderUnitDissector {
     var numVertices: Option[Int] = None
     var numTexCoords: Option[Int] = None
     var numTriangles: Option[Int] = None
+    var numFrames: Option[Int] = None
     var offSkins: Option[Int] = None
     var offTexCoords: Option[Int] = None
     var offTriangles: Option[Int] = None
+    var offFrames: Option[Int] = None
   }
 
   // Quake II's struct dstvert_t.
@@ -120,6 +123,32 @@ object MD2 extends MoleculeBuilderUnitDissector {
     }
   }
 
+  // Quake II's struct dtrivertx_t
+  private object FrameVertex extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+      val add = new SequentialAdder(input, offset, builder)
+
+      val coords = add("Coordinates", new Vector3(uInt8))
+      val lni = add("Light normal index", uInt8 +! lessThan(162.toShort, "NUMVERTEXNORMALS"))
+
+      for (x <- coords.x; y <- coords.y; z <- coords.z; lni <- lni)
+        builder.setRepr("(%s, %s, %s) | #%s".format(x, y, z, lni))
+    }
+  }
+
+  // Quake II's struct daliasframe_t
+  private class Frame(numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+      val add = new SequentialAdder(input, offset, builder)
+      add("Scale", new Vector3(float32L))
+      add("Translation", new Vector3(float32L))
+      builder.setRepr("\"" + add("Name", asciiZString(16)) + "\"")
+
+      for (numVertices <- numVertices)
+        add("Vertices", array(numVertices, "Vertex", FrameVertex))
+    }
+  }
+
   override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
     val add = new RandomAdder(input, offset, builder)
     val header = add("Header", Bytes(0), Header)
@@ -133,6 +162,9 @@ object MD2 extends MoleculeBuilderUnitDissector {
     for (offTriangles <- header.offTriangles; numTriangles <- header.numTriangles)
       add("Triangles", Bytes(offTriangles), array(numTriangles, "Triangle",
         new Triangle(header.numVertices, header.numTexCoords)))
+
+    for (numFrames <- header.numFrames; offFrames <- header.offFrames)
+      add("Frames", Bytes(offFrames), array(numFrames, "Frame", new Frame(header.numVertices)))
 
     builder.setRepr("Quake II model")
   }

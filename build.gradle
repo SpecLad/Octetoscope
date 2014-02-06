@@ -24,7 +24,7 @@ ext {
   scalaTestVersion = '2.0'
   scalaTestDep = "org.scalatest:scalatest_${scalaMajorVersion}:${scalaTestVersion}"
 
-  icuVersion = '51.1'
+  icuVersion = '52.1'
   icuDep = "com.ibm.icu:icu4j:${icuVersion}"
 
   armVersion = '1.3'

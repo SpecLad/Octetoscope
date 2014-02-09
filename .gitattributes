@@ -2,6 +2,7 @@
 *.gradle text
 *.groovy text
 *.java text
+*.pl text
 *.properties text
 *.scala text
 *.txt text

@@ -74,7 +74,11 @@ object MD2 extends MoleculeBuilderUnitDissector {
       value.offTriangles = add("Offset of triangles", sInt32L +! nonNegative)
       value.offFrames = add("Offset of frames", sInt32L +! nonNegative)
       add("Offset of OpenGL commands", sInt32L +! nonNegative)
-      add("File size", sInt32L +! nonNegative)
+
+      val fileSizeConstraint = if (input.size - offset.bytes <= Int.MaxValue)
+        noMoreThan((input.size - offset.bytes).toInt, "actual file size") else any
+
+      value.fileSize = add("File size", sInt32L +! nonNegative +! fileSizeConstraint)
     }
   }
 
@@ -89,6 +93,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
     var offTexCoords: Option[Int] = None
     var offTriangles: Option[Int] = None
     var offFrames: Option[Int] = None
+    var fileSize: Option[Int] = None
   }
 
   // Quake II's struct dstvert_t.
@@ -169,5 +174,8 @@ object MD2 extends MoleculeBuilderUnitDissector {
       add("Frames", Bytes(offFrames), array(numFrames, "Frame", new Frame(frameSize, header.numVertices)))
 
     builder.setRepr("Quake II model")
+
+    for (fileSize <- header.fileSize)
+      builder.fixSize(Bytes(fileSize))
   }
 }

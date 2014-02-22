@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
 
       add("Skin width", sInt32L +! positive)
       add("Skin height", sInt32L +! positive +? noMoreThan(480, "MAX_LBM_HEIGHT"))
-      add("Frame size", sInt32L)
+      value.frameSize = add("Frame size", sInt32L +! nonNegative)
 
       value.numSkins = add("Number of skins", sInt32L +! positive)
       value.numVertices = add("Number of vertices", sInt32L +! positive +? noMoreThan(2048, "MAX_VERTS"))
@@ -79,6 +79,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
   }
 
   private class HeaderValue {
+    var frameSize: Option[Int] = None
     var numSkins: Option[Int] = None
     var numVertices: Option[Int] = None
     var numTexCoords: Option[Int] = None
@@ -137,8 +138,9 @@ object MD2 extends MoleculeBuilderUnitDissector {
   }
 
   // Quake II's struct daliasframe_t
-  private class Frame(numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
+  private class Frame(frameSize: Int, numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+      builder.fixSize(Bytes(frameSize))
       val add = new SequentialAdder(input, offset, builder)
       add("Scale", new Vector3(float32L))
       add("Translation", new Vector3(float32L))
@@ -163,8 +165,8 @@ object MD2 extends MoleculeBuilderUnitDissector {
       add("Triangles", Bytes(offTriangles), array(numTriangles, "Triangle",
         new Triangle(header.numVertices, header.numTexCoords)))
 
-    for (numFrames <- header.numFrames; offFrames <- header.offFrames)
-      add("Frames", Bytes(offFrames), array(numFrames, "Frame", new Frame(header.numVertices)))
+    for (numFrames <- header.numFrames; offFrames <- header.offFrames; frameSize <- header.frameSize)
+      add("Frames", Bytes(offFrames), array(numFrames, "Frame", new Frame(frameSize, header.numVertices)))
 
     builder.setRepr("Quake II model")
   }

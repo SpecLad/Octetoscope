@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -73,5 +73,12 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
     builder.addNote("foo")
     builder.addNote("bar")
     builder.build() shouldBe Molecule(InfoSize(), None, Seq(), notes = Seq("foo", "bar"))
+  }
+
+  test("fixed size") {
+    builder.addChild("alpha", Bytes(1), Atom(Bytes(5), None))
+    builder.fixSize(Bytes(10))
+    builder.addChild("beta", Bytes(8), Atom(Bytes(5), None))
+    builder.build().size shouldBe Bytes(10)
   }
 }

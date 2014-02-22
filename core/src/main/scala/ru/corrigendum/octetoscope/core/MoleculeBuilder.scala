@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,8 @@ package ru.corrigendum.octetoscope.core
 class MoleculeBuilder {
   private[this] val childrenBuilder = Seq.newBuilder[SubPiece]
   private[this] var repr: Option[String] = None
-  private[this] var length: InfoSize = InfoSize()
+  private[this] var autoSize: InfoSize = InfoSize()
+  private[this] var fixedSize: Option[InfoSize] = None
   private[this] var quality: PieceQuality.Value = PieceQuality.Good
   private[this] val notes = Seq.newBuilder[String]
   private[this] var hasChildren_ = false
@@ -30,7 +31,7 @@ class MoleculeBuilder {
 
   def addChild(name: String, offset: InfoSize, piece: Piece) {
     childrenBuilder += SubPiece(name, offset, piece)
-    length = List(length, offset + piece.size).max
+    autoSize = List(autoSize, offset + piece.size).max
     hasChildren_ = true
   }
 
@@ -41,7 +42,10 @@ class MoleculeBuilder {
 
   def addNote(note: String) { notes += note }
 
-  def build(): Molecule = Molecule(length, repr, childrenBuilder.result(), quality, notes.result())
+  def build(): Molecule =
+    Molecule(fixedSize.getOrElse(autoSize), repr, childrenBuilder.result(), quality, notes.result())
 
   def hasChildren: Boolean = hasChildren_
+
+  def fixSize(size: InfoSize) { fixedSize = Some(size) }
 }

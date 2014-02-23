@@ -66,14 +66,14 @@ object MD2 extends MoleculeBuilderUnitDissector {
       value.numVertices = add("Number of vertices", sInt32L +! positive +? noMoreThan(2048, "MAX_VERTS"))
       value.numTexCoords = add("Number of texture coordinate pairs", sInt32L +! positive)
       value.numTriangles = add("Number of triangles", sInt32L +! positive)
-      add("Number of OpenGL command words", sInt32L +! positive)
+      value.numOpenGL = add("Number of OpenGL command words", sInt32L +! positive)
       value.numFrames = add("Number of frames", sInt32L +! positive)
 
       value.offSkins = add("Offset of skins", sInt32L +! nonNegative)
       value.offTexCoords = add("Offset of texture coordinates", sInt32L +! nonNegative)
       value.offTriangles = add("Offset of triangles", sInt32L +! nonNegative)
       value.offFrames = add("Offset of frames", sInt32L +! nonNegative)
-      add("Offset of OpenGL commands", sInt32L +! nonNegative)
+      value.offOpenGL = add("Offset of OpenGL commands", sInt32L +! nonNegative)
 
       val fileSizeConstraint = if (input.size - offset.bytes <= Int.MaxValue)
         noMoreThan((input.size - offset.bytes).toInt, "actual file size") else any
@@ -89,10 +89,12 @@ object MD2 extends MoleculeBuilderUnitDissector {
     var numTexCoords: Option[Int] = None
     var numTriangles: Option[Int] = None
     var numFrames: Option[Int] = None
+    var numOpenGL: Option[Int] = None
     var offSkins: Option[Int] = None
     var offTexCoords: Option[Int] = None
     var offTriangles: Option[Int] = None
     var offFrames: Option[Int] = None
+    var offOpenGL: Option[Int] = None
     var fileSize: Option[Int] = None
   }
 
@@ -156,6 +158,89 @@ object MD2 extends MoleculeBuilderUnitDissector {
     }
   }
 
+  private abstract sealed class OpenGLCommandTypeValue
+  private sealed case class TriangleFan(numVertices: Int) extends OpenGLCommandTypeValue {
+    override def toString: String = "Triangle Fan of " + numVertices
+  }
+  private sealed case class TriangleStrip(numVertices: Int) extends OpenGLCommandTypeValue {
+    override def toString: String = "Triangle Strip of " + numVertices
+  }
+  private case object OpenGLEnd extends OpenGLCommandTypeValue {
+    override def toString: String = "End"
+  }
+
+  private object OpenGLCommandType extends DissectorO[OpenGLCommandTypeValue] {
+    override def dissectO(input: Blob, offset: InfoSize): (Piece, Option[OpenGLCommandTypeValue]) = {
+      val word = readInt32L(input, offset)
+      if (word == Int.MinValue)
+        return (
+          Atom(Bytes(4), Some(word.toString), PieceQuality.Broken, Seq("too many vertices for a triangle fan")),
+          None)
+
+      val value = if (word < 0) TriangleFan(-word) else if (word > 0) TriangleStrip(word) else OpenGLEnd
+      val piece = Atom(Bytes(4), Some("%d -> %s".format(word, value)))
+
+      if (word != 0 && Math.abs(word) < 3)
+        (piece.impaired(PieceQuality.Bad).withNote("too few vertices for a triangle"), Some(value))
+      else
+        (piece, Some(value))
+    }
+  }
+
+  private object OpenGLVertex extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+      val add = new SequentialAdder(input, offset, builder)
+      add("Texture s", float32L)
+      add("Texture t", float32L)
+      add("Index", sInt32L +! nonNegative)
+    }
+  }
+
+  private case class OpenGLCommandValue(var typ: Option[OpenGLCommandTypeValue])
+
+  private object OpenGLCommand extends MoleculeBuilderDissector[OpenGLCommandValue] {
+    override def defaultValue: OpenGLCommandValue = OpenGLCommandValue(None)
+
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: OpenGLCommandValue) {
+      val add = new SequentialAdder(input, offset, builder)
+      value.typ = add("Type", OpenGLCommandType)
+
+      for (typ <- value.typ) {
+        builder.setRepr(typ.toString)
+
+        val numVerts = typ match {
+          case TriangleFan(n) => n
+          case TriangleStrip(n) => n
+          case OpenGLEnd => return
+        }
+
+        add("Vertices", array(numVerts, "Vertex", OpenGLVertex))
+      }
+    }
+  }
+
+  private class OpenGLCommands(numWords: Int) extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+      val add = new SequentialAdder(input, offset, builder)
+      builder.fixSize(Bytes(4L * numWords))
+
+      var dissectedWords = 0
+
+      while (dissectedWords < numWords) {
+        val cmd = add("Command", OpenGLCommand)
+        cmd.typ match {
+          case Some(TriangleFan(n)) => dissectedWords += 1 + 3 * n
+          case Some(TriangleStrip(n)) => dissectedWords += 1 + 3 * n
+          case Some(OpenGLEnd) => return
+          case None => dissectedWords = Int.MaxValue
+        }
+      }
+
+      builder.impair(PieceQuality.Bad)
+      builder.addNote("missing End command")
+    }
+  }
+
   override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
     val add = new RandomAdder(input, offset, builder)
     val header = add("Header", Bytes(0), Header)
@@ -172,6 +257,9 @@ object MD2 extends MoleculeBuilderUnitDissector {
 
     for (numFrames <- header.numFrames; offFrames <- header.offFrames; frameSize <- header.frameSize)
       add("Frames", Bytes(offFrames), array(numFrames, "Frame", new Frame(frameSize, header.numVertices)))
+
+    for (numOpenGL <- header.numOpenGL; offOpenGL <- header.offOpenGL)
+      add("OpenGL commands", Bytes(offOpenGL), new OpenGLCommands(numOpenGL))
 
     builder.setRepr("Quake II model")
 

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ object PrimitiveDissectors {
 
   def sInt16L: Dissector[Short] = SInt16L
 
-  private def readInt32L(input: Blob, offset: InfoSize) = {
+  def readInt32L(input: Blob, offset: InfoSize) = {
     val Bytes(bo) = offset
     (input(bo) & 0xFF) |
       ((input(bo + 1) & 0xFF) << 8) |

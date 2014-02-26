@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,17 +19,17 @@
 package ru.corrigendum.octetoscope.infra
 
 import java.lang.reflect.{Method, InvocationHandler, Proxy}
-import com.ibm.icu.util.ULocale
-import scala.Array
 import ru.corrigendum.octetoscope.abstractinfra.Translation
 import com.ibm.icu.text.MessageFormat
+import java.util.Locale
 
 object MessageLocalizer {
   def localize[T](iface: Class[T], translationMap: Map[String, Class[_ <: T]]): T = {
-    val locale = ULocale.acceptLanguage(Array(ULocale.getDefault),
-      translationMap.keys.map(ULocale.forLanguageTag).toArray, null)
+    val locale = Locale.getDefault
+    val language = locale.getLanguage.toLowerCase(Locale.ROOT)
+    val country = locale.getCountry.toUpperCase(Locale.ROOT)
 
-    val transIface = translationMap.getOrElse(locale.toLanguageTag, iface)
+    val transIface = translationMap.getOrElse(language + "-" + country, translationMap.getOrElse(language, iface))
 
     val translations = Map((for {
       meth <- transIface.getMethods

@@ -23,6 +23,7 @@ import PrimitiveDissectors._
 import CompoundDissectors._
 import CommonConstraints._
 import ru.corrigendum.octetoscope.core.Common.Vector3
+import java.util.Locale
 
 /*
   Quake II models (*.md2).
@@ -190,9 +191,12 @@ object MD2 extends MoleculeBuilderUnitDissector {
   private object OpenGLVertex extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
-      add("Texture s", float32L)
-      add("Texture t", float32L)
-      add("Index", sInt32L +! nonNegative)
+      val s = add("Texture s", float32L)
+      val t = add("Texture t", float32L)
+      val ind = add("Index", sInt32L +! nonNegative)
+
+      for (ind <- ind)
+        builder.setRepr("%d / (%f, %f)".formatLocal(Locale.ROOT, ind, s, t))
     }
   }
 

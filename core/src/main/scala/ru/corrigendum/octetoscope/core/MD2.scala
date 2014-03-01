@@ -188,12 +188,14 @@ object MD2 extends MoleculeBuilderUnitDissector {
     }
   }
 
-  private object OpenGLVertex extends MoleculeBuilderUnitDissector {
+  private class OpenGLVertex(numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
+    val validVertexIndex = numVertices.map(lessThan(_, "number of vertices")).getOrElse(any)
+
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
       val s = add("Texture s", float32L)
       val t = add("Texture t", float32L)
-      val ind = add("Index", sInt32L +! nonNegative)
+      val ind = add("Index", sInt32L +! nonNegative +! validVertexIndex)
 
       for (ind <- ind)
         builder.setRepr("%d / (%f, %f)".formatLocal(Locale.ROOT, ind, s, t))
@@ -202,7 +204,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
 
   private case class OpenGLCommandValue(var typ: Option[OpenGLCommandTypeValue])
 
-  private object OpenGLCommand extends MoleculeBuilderDissector[OpenGLCommandValue] {
+  private class OpenGLCommand(totalNumVertices: Option[Int]) extends MoleculeBuilderDissector[OpenGLCommandValue] {
     override def defaultValue: OpenGLCommandValue = OpenGLCommandValue(None)
 
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: OpenGLCommandValue) {
@@ -218,20 +220,21 @@ object MD2 extends MoleculeBuilderUnitDissector {
           case OpenGLEnd => return
         }
 
-        add("Vertices", array(numVerts, "Vertex", OpenGLVertex))
+        add("Vertices", array(numVerts, "Vertex", new OpenGLVertex(totalNumVertices)))
       }
     }
   }
 
-  private class OpenGLCommands(numWords: Int) extends MoleculeBuilderUnitDissector {
+  private class OpenGLCommands(numWords: Int, numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
       builder.fixSize(Bytes(4L * numWords))
 
       var dissectedWords = 0
+      val cmdDissector = new OpenGLCommand(numVertices)
 
       while (dissectedWords < numWords) {
-        val cmd = add("Command", OpenGLCommand)
+        val cmd = add("Command", cmdDissector)
         cmd.typ match {
           case Some(TriangleFan(n)) => dissectedWords += 1 + 3 * n
           case Some(TriangleStrip(n)) => dissectedWords += 1 + 3 * n
@@ -263,7 +266,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
       add("Frames", Bytes(offFrames), array(numFrames, "Frame", new Frame(frameSize, header.numVertices)))
 
     for (numOpenGL <- header.numOpenGL; offOpenGL <- header.offOpenGL)
-      add("OpenGL commands", Bytes(offOpenGL), new OpenGLCommands(numOpenGL))
+      add("OpenGL commands", Bytes(offOpenGL), new OpenGLCommands(numOpenGL, header.numVertices))
 
     builder.setRepr("Quake II model")
 

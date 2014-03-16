@@ -6,6 +6,7 @@
 *.properties text
 *.scala text
 *.txt text
+*.yml text
 .gitattributes text
 .gitignore text
 /gradlew text eol=lf

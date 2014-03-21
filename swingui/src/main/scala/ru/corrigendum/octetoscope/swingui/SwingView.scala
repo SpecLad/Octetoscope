@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import javax.swing.{JFileChooser, JOptionPane, JFrame}
 import java.io.File
 import ru.corrigendum.octetoscope.abstractui.View
 
-private class SwingView extends View {
+private class SwingView(chooser: JFileChooser) extends View {
   private[this] val _frame = new JFrame()
   protected def frame = _frame
 
@@ -31,9 +31,8 @@ private class SwingView extends View {
   }
 
   override def showFileOpenBox(): Option[File] = {
-    val fc = new JFileChooser()
-    fc.showOpenDialog(frame) match {
-      case JFileChooser.APPROVE_OPTION => Some(fc.getSelectedFile)
+    chooser.showOpenDialog(frame) match {
+      case JFileChooser.APPROVE_OPTION => Some(chooser.getSelectedFile)
       case _ => None
     }
   }

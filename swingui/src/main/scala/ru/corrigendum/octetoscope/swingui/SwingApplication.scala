@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,13 +19,16 @@
 package ru.corrigendum.octetoscope.swingui
 
 import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
-import javax.swing.{SwingUtilities, UIManager}
+import javax.swing.{JFileChooser, SwingUtilities, UIManager}
 
 object SwingApplication {
-  def start(strings: UIStrings, presentationInit: (MainView) => Unit) {
+  def setStyle() {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+  }
+
+  def start(strings: UIStrings, presentationInit: (MainView) => Unit) {
     SwingUtilities.invokeLater(new Runnable {
-      override def run() { presentationInit(new SwingMainView(strings)) }
+      override def run() { presentationInit(new SwingMainView(strings, new JFileChooser())) }
     })
   }
 }

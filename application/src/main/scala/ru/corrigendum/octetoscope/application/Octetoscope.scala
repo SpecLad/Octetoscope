@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ object Octetoscope extends App {
   val presentationStrings = MessageLocalizer.localize[PresentationStrings](
     classOf[PresentationStrings], PresentationStrings.translationMap)
 
+  SwingApplication.setStyle()
   SwingApplication.start(uiStrings,
     view => new MainPresenter(
       presentationStrings, APPLICATION_NAME, view,

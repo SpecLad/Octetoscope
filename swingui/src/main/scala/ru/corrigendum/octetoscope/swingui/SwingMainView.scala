@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
 import javax.swing.tree.{MutableTreeNode, DefaultMutableTreeNode}
 import java.awt.Dimension
 
-private class SwingMainView(strings: UIStrings) extends SwingView with MainView {
+private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends SwingView(chooser) with MainView {
   private[this] val menuBar = new JMenuBar()
   private[this] val tabPane = new JTabbedPane()
 

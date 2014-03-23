@@ -71,7 +71,7 @@ FILE: for my $fname (@changed_files) {
     }
   }
 
-  print STDERR "$fname: copyright years don't cover current year\n";
+  print STDERR "$fname: copyright years \"$years\" don't cover current year $current_year\n";
   $exit_status = 1;
 }
 

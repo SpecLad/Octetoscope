@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 
 package ru.corrigendum.octetoscope.core
 
-import scala.language.implicitConversions
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 trait MoleculeBuilderDissector[Value] extends Dissector[Value] {

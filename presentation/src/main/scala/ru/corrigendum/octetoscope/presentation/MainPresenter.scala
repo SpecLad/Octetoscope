@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ class MainPresenter(strings: PresentationStrings,
 
   view.subscribe(viewHandler)
 
+  var numTabs = 0
+
   private object viewHandler extends MainView#Sub {
     override def notify(pub: MainView#Pub, event: Event) {
       event match {
@@ -59,7 +61,9 @@ class MainPresenter(strings: PresentationStrings,
                   return
               }
 
-              pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(tabHandler)
+              pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(new TabHandler(path.getName))
+              numTabs += 1
+              view.title = appName + " - " + path.getName
           }
 
         case CommandEvent(_) => // workaround for bug SI-7206
@@ -67,10 +71,16 @@ class MainPresenter(strings: PresentationStrings,
     }
   }
 
-  private object tabHandler extends MainView.Tab#Sub {
+  private class TabHandler(title: String) extends MainView.Tab#Sub {
     override def notify(pub: Tab#Pub, event: TabEvent) {
       event match {
-        case TabClosedEvent => pub.close()
+        case TabClosedEvent =>
+          pub.close()
+          numTabs -= 1
+          if (numTabs == 0) view.title = appName
+
+        case TabActivatedEvent =>
+          view.title = appName + " - " + title
       }
     }
   }

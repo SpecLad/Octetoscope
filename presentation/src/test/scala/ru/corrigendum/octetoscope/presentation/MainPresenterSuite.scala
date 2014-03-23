@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -96,6 +96,19 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     tab.title shouldBe "cadabra"
     tab.toolTip shouldBe MainPresenterSuite.FakePath.toString
     tab.tree shouldBe presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath))
+
+    view.title shouldBe "Blarf - cadabra"
+  }
+
+  test("switching tabs") {
+    dissectorDriver.result = MainPresenterSuite.FakePiece
+    view.selectedFile = Some(MainPresenterSuite.FakePath)
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+    view.selectedFile = Some(new File(MainPresenterSuite.FakePath, "alalazam"))
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+
+    view.tabs.head.trigger(MainView.TabActivatedEvent)
+    view.title shouldBe "Blarf - cadabra"
   }
 
   test("tab closing") {
@@ -105,6 +118,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
     view.tabs.head.trigger(MainView.TabClosedEvent)
     view.tabs should have size 0
+    view.title shouldBe "Blarf"
   }
 }
 

@@ -24,6 +24,7 @@ import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
 import javax.swing.tree.{MutableTreeNode, DefaultMutableTreeNode}
 import java.awt.Dimension
+import javax.swing.event.{ChangeEvent, ChangeListener}
 
 private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends SwingView(chooser) with MainView {
   private[this] val menuBar = new JMenuBar()
@@ -69,6 +70,19 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   frame.pack()
   frame.setLocationRelativeTo(null)
 
+  tabPane.addChangeListener(new ChangeListener {
+    override def stateChanged(e: ChangeEvent): Unit = {
+      val tabIndex = tabPane.getSelectedIndex
+      if (tabIndex == -1) return
+
+      val tabComponent = tabPane.getTabComponentAt(tabIndex).asInstanceOf[JComponent]
+      if (tabComponent eq null) return // can happen when we haven't assigned the tab component yet
+
+      val tab = tabComponent.getClientProperty(SwingMainView.PropertyKeyTab).asInstanceOf[TabImpl]
+      tab.triggerEvent(MainView.TabActivatedEvent)
+    }
+  })
+
   override def dispose() {
     frame.dispose()
   }
@@ -86,6 +100,8 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   override def addTab(title: String, toolTip: String, root: DisplayTreeNode): Tab = {
     lazy val tab: TabImpl = new TabImpl(TabComponent.get(title,
       () => tab.triggerEvent(MainView.TabClosedEvent)))
+
+    tab.component.putClientProperty(SwingMainView.PropertyKeyTab, tab)
 
     val tree = new JTree(abstractTreeNodeToSwing(root))
     tree.setShowsRootHandles(true)
@@ -112,4 +128,8 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
       tabPane.remove(tabPane.indexOfTabComponent(component))
     }
   }
+}
+
+private object SwingMainView {
+  private val PropertyKeyTab: Object = new Object
 }

@@ -16,14 +16,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.core
+package ru.corrigendum.octetoscope.dissectors
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import PrimitiveDissectors._
-import CompoundDissectors._
-import CommonConstraints._
-import ru.corrigendum.octetoscope.core.Common.Vector3
 import java.util.Locale
+import ru.corrigendum.octetoscope.core._
+import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
+import ru.corrigendum.octetoscope.core.CommonConstraints._
+import ru.corrigendum.octetoscope.core.CompoundDissectors._
+import Common.Vector3
 
 /*
   Quake II models (*.md2).

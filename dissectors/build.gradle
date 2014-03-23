@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,15 +16,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-apply plugin: 'application'
-
-applicationName = 'octetoscope'
-mainClassName = 'ru.corrigendum.octetoscope.application.Octetoscope'
-
 dependencies {
   compile project(':core')
-  compile project(':dissectors')
-  compile project(':infra')
-  compile project(':presentation')
-  compile project(':swingui')
 }

@@ -16,10 +16,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.core
+package ru.corrigendum.octetoscope.dissectors
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import java.util.Locale
+import ru.corrigendum.octetoscope.core._
 
 object Common {
   class Vector3[T](component: DissectorO[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {

@@ -33,12 +33,11 @@ EOF
 
 my @file_suffixes = (".gradle", ".groovy", ".java", ".scala");
 
-my @changed_files = split /\0/, `git diff --staged --name-only --diff-filter=ACMR -z`;
-
 my $exit_status = 0;
 
-FILE: for my $fname (@changed_files) {
-  next if (fileparse($fname, @file_suffixes))[2] eq '';
+sub get_copyright_years {
+  my ($fname) = @_;
+  return undef if (fileparse($fname, @file_suffixes))[2] eq '';
 
   # This transformation is not part of $generic_header in case
   # we later need to support languages with different comment syntax.
@@ -48,20 +47,29 @@ FILE: for my $fname (@changed_files) {
   $header =~ s/YEARS/($re_years)/;
   $header = qr"^/\*\n$header\*/\n";
 
-  # print $header;
-
   open my $file, '-|', 'git', 'show', ':' . $fname;
 
   my $contents = do { local $/; <$file> };
 
+  close $file;
+
   if ($contents !~ $header) {
-    print STDERR "$fname: no license header\n";
+    print STDERR "$fname: missing/wrong license header\n";
     $exit_status = 1;
-    next;
+    return undef;
   }
 
-  my $years = $1;
-  my $current_year = (gmtime)[5] + 1900;
+  return $1;
+}
+
+my $current_year = (gmtime)[5] + 1900;
+
+my @changed_files = split /\0/, `git diff --staged --name-only --diff-filter=CMR -z`;
+
+FILE: for my $fname (@changed_files) {
+  my $years = get_copyright_years($fname);
+
+  next unless defined $years;
 
   for my $year_range (split /, /, $years) {
     if ($year_range =~ /^(.*)-(.*)$/) {
@@ -72,6 +80,19 @@ FILE: for my $fname (@changed_files) {
   }
 
   print STDERR "$fname: copyright years \"$years\" don't cover current year $current_year\n";
+  $exit_status = 1;
+}
+
+my @added_files = split /\0/, `git diff --staged --name-only --diff-filter=A -z`;
+
+for my $fname (@added_files) {
+  my $years = get_copyright_years($fname);
+
+  next unless defined $years;
+
+  next if $years eq $current_year;
+
+  print STDERR "$fname: copyright years for new file should be \"$current_year\", but is \"$years\" instead\n";
   $exit_status = 1;
 }
 

@@ -78,4 +78,18 @@ task installLibs(type: Sync) {
 
 task install(dependsOn: [installLauncher, installLibs])
 
+task dist(type: Zip) {
+  into 'Octetoscope'
+  dirMode 0755
+  fileMode 0644
+
+  from(installLauncher.outputs) {
+    into 'bin'
+    fileMode 0755
+  }
+  from(installLibs.outputs) {
+    into 'lib'
+  }
+}
+
 defaultTasks "build", "install"

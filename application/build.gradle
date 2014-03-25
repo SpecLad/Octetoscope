@@ -16,11 +16,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-apply plugin: 'application'
-
-applicationName = 'octetoscope'
-mainClassName = 'ru.corrigendum.octetoscope.application.Octetoscope'
-
 dependencies {
   compile project(':core')
   compile project(':dissectors')

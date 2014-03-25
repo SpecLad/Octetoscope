@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+apply plugin: 'base'
 
 ext {
   scalaMajorVersion = '2.10'
@@ -57,3 +59,21 @@ subprojects {
 task wrapper(type: Wrapper) {
   gradleVersion = '1.10'
 }
+
+task installLauncher(type: Jar) {
+  from project(':application').sourceSets.main.output
+  archiveName 'octetoscope.jar'
+  destinationDir new File(buildDir, 'install/bin')
+  manifest {
+    attributes("Class-Path":
+        "${-> project(':application').configurations.runtime.collect{'../lib/' + it.name}.join(' ')}")
+    attributes("Main-Class": 'ru.corrigendum.octetoscope.application.Octetoscope')
+  }
+}
+
+task installLibs(type: Sync) {
+  from project(':application').configurations.runtime
+  into new File(buildDir, 'install/lib')
+}
+
+task install(dependsOn: [installLauncher, installLibs])

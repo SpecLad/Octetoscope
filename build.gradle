@@ -77,3 +77,5 @@ task installLibs(type: Sync) {
 }
 
 task install(dependsOn: [installLauncher, installLibs])
+
+defaultTasks "build", "install"

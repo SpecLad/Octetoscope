@@ -16,9 +16,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-ext {
-  generatedResourcesDir = new File(buildDir, "generated/resources")
-}
+def generatedResourcesDir = new File(buildDir, "generated/resources")
 
 sourceSets {
   main {

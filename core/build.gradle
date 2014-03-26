@@ -16,7 +16,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-def generatedResourcesDir = new File(buildDir, "generated/resources")
+def generatedResourcesDir = new File(buildDir, 'generated/resources')
 
 sourceSets {
   main {
@@ -28,15 +28,15 @@ sourceSets {
 
 task generateVersionInfo {
   doLast {
-    def coreDir = new File(generatedResourcesDir, "ru/corrigendum/octetoscope/core")
+    def coreDir = new File(generatedResourcesDir, 'ru/corrigendum/octetoscope/core')
     coreDir.mkdirs()
 
     // Not using the Properties class here to avoid the timestamp.
     def propString = """\
-    releaseVersion = ${versionInfo.releaseVersion}
-    extraCommits = ${versionInfo.extraCommits}
-    commitHash = ${versionInfo.commitHash}
-    dirty = ${versionInfo.dirty}
+    releaseVersion = $versionInfo.releaseVersion
+    extraCommits = $versionInfo.extraCommits
+    commitHash = $versionInfo.commitHash
+    dirty = $versionInfo.dirty
     """.stripIndent()
 
     new File(coreDir, 'version.properties').write(propString)

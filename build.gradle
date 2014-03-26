@@ -36,17 +36,17 @@ ext {
   versionInfo = getVersionInfo()
 
   scalaMajorVersion = '2.10'
-  scalaVersion = "${scalaMajorVersion}.3"
-  scalaLibraryDep = "org.scala-lang:scala-library:${scalaVersion}"
+  scalaVersion = "$scalaMajorVersion.3"
+  scalaLibraryDep = "org.scala-lang:scala-library:$scalaVersion"
 
   scalaTestVersion = '2.0'
-  scalaTestDep = "org.scalatest:scalatest_${scalaMajorVersion}:${scalaTestVersion}"
+  scalaTestDep = "org.scalatest:scalatest_$scalaMajorVersion:$scalaTestVersion"
 
   icuVersion = '52.1'
-  icuDep = "com.ibm.icu:icu4j:${icuVersion}"
+  icuDep = "com.ibm.icu:icu4j:$icuVersion"
 
   armVersion = '1.3'
-  armDep = "com.jsuereth:scala-arm_${scalaMajorVersion}:${armVersion}"
+  armDep = "com.jsuereth:scala-arm_$scalaMajorVersion:$armVersion"
 }
 
 subprojects {
@@ -81,9 +81,9 @@ task installLauncher(type: Jar) {
   archiveName 'octetoscope.jar'
   destinationDir new File(buildDir, 'install/bin')
   manifest {
-    attributes("Class-Path":
+    attributes('Class-Path':
         "${-> project(':application').configurations.runtime.collect{'../lib/' + it.name}.join(' ')}")
-    attributes("Main-Class": 'ru.corrigendum.octetoscope.application.Octetoscope')
+    attributes('Main-Class': 'ru.corrigendum.octetoscope.application.Octetoscope')
   }
 }
 
@@ -110,4 +110,4 @@ task dist(type: Zip) {
   }
 }
 
-defaultTasks "build", "install"
+defaultTasks 'build', 'install'

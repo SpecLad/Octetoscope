@@ -24,6 +24,6 @@ public final class VersionInfo {
 
   @Override
   String toString() {
-    "$releaseVersion${extraCommits == 0 ? "" : "+" + extraCommits}-g${commitHash[0..<7]}${dirty ? "-dirty" : ""}"
+    "$releaseVersion${extraCommits == 0 ? '' : '+' + extraCommits}-g${commitHash[0..<7]}${dirty ? '-dirty' : ''}"
   }
 }

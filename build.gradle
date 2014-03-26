@@ -18,7 +18,23 @@
 
 apply plugin: 'base'
 
+def getVersionInfo() {
+  def versionFile = file('version.gradle')
+
+  if (versionFile.exists()) {
+    def versionInfo = new VersionInfo(extraCommits: 0, commitHash: '0' * 40, dirty: false)
+    apply from: versionFile, to: versionInfo
+    if (versionInfo.releaseVersion == null)
+      throw new InvalidUserDataException('version.gradle provided, but doesn\'t set releaseVersion')
+    return versionInfo
+  } else {
+    return BuildUtils.getVersionInfo(project, 'release-')
+  }
+}
+
 ext {
+  versionInfo = getVersionInfo()
+
   scalaMajorVersion = '2.10'
   scalaVersion = "${scalaMajorVersion}.3"
   scalaLibraryDep = "org.scala-lang:scala-library:${scalaVersion}"

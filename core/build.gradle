@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,18 +32,6 @@ task generateVersionInfo {
   doLast {
     def coreDir = new File(generatedResourcesDir, "ru/corrigendum/octetoscope/core")
     coreDir.mkdirs()
-
-    def versionFile = rootProject.file('version.gradle')
-    def versionInfo
-
-    if (versionFile.exists()) {
-      versionInfo = new VersionInfo(extraCommits: 0, commitHash: '0' * 40, dirty: false)
-      apply from: versionFile, to: versionInfo
-      if (versionInfo.releaseVersion == null)
-        throw new InvalidUserDataException('version.gradle provided, but doesn\'t set releaseVersion')
-    } else {
-      versionInfo = BuildUtils.getVersionInfo(rootProject, 'release-')
-    }
 
     // Not using the Properties class here to avoid the timestamp.
     def propString = """\

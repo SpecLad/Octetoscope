@@ -27,10 +27,10 @@ sourceSets {
 }
 
 task generateVersionInfo {
-  doLast {
-    def coreDir = new File(generatedResourcesDir, 'ru/corrigendum/octetoscope/core')
-    coreDir.mkdirs()
+  def propFile = new File(generatedResourcesDir, 'ru/corrigendum/octetoscope/core/version.properties')
+  outputs.file propFile
 
+  doLast {
     // Not using the Properties class here to avoid the timestamp.
     def propString = """\
     releaseVersion = $versionInfo.releaseVersion
@@ -39,7 +39,8 @@ task generateVersionInfo {
     dirty = $versionInfo.dirty
     """.stripIndent()
 
-    new File(coreDir, 'version.properties').write(propString)
+    propFile.parentFile.mkdirs()
+    propFile.write(propString)
   }
 }
 

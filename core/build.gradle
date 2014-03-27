@@ -26,7 +26,7 @@ sourceSets {
   }
 }
 
-task generateVersionInfo {
+task generateVersionResource {
   def propFile = new File(generatedResourcesDir, 'ru/corrigendum/octetoscope/core/version.properties')
   outputs.file propFile
 
@@ -45,7 +45,7 @@ task generateVersionInfo {
 }
 
 processResources {
-  dependsOn generateVersionInfo
+  dependsOn generateVersionResource
 }
 
 dependencies {

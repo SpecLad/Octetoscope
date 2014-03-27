@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 import org.scalatest.Inside._
 import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
@@ -31,10 +31,10 @@ class AdderSuite extends FunSuite {
     val builder = new MoleculeBuilder
 
     val adder = new SequentialAdder(blob, Bytes(1), builder)
-    adder("alpha", sInt32L) shouldBe 1
-    adder("beta", sInt32L.asInstanceOf[DissectorO[Int]]) shouldBe Some(2)
+    adder("alpha", sInt32L) mustBe 1
+    adder("beta", sInt32L.asInstanceOf[DissectorO[Int]]) mustBe Some(2)
 
-    builder.build() shouldBe Molecule(Bytes(8), None, Seq(
+    builder.build() mustBe Molecule(Bytes(8), None, Seq(
       SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("1"))),
       SubPiece("beta", Bytes(4), Atom(Bytes(4), Some("2")))
     ))
@@ -45,8 +45,8 @@ class AdderSuite extends FunSuite {
 
     val cause = new IndexOutOfBoundsException
     val exc = the [MoleculeBuilderDissector.TruncatedException] thrownBy invokeAdder(adder, cause)
-    exc.getCause should be theSameInstanceAs cause
-    exc.subPieceName shouldBe "alpha"
+    exc.getCause must be theSameInstanceAs cause
+    exc.subPieceName mustBe "alpha"
   }
 
   test("sequential adder - throw - DissectorO") {
@@ -74,15 +74,15 @@ class AdderSuite extends FunSuite {
       def defaultValue: Value = Value(0)
       def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
         value.i = 1
-        offset shouldBe Bytes(3)
+        offset mustBe Bytes(3)
         builder.addChild("alpha", Bytes(0), Atom(Bytes(1), None))
       }
     }
 
     val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
-    adder("omega", Bytes(2), dissector) shouldBe Value(1)
+    adder("omega", Bytes(2), dissector) mustBe Value(1)
 
-    builder.build() shouldBe Molecule(Bytes(3), None, Seq(
+    builder.build() mustBe Molecule(Bytes(3), None, Seq(
       SubPiece("omega", Bytes(2), Molecule(Bytes(1), None, Seq(
         SubPiece("alpha", Bytes(0), Atom(Bytes(1), None))
       )))
@@ -103,13 +103,13 @@ class AdderSuite extends FunSuite {
     }
 
     val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
-    adder("omega", Bytes(2), dissector) shouldBe Value(0)
+    adder("omega", Bytes(2), dissector) mustBe Value(0)
 
     inside(builder.build()) { case Molecule(size_, _, children, quality, notes) =>
-      size_ shouldBe InfoSize()
-      children shouldBe empty
-      quality shouldBe PieceQuality.Broken
-      notes.loneElement should include ("\"omega\"")
+      size_ mustBe InfoSize()
+      children mustBe empty
+      quality mustBe PieceQuality.Broken
+      notes.loneElement must include ("\"omega\"")
     }
   }
 }

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 import org.scalatest.Inside._
 import org.scalatest.OptionValues._
 import PrimitiveDissectors._
@@ -65,9 +65,9 @@ class PrimitiveDissectorsSuite extends FunSuite {
   }
 
   test("float32L") {
-    verifyGeneric[Float](float32L, Some("-NaN(0x400001)"), opt => Float.box(opt.value) shouldBe 'NaN,
+    verifyGeneric[Float](float32L, Some("-NaN(0x400001)"), opt => Float.box(opt.value) mustBe 'NaN,
       PieceQuality.Good, 0, 0x01, 0x00, 0xC0.toByte, 0xFF.toByte)
-    verifyGeneric[Float](float32L, Some("-NaN(0x000001)"), opt => Float.box(opt.value) shouldBe 'NaN,
+    verifyGeneric[Float](float32L, Some("-NaN(0x000001)"), opt => Float.box(opt.value) mustBe 'NaN,
       PieceQuality.Good, 0, 0x01, 0x00, 0x80.toByte, 0xFF.toByte)
     verify(float32L, "-Infinity", Float.NegativeInfinity, 0x00, 0x00, 0x80.toByte, 0xFF.toByte)
     verify(float32L, "-1.50000000", -1.5f, 0x00, 0x00, 0xC0.toByte, 0xBF.toByte)
@@ -81,9 +81,9 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(float32L, "5.50000000", 5.5f, 0x00, 0x00, 0xB0.toByte, 0x40)
     verify(float32L, "1.73782444e+34", 1.73782444e+34f, 0x12, 0x34, 0x56, 0x78)
     verify(float32L, "Infinity", Float.PositiveInfinity, 0x00, 0x00, 0x80.toByte, 0x7F)
-    verifyGeneric[Float](float32L, Some("NaN(0x000001)"), opt => Float.box(opt.value) shouldBe 'NaN,
+    verifyGeneric[Float](float32L, Some("NaN(0x000001)"), opt => Float.box(opt.value) mustBe 'NaN,
       PieceQuality.Good, 0, 0x01, 0x00, 0x80.toByte, 0x7F.toByte)
-    verifyGeneric[Float](float32L, Some("NaN(0x400001)"), opt => Float.box(opt.value) shouldBe 'NaN,
+    verifyGeneric[Float](float32L, Some("NaN(0x400001)"), opt => Float.box(opt.value) mustBe 'NaN,
       PieceQuality.Good, 0, 0x01, 0x00, 0xC0.toByte, 0x7F.toByte)
   }
 
@@ -103,7 +103,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
     val dissector = magic(Array[Byte](1, 2, 3), "123")
     verify(dissector, "123", (), 1, 2, 3)
 
-    dissector.dissectO(new ArrayBlob(Array[Byte](4, 5, 6))) shouldBe (
+    dissector.dissectO(new ArrayBlob(Array[Byte](4, 5, 6))) mustBe (
       Atom(Bytes(3), None, PieceQuality.Broken, Seq("expected \"123\" (0x010203)")),
       None
     )
@@ -122,10 +122,10 @@ object PrimitiveDissectorsSuite {
       val (piece, value) = dissector.dissectO(blob, Bytes(padSize))
 
       inside(piece) { case Atom(size_, repr, quality, notes) =>
-        size_ shouldBe Bytes(bytes.size)
-        repr shouldBe expectedRepr
-        quality shouldBe expectedQuality
-        notes should have size expectedNumNotes
+        size_ mustBe Bytes(bytes.size)
+        repr mustBe expectedRepr
+        quality mustBe expectedQuality
+        notes must have size expectedNumNotes
       }
 
       valueAssert(value)
@@ -133,10 +133,10 @@ object PrimitiveDissectorsSuite {
   }
 
   def verify[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
-    verifyGeneric[Value](dissector, Some(expectedRepr), _ shouldBe Some(expectedValue), PieceQuality.Good, 0, bytes: _*)
+    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe Some(expectedValue), PieceQuality.Good, 0, bytes: _*)
   }
 
   def verifyBad[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
-    verifyGeneric[Value](dissector, Some(expectedRepr), _ shouldBe Some(expectedValue), PieceQuality.Bad, 1, bytes: _*)
+    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe Some(expectedValue), PieceQuality.Bad, 1, bytes: _*)
   }
 }

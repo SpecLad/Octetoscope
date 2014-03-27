@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 import java.util
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
@@ -31,7 +31,7 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("apply - normal") {
-    blob(1) shouldBe 4
+    blob(1) mustBe 4
   }
 
   test("apply - out of range") {
@@ -40,19 +40,19 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("toArray") {
-    blob.toArray shouldBe Array[Byte](3, 4, 5, 6, 7)
+    blob.toArray mustBe Array[Byte](3, 4, 5, 6, 7)
   }
 
   test("size") {
-    blob.size shouldBe 5
+    blob.size mustBe 5
   }
 
   test("slice - normal") {
-    blob.slice(2, 4).toArray shouldBe Array[Byte](5, 6)
-    blob.slice(0, 4).toArray shouldBe Array[Byte](3, 4, 5, 6)
-    blob.slice(2, 5).toArray shouldBe Array[Byte](5, 6, 7)
-    blob.slice(0, 5).toArray shouldBe Array[Byte](3, 4, 5, 6, 7)
-    blob.slice(2, 2).toArray shouldBe Array[Byte]()
+    blob.slice(2, 4).toArray mustBe Array[Byte](5, 6)
+    blob.slice(0, 4).toArray mustBe Array[Byte](3, 4, 5, 6)
+    blob.slice(2, 5).toArray mustBe Array[Byte](5, 6, 7)
+    blob.slice(0, 5).toArray mustBe Array[Byte](3, 4, 5, 6, 7)
+    blob.slice(2, 2).toArray mustBe Array[Byte]()
   }
 
   test("slice - out of range") {

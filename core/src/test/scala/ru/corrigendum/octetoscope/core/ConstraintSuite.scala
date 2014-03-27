@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 
 class ConstraintSuite extends FunSuite {
   test("ShouldMustConstraint") {
@@ -31,9 +31,9 @@ class ConstraintSuite extends FunSuite {
 
     // Doesn't really make sense to constrain with the Good quality,
     // but let's test it anyway.
-    constraint.note(PieceQuality.Good) shouldBe "should"
-    constraint.note(PieceQuality.Dubious) shouldBe "should"
-    constraint.note(PieceQuality.Bad) shouldBe "must"
-    constraint.note(PieceQuality.Broken) shouldBe "must"
+    constraint.note(PieceQuality.Good) mustBe "should"
+    constraint.note(PieceQuality.Dubious) mustBe "should"
+    constraint.note(PieceQuality.Bad) mustBe "must"
+    constraint.note(PieceQuality.Broken) mustBe "must"
   }
 }

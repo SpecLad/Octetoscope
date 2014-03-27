@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.mocks.MockDissector
@@ -30,8 +30,8 @@ class DissectorSuite extends FunSuite {
     val result = MockDissector.dissect(blob)
     val resultO = MockDissector.dissectO(blob)
 
-    resultO._1 shouldBe result._1
-    resultO._2 shouldBe Some(result._2)
+    resultO._1 mustBe result._1
+    resultO._2 mustBe Some(result._2)
   }
 
   test("MoleculeBuilderDissector.dissect") {
@@ -40,13 +40,13 @@ class DissectorSuite extends FunSuite {
     val mbd = new MoleculeBuilderDissector[Value] {
       override def defaultValue: Value = Value(1)
       override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
-        value.i shouldBe 1
+        value.i mustBe 1
         value.i = 2
         builder.addChild("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
       }
     }
 
-    mbd.dissect(Blob.empty) shouldBe (
+    mbd.dissect(Blob.empty) mustBe (
       Molecule(Bytes(2), None, Seq(
         SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
       )),
@@ -64,7 +64,7 @@ class DissectorSuite extends FunSuite {
     val builder = new MoleculeBuilder
     mbud.dissectMB(Blob.empty, InfoSize(), builder, ())
 
-    builder.build() shouldBe
+    builder.build() mustBe
       Molecule(Bytes(2), None, Seq(
         SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
       ))
@@ -81,7 +81,7 @@ class DissectorSuite extends FunSuite {
     }
 
     val exc = the [IndexOutOfBoundsException] thrownBy truncated.dissect(Blob.empty)
-    exc should be theSameInstanceAs cause
+    exc must be theSameInstanceAs cause
   }
 
   test("MoleculeBuilderDissector - truncated - non-empty") {
@@ -99,9 +99,9 @@ class DissectorSuite extends FunSuite {
     }
 
     val (molecule, value) = truncated.dissect(Blob.empty)
-    molecule.children shouldBe Seq(SubPiece("alpha", InfoSize(), child))
-    molecule.quality shouldBe PieceQuality.Broken
-    molecule.notes.loneElement should include ("\"beta\"")
-    value.i shouldBe 1
+    molecule.children mustBe Seq(SubPiece("alpha", InfoSize(), child))
+    molecule.quality mustBe PieceQuality.Broken
+    molecule.notes.loneElement must include ("\"beta\"")
+    value.i mustBe 1
   }
 }

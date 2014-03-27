@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 
 class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   var builder: MoleculeBuilder = _
@@ -29,13 +29,13 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("default") {
-    builder.hasChildren shouldBe false
-    builder.build() shouldBe Molecule(InfoSize(), None, Seq())
+    builder.hasChildren mustBe false
+    builder.build() mustBe Molecule(InfoSize(), None, Seq())
   }
 
   test("with repr") {
     builder.setRepr("value")
-    builder.build() shouldBe Molecule(InfoSize(), Some("value"), Seq())
+    builder.build() mustBe Molecule(InfoSize(), Some("value"), Seq())
   }
 
   test("with children") {
@@ -44,41 +44,41 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
     val gamma = SubPiece("gamma", Bytes(1), Atom(Bytes(1), None))
 
     builder.addChild(alpha.name, alpha.offset, alpha.piece)
-    builder.hasChildren shouldBe true
+    builder.hasChildren mustBe true
 
     builder.addChild(beta.name, beta.offset, beta.piece)
     builder.addChild(gamma.name, gamma.offset, gamma.piece)
 
-    builder.build() shouldBe Molecule(Bytes(4), None, Seq(alpha, beta, gamma))
+    builder.build() mustBe Molecule(Bytes(4), None, Seq(alpha, beta, gamma))
   }
 
   test("with quality") {
     builder.impair(PieceQuality.Bad)
-    builder.build() shouldBe Molecule(InfoSize(), None, Seq(), PieceQuality.Bad)
+    builder.build() mustBe Molecule(InfoSize(), None, Seq(), PieceQuality.Bad)
   }
 
   test("with decreasing quality") {
     builder.impair(PieceQuality.Dubious)
     builder.impair(PieceQuality.Broken)
-    builder.build() shouldBe Molecule(InfoSize(), None, Seq(), PieceQuality.Broken)
+    builder.build() mustBe Molecule(InfoSize(), None, Seq(), PieceQuality.Broken)
   }
 
   test("with increasing quality") {
     builder.impair(PieceQuality.Broken)
     builder.impair(PieceQuality.Dubious)
-    builder.build() shouldBe Molecule(InfoSize(), None, Seq(), PieceQuality.Broken)
+    builder.build() mustBe Molecule(InfoSize(), None, Seq(), PieceQuality.Broken)
   }
 
   test("with notes") {
     builder.addNote("foo")
     builder.addNote("bar")
-    builder.build() shouldBe Molecule(InfoSize(), None, Seq(), notes = Seq("foo", "bar"))
+    builder.build() mustBe Molecule(InfoSize(), None, Seq(), notes = Seq("foo", "bar"))
   }
 
   test("fixed size") {
     builder.addChild("alpha", Bytes(1), Atom(Bytes(5), None))
     builder.fixSize(Bytes(10))
     builder.addChild("beta", Bytes(8), Atom(Bytes(5), None))
-    builder.build().size shouldBe Bytes(10)
+    builder.build().size mustBe Bytes(10)
   }
 }

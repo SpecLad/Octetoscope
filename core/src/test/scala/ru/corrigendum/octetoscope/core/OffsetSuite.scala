@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,27 +19,27 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 
 class OffsetSuite extends FunSuite {
   test("totalBits") {
-    Bytes(0).totalBits shouldBe 0
-    Bytes(3).totalBits shouldBe 24
+    Bytes(0).totalBits mustBe 0
+    Bytes(3).totalBits mustBe 24
   }
 
   test("plus") {
-    (Bytes(4) + InfoSize()) shouldBe Bytes(4)
-    (Bytes(4) + Bytes(1)) shouldBe Bytes(5)
+    (Bytes(4) + InfoSize()) mustBe Bytes(4)
+    (Bytes(4) + Bytes(1)) mustBe Bytes(5)
   }
 
   test("minus") {
-    (Bytes(4) - Bytes(4)) shouldBe InfoSize()
-    (Bytes(8) - Bytes(4)) shouldBe Bytes(4)
+    (Bytes(4) - Bytes(4)) mustBe InfoSize()
+    (Bytes(8) - Bytes(4)) mustBe Bytes(4)
   }
 
   test("compare") {
-    Bytes(5) should be < Bytes(7)
-    Bytes(5) should be > Bytes(3)
-    Bytes(5).compareTo(Bytes(5)) shouldBe 0
+    Bytes(5) must be < Bytes(7)
+    Bytes(5) must be > Bytes(3)
+    Bytes(5).compareTo(Bytes(5)) mustBe 0
   }
 }

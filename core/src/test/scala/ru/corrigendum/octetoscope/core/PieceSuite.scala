@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,20 +19,20 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 
 class PieceSuite extends FunSuite {
   test("impaired") {
-    Atom(InfoSize(), None, PieceQuality.Dubious).impaired(PieceQuality.Bad).quality shouldBe PieceQuality.Bad
-    Atom(InfoSize(), None, PieceQuality.Bad).impaired(PieceQuality.Dubious).quality shouldBe PieceQuality.Bad
+    Atom(InfoSize(), None, PieceQuality.Dubious).impaired(PieceQuality.Bad).quality mustBe PieceQuality.Bad
+    Atom(InfoSize(), None, PieceQuality.Bad).impaired(PieceQuality.Dubious).quality mustBe PieceQuality.Bad
     Molecule(InfoSize(), None, Seq(), PieceQuality.Dubious)
-      .impaired(PieceQuality.Bad).quality shouldBe PieceQuality.Bad
+      .impaired(PieceQuality.Bad).quality mustBe PieceQuality.Bad
     Molecule(InfoSize(), None, Seq(), PieceQuality.Bad)
-      .impaired(PieceQuality.Dubious).quality shouldBe PieceQuality.Bad
+      .impaired(PieceQuality.Dubious).quality mustBe PieceQuality.Bad
   }
 
   test("withNote") {
-    Atom(InfoSize(), None, notes = Seq("foo")).withNote("bar").notes shouldBe Seq("foo", "bar")
-    Molecule(InfoSize(), None, Seq(), notes = Seq("foo")).withNote("bar").notes shouldBe Seq("foo", "bar")
+    Atom(InfoSize(), None, notes = Seq("foo")).withNote("bar").notes mustBe Seq("foo", "bar")
+    Molecule(InfoSize(), None, Seq(), notes = Seq("foo")).withNote("bar").notes mustBe Seq("foo", "bar")
   }
 }

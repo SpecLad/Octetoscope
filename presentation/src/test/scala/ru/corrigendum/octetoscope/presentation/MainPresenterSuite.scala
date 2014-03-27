@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.presentation
 import ru.corrigendum.octetoscope.presentation.mocks.{MockDissectorDriver, MockDialogBoxer, MockMainView}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 import ru.corrigendum.octetoscope.core.{Bytes, Atom, VersionInfo}
@@ -42,28 +42,28 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("closing the window") {
     view.trigger(MainView.ClosedEvent)
-    view shouldBe 'disposed
+    view mustBe 'disposed
   }
 
   test("initialization") {
-    view shouldBe 'visible
-    view.title shouldBe "Blarf"
+    view mustBe 'visible
+    view.title mustBe "Blarf"
   }
 
   test("quit command") {
     view.trigger(MainView.CommandEvent(MainView.Command.Quit))
-    view shouldBe 'disposed
+    view mustBe 'disposed
   }
 
   test("about command") {
     view.trigger(MainView.CommandEvent(MainView.Command.About))
-    boxer.messages shouldBe List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours)))
+    boxer.messages mustBe List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours)))
   }
 
   test("open command - cancelled") {
     view.selectedFile = None
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
-    view.tabs should have size 0
+    view.tabs must have size 0
   }
 
   test("open command - IOException") {
@@ -73,8 +73,8 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.tabs should have size 0
-    boxer.messages shouldBe List(strings.errorReadingFile(exception.getMessage))
+    view.tabs must have size 0
+    boxer.messages mustBe List(strings.errorReadingFile(exception.getMessage))
   }
 
   test("open command - IndexOutOfBoundsException") {
@@ -83,8 +83,8 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.tabs should have size 0
-    boxer.messages shouldBe List(strings.fileTooSmallToDissect())
+    view.tabs must have size 0
+    boxer.messages mustBe List(strings.fileTooSmallToDissect())
   }
 
   test("open command - successful") {
@@ -93,11 +93,11 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     val tab = view.tabs.loneElement
-    tab.title shouldBe "cadabra"
-    tab.toolTip shouldBe MainPresenterSuite.FakePath.toString
-    tab.tree shouldBe presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath))
+    tab.title mustBe "cadabra"
+    tab.toolTip mustBe MainPresenterSuite.FakePath.toString
+    tab.tree mustBe presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath))
 
-    view.title shouldBe "Blarf - cadabra"
+    view.title mustBe "Blarf - cadabra"
   }
 
   test("switching tabs") {
@@ -108,7 +108,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs.head.trigger(MainView.TabActivatedEvent)
-    view.title shouldBe "Blarf - cadabra"
+    view.title mustBe "Blarf - cadabra"
   }
 
   test("tab closing") {
@@ -117,8 +117,8 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs.head.trigger(MainView.TabClosedEvent)
-    view.tabs should have size 0
-    view.title shouldBe "Blarf"
+    view.tabs must have size 0
+    view.title mustBe "Blarf"
   }
 }
 

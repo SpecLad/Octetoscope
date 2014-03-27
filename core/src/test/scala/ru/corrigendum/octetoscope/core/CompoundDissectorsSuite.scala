@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 import java.nio.charset.StandardCharsets
 import PrimitiveDissectors._
 import CompoundDissectors._
@@ -28,7 +28,7 @@ class CompoundDissectorsSuite extends FunSuite {
   def arrayTest[T](dissector: Dissector[T], repr: Option[String], value: T) {
     val blob = new ArrayBlob("afoobarbazb".getBytes(StandardCharsets.US_ASCII))
 
-    dissector.dissect(blob, Bytes(1)) shouldBe (
+    dissector.dissect(blob, Bytes(1)) mustBe (
       Molecule(Bytes(9), repr, Seq(
         SubPiece("Item #0", Bytes(0), Atom(Bytes(3), Some("\"foo\""))),
         SubPiece("Item #1", Bytes(3), Atom(Bytes(3), Some("\"bar\""))),

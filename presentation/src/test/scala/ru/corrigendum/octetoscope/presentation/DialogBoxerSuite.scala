@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import org.scalatest.Matchers._
+import org.scalatest.MustMatchers._
 
 import mocks.MockView
 import org.scalatest.{BeforeAndAfter, FunSuite}
@@ -32,6 +32,6 @@ class DialogBoxerSuite extends FunSuite with BeforeAndAfter {
 
   test("message box") {
     new DialogBoxerImpl(view, "Blarf").showMessageBox("Abracadabra")
-    view.messageBoxes shouldBe List(("Abracadabra", "Blarf"))
+    view.messageBoxes mustBe List(("Abracadabra", "Blarf"))
   }
 }

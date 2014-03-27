@@ -38,8 +38,8 @@ ext {
   def scalaMajorVersion = '2.10'
 
   deps = [
-    scalaLibrary: "org.scala-lang:scala-library:$scalaMajorVersion.3",
-    scalaTest: "org.scalatest:scalatest_$scalaMajorVersion:2.0",
+    scalaLibrary: "org.scala-lang:scala-library:$scalaMajorVersion.4",
+    scalaTest: "org.scalatest:scalatest_$scalaMajorVersion:2.1.0",
     icu: 'com.ibm.icu:icu4j:52.1',
     arm: "com.jsuereth:scala-arm_$scalaMajorVersion:1.3",
   ]
@@ -69,7 +69,7 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '1.10'
+  gradleVersion = '1.11'
 }
 
 task installLauncher(type: Jar) {

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("apply - out of range") {
-    evaluating { blob(5) } should produce [IndexOutOfBoundsException]
-    evaluating { blob(-1) } should produce [IndexOutOfBoundsException]
+    an [IndexOutOfBoundsException] should be thrownBy { blob(5) }
+    an [IndexOutOfBoundsException] should be thrownBy { blob(-1) }
   }
 
   test("toArray") {
@@ -56,10 +56,10 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("slice - out of range") {
-    evaluating { blob.slice(-1, 4) } should produce [IndexOutOfBoundsException]
-    evaluating { blob.slice(5, 6) } should produce [IndexOutOfBoundsException]
-    evaluating { blob.slice(2, 6) } should produce [IndexOutOfBoundsException]
-    evaluating { blob.slice(-2, -1) } should produce [IndexOutOfBoundsException]
-    evaluating { blob.slice(4, 2) } should produce [IndexOutOfBoundsException]
+    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(-1, 4) }
+    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(5, 6) }
+    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(2, 6) }
+    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(-2, -1) }
+    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(4, 2) }
   }
 }

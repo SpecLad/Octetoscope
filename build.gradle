@@ -37,10 +37,12 @@ ext {
 
   def scalaMajorVersion = '2.10'
 
-  scalaLibraryDep = "org.scala-lang:scala-library:$scalaMajorVersion.3"
-  scalaTestDep = "org.scalatest:scalatest_$scalaMajorVersion:2.0"
-  icuDep = 'com.ibm.icu:icu4j:52.1'
-  armDep = "com.jsuereth:scala-arm_$scalaMajorVersion:1.3"
+  deps = [
+    scalaLibrary: "org.scala-lang:scala-library:$scalaMajorVersion.3",
+    scalaTest: "org.scalatest:scalatest_$scalaMajorVersion:2.0",
+    icu: 'com.ibm.icu:icu4j:52.1',
+    arm: "com.jsuereth:scala-arm_$scalaMajorVersion:1.3",
+  ]
 }
 
 subprojects {
@@ -51,9 +53,9 @@ subprojects {
   }
 
   dependencies {
-    compile scalaLibraryDep
+    compile deps.scalaLibrary
 
-    testCompile scalaTestDep
+    testCompile deps.scalaTest
   }
 
   targetCompatibility = '1.7'

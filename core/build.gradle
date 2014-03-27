@@ -48,7 +48,7 @@ processResources {
 }
 
 dependencies {
-  compile armDep
+  compile deps.arm
 
   compile project(':abstractinfra')
 }

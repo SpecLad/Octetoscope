@@ -17,8 +17,7 @@
 */
 
 ext {
-  jGitVersion = '3.2.0.201312181205-r'
-  jGitDep = "org.eclipse.jgit:org.eclipse.jgit:$jGitVersion"
+  jGitDep = 'org.eclipse.jgit:org.eclipse.jgit:3.2.0.201312181205-r'
 }
 
 repositories {

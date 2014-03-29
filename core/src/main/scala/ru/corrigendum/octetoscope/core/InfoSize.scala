@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.core
 
-sealed case class InfoSize(bytes: Long = 0) extends Ordered[InfoSize] {
+sealed class InfoSize(val bytes: Long = 0) extends Ordered[InfoSize] {
   require(bytes >= 0)
 
   def totalBits: Long = bytes * InfoSize.BitsPerByte
@@ -26,9 +26,20 @@ sealed case class InfoSize(bytes: Long = 0) extends Ordered[InfoSize] {
   def + (that: InfoSize): InfoSize = InfoSize(this.bytes + that.bytes)
 
   override def compare(that: InfoSize): Int = this.bytes.compareTo(that.bytes)
+
+  override def equals(obj: Any): Boolean = obj match {
+    case that: InfoSize => this.bytes == that.bytes
+    case _ => false
+  }
+
+  override def hashCode(): Int = bytes.hashCode()
+
+  override def toString: String = "Bytes(%d)".format(bytes)
 }
 
 object InfoSize {
+  def apply(bytes: Long = 0): InfoSize = new InfoSize(bytes)
+  def unapply(size: InfoSize): Option[Long] = Some(size.bytes)
   val BitsPerByte: Long = 8
 }
 

@@ -42,4 +42,14 @@ class InfoSizeSuite extends FunSuite {
     Bytes(5) must be > Bytes(3)
     Bytes(5).compareTo(Bytes(5)) mustBe 0
   }
+
+  test("equals") {
+    Bytes(3).equals(null) mustBe false
+    Bytes(3).equals(Bytes(1)) mustBe false
+    Bytes(3).equals(Bytes(3)) mustBe true
+  }
+
+  test("toString") {
+    Bytes(9).toString mustBe "Bytes(9)"
+  }
 }

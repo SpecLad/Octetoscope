@@ -38,9 +38,11 @@ sealed class InfoSize(val bytes: Long = 0) extends Ordered[InfoSize] {
 }
 
 object InfoSize {
-  def apply(bytes: Long = 0): InfoSize = new InfoSize(bytes)
+  def apply(bytes: Long = 0): InfoSize = if (bytes < _cache.length) _cache(bytes.toInt) else new InfoSize(bytes)
   def unapply(size: InfoSize): Option[Long] = Some(size.bytes)
   val BitsPerByte: Long = 8
+
+  private val _cache: Array[InfoSize] = Array.tabulate[InfoSize](256) { new InfoSize(_) }
 }
 
 object Bytes {

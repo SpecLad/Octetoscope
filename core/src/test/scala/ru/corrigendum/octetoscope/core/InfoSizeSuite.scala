@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.core
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
 
-class OffsetSuite extends FunSuite {
+class InfoSizeSuite extends FunSuite {
   test("totalBits") {
     Bytes(0).totalBits mustBe 0
     Bytes(3).totalBits mustBe 24

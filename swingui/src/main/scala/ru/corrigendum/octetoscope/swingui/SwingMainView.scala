@@ -23,7 +23,8 @@ import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
 import java.awt.Dimension
-import javax.swing.event.{ChangeEvent, ChangeListener}
+import javax.swing.event.{TreeExpansionEvent, TreeWillExpandListener, ChangeEvent, ChangeListener}
+import javax.swing.tree.DefaultTreeModel
 
 private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends SwingView(chooser) with MainView {
   private[this] val menuBar = new JMenuBar()
@@ -102,9 +103,22 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
     tab.component.putClientProperty(SwingMainView.PropertyKeyTab, tab)
 
-    val tree = new JTree(new PieceTreeNode(root))
+    val model = new DefaultTreeModel(new PieceTreeNode(root))
+    val tree = new JTree(model)
+    // we collapse the root and then expand it again, so that
+    // the expand handler can fire for it, and its children are properly loaded
+    tree.collapseRow(0)
+
     tree.setShowsRootHandles(true)
     tree.setCellRenderer(new PieceTreeCellRenderer)
+    tree.addTreeWillExpandListener(new TreeWillExpandListener {
+      override def treeWillCollapse(event: TreeExpansionEvent) {}
+      override def treeWillExpand(event: TreeExpansionEvent) {
+        val node = event.getPath.getLastPathComponent.asInstanceOf[PieceTreeNode]
+        if (node.loadChildren()) model.nodeStructureChanged(node)
+      }
+    })
+    tree.expandRow(0)
 
     tabPane.addTab(null, null, new JScrollPane(tree), toolTip)
     tabPane.setTabComponentAt(tabPane.getTabCount - 1, tab.component)

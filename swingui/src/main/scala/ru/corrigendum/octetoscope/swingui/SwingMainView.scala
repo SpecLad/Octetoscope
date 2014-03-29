@@ -103,7 +103,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
     tab.component.putClientProperty(SwingMainView.PropertyKeyTab, tab)
 
-    val model = new DefaultTreeModel(new PieceTreeNode(root))
+    val model = new DefaultTreeModel(new PieceTreeNode(root), true)
     val tree = new JTree(model)
     // we collapse the root and then expand it again, so that
     // the expand handler can fire for it, and its children are properly loaded

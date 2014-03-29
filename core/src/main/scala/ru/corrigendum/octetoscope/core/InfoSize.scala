@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 sealed case class InfoSize(bytes: Long = 0) extends Ordered[InfoSize] {
-  assert(bytes >= 0)
+  require(bytes >= 0)
 
   def totalBits: Long = bytes * InfoSize.BitsPerByte
   def - (that: InfoSize): InfoSize = InfoSize(this.bytes - that.bytes)

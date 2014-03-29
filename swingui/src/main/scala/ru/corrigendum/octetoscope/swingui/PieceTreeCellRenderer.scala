@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,26 +18,20 @@
 
 package ru.corrigendum.octetoscope.swingui
 
-import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeCellRenderer, TreeCellRenderer}
+import javax.swing.tree.{DefaultTreeCellRenderer, TreeCellRenderer}
 import javax.swing.JTree
-import java.awt.{Color, Component}
+import java.awt.Component
 
 private class PieceTreeCellRenderer extends TreeCellRenderer {
-  import PieceTreeCellRenderer._
-
   private val wrapped = new DefaultTreeCellRenderer
   wrapped.putClientProperty("html.disable", java.lang.Boolean.TRUE)
 
   override def getTreeCellRendererComponent(
       tree: JTree, value: Any, selected: Boolean, expanded: Boolean,
       leaf: Boolean, row: Int, hasFocus: Boolean): Component = {
-    val props = value.asInstanceOf[DefaultMutableTreeNode].getUserObject.asInstanceOf[CellProperties]
-    val component = wrapped.getTreeCellRendererComponent(tree, props.text, selected, expanded, leaf, row, hasFocus)
-    component.setForeground(props.color)
+    val node = value.asInstanceOf[PieceTreeNode]
+    val component = wrapped.getTreeCellRendererComponent(tree, node.text, selected, expanded, leaf, row, hasFocus)
+    component.setForeground(node.color)
     component
   }
-}
-
-private object PieceTreeCellRenderer {
-  case class CellProperties(text: String, color: Color)
 }

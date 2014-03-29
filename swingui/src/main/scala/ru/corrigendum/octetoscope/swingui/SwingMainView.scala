@@ -22,7 +22,6 @@ import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, UIStrings, MainVi
 import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
-import javax.swing.tree.{MutableTreeNode, DefaultMutableTreeNode}
 import java.awt.Dimension
 import javax.swing.event.{ChangeEvent, ChangeListener}
 
@@ -103,7 +102,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
     tab.component.putClientProperty(SwingMainView.PropertyKeyTab, tab)
 
-    val tree = new JTree(abstractTreeNodeToSwing(root))
+    val tree = new JTree(new PieceTreeNode(root))
     tree.setShowsRootHandles(true)
     tree.setCellRenderer(new PieceTreeCellRenderer)
 
@@ -112,13 +111,6 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     tabPane.setSelectedIndex(tabPane.getTabCount - 1)
 
     tab
-  }
-
-  private def abstractTreeNodeToSwing(node: DisplayTreeNode): MutableTreeNode = {
-    val result = new DefaultMutableTreeNode(
-      PieceTreeCellRenderer.CellProperties(node.text, node.color))
-    for (child <- node.children) result.add(abstractTreeNodeToSwing(child))
-    result
   }
 
   private class TabImpl(val component: JComponent) extends Tab {

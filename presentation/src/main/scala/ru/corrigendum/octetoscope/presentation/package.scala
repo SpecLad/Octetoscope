@@ -55,7 +55,7 @@ package object presentation {
         QualityColors(np.piece.quality),
         np.piece match {
           case _: Atom => None
-          case m: Molecule => Some(m.children.map(helper))
+          case m: Molecule => Some(() => m.children.map(helper))
         }
       )
     }

@@ -20,6 +20,7 @@ package ru.corrigendum.octetoscope.presentation
 
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
+import org.scalatest.OptionValues._
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 
@@ -48,13 +49,13 @@ class PackageSuite extends FunSuite {
         SubPiece("one", Bytes(0), Atom(Bytes(10), Some("gamma"))),
         SubPiece("two", Bytes(50), Atom(Bytes(10), None))))
 
-    val displayed =
-      DisplayTreeNode("WHOLE: beta", GoodColor, Some(Seq(
-        DisplayTreeNode("one: gamma", GoodColor, None),
-        DisplayTreeNode("two", GoodColor, None)
-      )))
-
-    presentPiece(molecule) mustBe displayed
+    val displayed = presentPiece(molecule)
+    displayed.text mustBe "WHOLE: beta"
+    displayed.color mustBe GoodColor
+    displayed.getChildren.value() mustBe Seq(
+      DisplayTreeNode("one: gamma", GoodColor, None),
+      DisplayTreeNode("two", GoodColor, None)
+    )
   }
 
   test("presentPiece - without value - with note") {

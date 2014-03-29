@@ -25,19 +25,19 @@ private class PieceTreeNode(data: DisplayTreeNode) extends DefaultMutableTreeNod
   val text = data.text
   val color = data.color
 
-  private[this] var _childrenData: Option[Seq[DisplayTreeNode]] = data.children
+  private[this] var _childrenThunk: Option[() => Seq[DisplayTreeNode]] = data.getChildren
 
-  if (_childrenData.isDefined)
+  if (_childrenThunk.isDefined)
     add(new DefaultMutableTreeNode("You shouldn't be seeing this"))
   else
     setAllowsChildren(false)
 
   def loadChildren(): Boolean = {
-    for (childrenData <- _childrenData) {
+    for (childrenThunk <- _childrenThunk) {
       removeAllChildren()
-      for (childData <- childrenData)
+      for (childData <- childrenThunk())
         add(new PieceTreeNode(childData))
-      _childrenData = None
+      _childrenThunk = None
       return true
     }
 

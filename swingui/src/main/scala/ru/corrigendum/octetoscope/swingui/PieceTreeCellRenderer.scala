@@ -43,12 +43,15 @@ private class PieceTreeCellRenderer extends TreeCellRenderer {
     panel.add(component)
 
     for (note <- node.notes) {
-      val label = new JLabel(note._2)
+      val label = new JLabel()
 
       label.setBorder(noteBorder)
       label.setBackground(note._1)
       label.setForeground(Color.BLACK)
       label.setOpaque(true)
+      label.putClientProperty("html.disable", java.lang.Boolean.TRUE)
+      // Have to set the text after the html.disable property, otherwise the former won't take effect.
+      label.setText(note._2)
 
       panel.add(label)
     }

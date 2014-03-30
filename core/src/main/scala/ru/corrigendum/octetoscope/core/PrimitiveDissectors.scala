@@ -23,11 +23,21 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 
 object PrimitiveDissectors {
+  private val _numberAtomCache: Array[Array[Atom]] =
+    Array.tabulate(4, 256) { (byteSize, value) => Atom(Bytes(byteSize + 1), Some(value.toString)) }
+
+  private def getNumberAtom(byteSize: Int, value: Int) =
+    if (byteSize > 0 && byteSize <= _numberAtomCache.length &&
+        value >= 0 && value < _numberAtomCache(byteSize - 1).length)
+      _numberAtomCache(byteSize - 1)(value)
+    else
+      Atom(Bytes(byteSize), Some(value.toString))
+
   private object SInt8 extends Dissector[Byte] {
     override def dissect(input: Blob, offset: InfoSize): (Piece, Byte) = {
       val Bytes(bo) = offset
       val value = input(bo)
-      (Atom(Bytes(1), Some(value.toString)), value)
+      (getNumberAtom(1, value), value)
     }
   }
 
@@ -38,7 +48,7 @@ object PrimitiveDissectors {
       val Bytes(bo) = offset
       val byte = input(bo)
       val value = if (byte >= 0) byte else 256 + byte
-      (Atom(Bytes(1), Some(value.toString)), value.toShort)
+      (getNumberAtom(1, value), value.toShort)
     }
   }
 
@@ -51,7 +61,7 @@ object PrimitiveDissectors {
       val value = ((input(bo) & 0xFF) |
         ((input(bo + 1) & 0xFF) << 8)).toShort
 
-      (Atom(Bytes(2), Some(value.toString)), value)
+      (getNumberAtom(2, value), value)
     }
   }
 
@@ -69,7 +79,7 @@ object PrimitiveDissectors {
     override def dissect(input: Blob, offset: InfoSize) = {
       val value = readInt32L(input, offset)
 
-      (Atom(Bytes(4), Some(value.toString)), value)
+      (getNumberAtom(4, value), value)
     }
   }
 

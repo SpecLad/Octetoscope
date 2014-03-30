@@ -24,10 +24,10 @@ import java.awt.Color
 
 package object presentation {
   private[presentation] val QualityColors = Map(
-    PieceQuality.Good -> Color.BLACK,
-    PieceQuality.Dubious -> new Color(200, 175, 0),
-    PieceQuality.Bad -> Color.RED,
-    PieceQuality.Broken -> Color.MAGENTA
+    PieceQuality.Good -> Color.WHITE,
+    PieceQuality.Dubious -> Color.YELLOW,
+    PieceQuality.Bad -> Color.PINK,
+    PieceQuality.Broken -> new Color(255, 200, 255)
   )
 
   private[presentation] def presentVersionInfo(vi: VersionInfo): String = {

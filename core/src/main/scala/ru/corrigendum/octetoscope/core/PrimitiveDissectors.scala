@@ -102,17 +102,15 @@ object PrimitiveDissectors {
 
   abstract private class AsciiStringGeneric(length: Int) extends Dissector[String] {
     protected def findLength(input: Blob, byteOffset: Long): Int
-    protected def assess(value: String): (PieceQuality.Value, Seq[String]) =
-      (PieceQuality.Good, Nil)
+    protected def assess(value: String): Seq[PieceNote] = Nil
 
     final override def dissect(input: Blob, offset: InfoSize) = {
       val Bytes(bo) = offset
 
       val value = new String(input.slice(bo, bo + findLength(input, bo)).toArray,
         StandardCharsets.US_ASCII)
-      val (quality, notes) = assess(value)
 
-      (Atom(Bytes(length), Some("\"" + value + "\""), quality, notes), value)
+      (Atom(Bytes(length), Some("\"" + value + "\""), assess(value)), value)
     }
   }
 
@@ -132,9 +130,9 @@ object PrimitiveDissectors {
       actualLen
     }
 
-    override protected def assess(value: String): (PieceQuality.Value, Seq[String]) =
+    override protected def assess(value: String): Seq[PieceNote] =
       if (value.length < length) super.assess(value)
-      else (PieceQuality.Bad, Seq("missing NUL terminator"))
+      else Seq(PieceNote(PieceQuality.Bad, "missing NUL terminator"))
   }
 
   def asciiZString(length: Int): Dissector[String] = new AsciiZString(length)
@@ -147,7 +145,7 @@ object PrimitiveDissectors {
         (Atom(Bytes(expected.length), Some(interpretation)), Some(()))
       } else {
         val note = "expected \"%s\" (0x%s)".format(interpretation, expected.map("%02x".format(_)).mkString)
-        (Atom(Bytes(expected.length), None, PieceQuality.Broken, Seq(note)), None)
+        (Atom(Bytes(expected.length), None, Seq(PieceNote(PieceQuality.Broken, note))), None)
       }
     }
   }

@@ -105,11 +105,11 @@ class AdderSuite extends FunSuite {
     val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
     adder("omega", Bytes(2), dissector) mustBe Value(0)
 
-    inside(builder.build()) { case Molecule(size_, _, children, quality, notes) =>
+    inside(builder.build()) { case Molecule(size_, _, children, notes) =>
       size_ mustBe InfoSize()
       children mustBe empty
-      quality mustBe PieceQuality.Broken
-      notes.loneElement must include ("\"omega\"")
+      notes.loneElement.quality mustBe PieceQuality.Broken
+      notes.loneElement.text must include ("\"omega\"")
     }
   }
 }

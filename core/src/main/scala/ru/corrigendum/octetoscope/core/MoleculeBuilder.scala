@@ -23,8 +23,7 @@ class MoleculeBuilder {
   private[this] var repr: Option[String] = None
   private[this] var autoSize: InfoSize = InfoSize()
   private[this] var fixedSize: Option[InfoSize] = None
-  private[this] var quality: PieceQuality.Value = PieceQuality.Good
-  private[this] val notes = Seq.newBuilder[String]
+  private[this] val notes = Seq.newBuilder[PieceNote]
   private[this] var hasChildren_ = false
 
   def setRepr(repr: String) { this.repr = Some(repr) }
@@ -35,15 +34,10 @@ class MoleculeBuilder {
     hasChildren_ = true
   }
 
-  def impair(newQuality: PieceQuality.Value) {
-    if (newQuality.id > quality.id)
-      quality = newQuality
-  }
-
-  def addNote(note: String) { notes += note }
+  def addNote(quality: PieceQuality.Value, text: String) { notes += PieceNote(quality, text) }
 
   def build(): Molecule =
-    Molecule(fixedSize.getOrElse(autoSize), repr, childrenBuilder.result(), quality, notes.result())
+    Molecule(fixedSize.getOrElse(autoSize), repr, childrenBuilder.result(), notes.result())
 
   def hasChildren: Boolean = hasChildren_
 

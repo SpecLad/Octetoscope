@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ object SpecialDissectors {
   ): Dissector[Value] = {
     def transform(piece: Piece, value: Value) =
       if (constraint.check(value)) (piece, value)
-      else (piece.impaired(quality).withNote(constraint.note(quality)), value)
+      else (piece.withNote(PieceNote(quality, constraint.note(quality))), value)
     transformed(dissector, transform)
   }
 
@@ -64,7 +64,7 @@ object SpecialDissectors {
   ): DissectorO[Value] = {
     def transform(piece: Piece, value: Value) =
       if (constraint.check(value)) (piece, Some(value))
-      else (piece.impaired(quality).withNote(constraint.note(quality)), Some(value))
+      else (piece.withNote(PieceNote(quality, constraint.note(quality))), Some(value))
     transformedO(dissector, transform)
   }
 
@@ -73,7 +73,7 @@ object SpecialDissectors {
   ): DissectorO[Value] = {
     def transform(piece: Piece, value: Value) =
       if (constraint.check(value)) (piece, Some(value))
-      else (piece.impaired(quality).withNote(constraint.note(quality)), None)
+      else (piece.withNote(PieceNote(quality, constraint.note(quality))), None)
     transformedO(dissector, transform)
   }
 }

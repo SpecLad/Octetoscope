@@ -47,11 +47,9 @@ package object presentation {
       for (repr <- np.piece.repr)
         displayText ++= ": " ++= repr
 
-      val color = QualityColors(np.piece.quality)
-
       DisplayTreeNode(
         displayText.result(),
-        np.piece.notes.map((color, _)),
+        np.piece.notes.map(n => (QualityColors(n.quality), n.text)),
         np.piece match {
           case _: Atom => None
           case m: Molecule => Some(() => m.children.map(helper))

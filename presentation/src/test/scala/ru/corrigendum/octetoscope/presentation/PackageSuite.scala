@@ -25,8 +25,6 @@ import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 
 class PackageSuite extends FunSuite {
-  import PackageSuite._
-
   test("presentVersionInfo") {
     val hash = "1234" * 10
     presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) mustBe "1.2-g1234123"
@@ -60,16 +58,15 @@ class PackageSuite extends FunSuite {
 
   test("presentPiece - with note") {
     for (quality <- PieceQuality.values)
-      presentPiece(Atom(Bytes(2), None, quality = quality, notes = Seq("note"))) mustBe
+      presentPiece(Atom(Bytes(2), None, notes = Seq(PieceNote(quality, "note")))) mustBe
         DisplayTreeNode("WHOLE", Seq((QualityColors(quality), "note")), None)
   }
 
   test("presentPiece - multiple notes") {
-    presentPiece(Atom(Bytes(2), None, notes = Seq("note 1", "note 2"))) mustBe
-      DisplayTreeNode("WHOLE", Seq((GoodColor, "note 1"), (GoodColor, "note 2")), None)
+    val actual = presentPiece(Atom(Bytes(2), None, notes =
+      Seq(PieceNote(PieceQuality.Good, "note 1"), PieceNote(PieceQuality.Bad, "note 2"))))
+    val expected = DisplayTreeNode("WHOLE",
+      Seq((QualityColors(PieceQuality.Good), "note 1"), (QualityColors(PieceQuality.Bad), "note 2")), None)
+    actual mustBe expected
   }
-}
-
-object PackageSuite {
-  private val GoodColor = QualityColors(PieceQuality.Good)
 }

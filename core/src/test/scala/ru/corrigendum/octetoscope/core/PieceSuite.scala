@@ -22,17 +22,10 @@ import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
 
 class PieceSuite extends FunSuite {
-  test("impaired") {
-    Atom(InfoSize(), None, PieceQuality.Dubious).impaired(PieceQuality.Bad).quality mustBe PieceQuality.Bad
-    Atom(InfoSize(), None, PieceQuality.Bad).impaired(PieceQuality.Dubious).quality mustBe PieceQuality.Bad
-    Molecule(InfoSize(), None, Seq(), PieceQuality.Dubious)
-      .impaired(PieceQuality.Bad).quality mustBe PieceQuality.Bad
-    Molecule(InfoSize(), None, Seq(), PieceQuality.Bad)
-      .impaired(PieceQuality.Dubious).quality mustBe PieceQuality.Bad
-  }
-
   test("withNote") {
-    Atom(InfoSize(), None, notes = Seq("foo")).withNote("bar").notes mustBe Seq("foo", "bar")
-    Molecule(InfoSize(), None, Seq(), notes = Seq("foo")).withNote("bar").notes mustBe Seq("foo", "bar")
+    val note1 = PieceNote(PieceQuality.Dubious, "foo")
+    val note2 = PieceNote(PieceQuality.Bad, "bar")
+    Atom(InfoSize(), None, notes = Seq(note1)).withNote(note2).notes mustBe Seq(note1, note2)
+    Molecule(InfoSize(), None, Seq(), notes = Seq(note2)).withNote(note1).notes mustBe Seq(note2, note1)
   }
 }

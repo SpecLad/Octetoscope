@@ -22,6 +22,7 @@ import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
 import org.scalatest.Inside._
 import org.scalatest.OptionValues._
+import org.scalatest.LoneElement._
 import PrimitiveDissectors._
 
 class PrimitiveDissectorsSuite extends FunSuite {
@@ -66,9 +67,9 @@ class PrimitiveDissectorsSuite extends FunSuite {
 
   test("float32L") {
     verifyGeneric[Float](float32L, Some("-NaN(0x400001)"), opt => Float.box(opt.value) mustBe 'NaN,
-      PieceQuality.Good, 0, 0x01, 0x00, 0xC0.toByte, 0xFF.toByte)
+      None, 0x01, 0x00, 0xC0.toByte, 0xFF.toByte)
     verifyGeneric[Float](float32L, Some("-NaN(0x000001)"), opt => Float.box(opt.value) mustBe 'NaN,
-      PieceQuality.Good, 0, 0x01, 0x00, 0x80.toByte, 0xFF.toByte)
+      None, 0x01, 0x00, 0x80.toByte, 0xFF.toByte)
     verify(float32L, "-Infinity", Float.NegativeInfinity, 0x00, 0x00, 0x80.toByte, 0xFF.toByte)
     verify(float32L, "-1.50000000", -1.5f, 0x00, 0x00, 0xC0.toByte, 0xBF.toByte)
     verify(float32L, "-1.00000000", -1.0f, 0x00, 0x00, 0x80.toByte, 0xBF.toByte)
@@ -82,9 +83,9 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(float32L, "1.73782444e+34", 1.73782444e+34f, 0x12, 0x34, 0x56, 0x78)
     verify(float32L, "Infinity", Float.PositiveInfinity, 0x00, 0x00, 0x80.toByte, 0x7F)
     verifyGeneric[Float](float32L, Some("NaN(0x000001)"), opt => Float.box(opt.value) mustBe 'NaN,
-      PieceQuality.Good, 0, 0x01, 0x00, 0x80.toByte, 0x7F.toByte)
+      None, 0x01, 0x00, 0x80.toByte, 0x7F.toByte)
     verifyGeneric[Float](float32L, Some("NaN(0x400001)"), opt => Float.box(opt.value) mustBe 'NaN,
-      PieceQuality.Good, 0, 0x01, 0x00, 0xC0.toByte, 0x7F.toByte)
+      None, 0x01, 0x00, 0xC0.toByte, 0x7F.toByte)
   }
 
   test("asciiString") {
@@ -104,7 +105,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(dissector, "123", (), 1, 2, 3)
 
     dissector.dissectO(new ArrayBlob(Array[Byte](4, 5, 6))) mustBe (
-      Atom(Bytes(3), None, PieceQuality.Broken, Seq("expected \"123\" (0x010203)")),
+      Atom(Bytes(3), None, Seq(PieceNote(PieceQuality.Broken, "expected \"123\" (0x010203)"))),
       None
     )
   }
@@ -113,7 +114,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
 object PrimitiveDissectorsSuite {
   def verifyGeneric[Value](
     dissector: DissectorO[Value], expectedRepr: Option[String], valueAssert: Option[Value] => Unit,
-    expectedQuality: PieceQuality.Value, expectedNumNotes: Int, bytes: Byte*
+    expectedNoteQuality: Option[PieceQuality.Value], bytes: Byte*
   ) {
     for (padSize <- List(0, 1)) {
       val pad = List.fill(padSize)((-1).toByte)
@@ -121,11 +122,10 @@ object PrimitiveDissectorsSuite {
       val blob = new ArrayBlob(paddedBytes.toArray)
       val (piece, value) = dissector.dissectO(blob, Bytes(padSize))
 
-      inside(piece) { case Atom(size_, repr, quality, notes) =>
+      inside(piece) { case Atom(size_, repr, notes) =>
         size_ mustBe Bytes(bytes.size)
         repr mustBe expectedRepr
-        quality mustBe expectedQuality
-        notes must have size expectedNumNotes
+        expectedNoteQuality.foreach(q => notes.loneElement.quality mustBe q)
       }
 
       valueAssert(value)
@@ -133,10 +133,10 @@ object PrimitiveDissectorsSuite {
   }
 
   def verify[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
-    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe Some(expectedValue), PieceQuality.Good, 0, bytes: _*)
+    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe Some(expectedValue), None, bytes: _*)
   }
 
   def verifyBad[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
-    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe Some(expectedValue), PieceQuality.Bad, 1, bytes: _*)
+    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe Some(expectedValue), Some(PieceQuality.Bad), bytes: _*)
   }
 }

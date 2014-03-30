@@ -52,27 +52,13 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
     builder.build() mustBe Molecule(Bytes(4), None, Seq(alpha, beta, gamma))
   }
 
-  test("with quality") {
-    builder.impair(PieceQuality.Bad)
-    builder.build() mustBe Molecule(InfoSize(), None, Seq(), PieceQuality.Bad)
-  }
-
-  test("with decreasing quality") {
-    builder.impair(PieceQuality.Dubious)
-    builder.impair(PieceQuality.Broken)
-    builder.build() mustBe Molecule(InfoSize(), None, Seq(), PieceQuality.Broken)
-  }
-
-  test("with increasing quality") {
-    builder.impair(PieceQuality.Broken)
-    builder.impair(PieceQuality.Dubious)
-    builder.build() mustBe Molecule(InfoSize(), None, Seq(), PieceQuality.Broken)
-  }
-
   test("with notes") {
-    builder.addNote("foo")
-    builder.addNote("bar")
-    builder.build() mustBe Molecule(InfoSize(), None, Seq(), notes = Seq("foo", "bar"))
+    builder.addNote(PieceQuality.Dubious, "foo")
+    builder.addNote(PieceQuality.Bad, "bar")
+    builder.build() mustBe Molecule(InfoSize(), None, Seq(), notes = Seq(
+      PieceNote(PieceQuality.Dubious, "foo"),
+      PieceNote(PieceQuality.Bad, "bar"))
+    )
   }
 
   test("fixed size") {

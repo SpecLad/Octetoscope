@@ -176,14 +176,14 @@ object MD2 extends MoleculeBuilderUnitDissector {
       val word = readInt32L(input, offset)
       if (word == Int.MinValue)
         return (
-          Atom(Bytes(4), Some(word.toString), PieceQuality.Broken, Seq("too many vertices for a triangle fan")),
+          Atom(Bytes(4), Some(word.toString), Seq(PieceNote(PieceQuality.Broken, "too many vertices for a triangle fan"))),
           None)
 
       val value = if (word < 0) TriangleFan(-word) else if (word > 0) TriangleStrip(word) else OpenGLEnd
       val piece = Atom(Bytes(4), Some("%d -> %s".format(word, value)))
 
       if (word != 0 && Math.abs(word) < 3)
-        (piece.impaired(PieceQuality.Bad).withNote("too few vertices for a triangle"), Some(value))
+        (piece.withNote(PieceNote(PieceQuality.Bad, "too few vertices for a triangle")), Some(value))
       else
         (piece, Some(value))
     }
@@ -244,8 +244,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
         }
       }
 
-      builder.impair(PieceQuality.Bad)
-      builder.addNote("missing End command")
+      builder.addNote(PieceQuality.Bad, "missing End command")
     }
   }
 

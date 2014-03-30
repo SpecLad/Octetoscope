@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,29 +22,22 @@ object PieceQuality extends Enumeration {
   val Good, Dubious, Bad, Broken = Value
 }
 
+sealed case class PieceNote(quality: PieceQuality.Value, text: String)
+
 abstract sealed class Piece {
   def size: InfoSize
   def repr: Option[String]
-  def quality: PieceQuality.Value
-  def notes: Seq[String]
+  def notes: Seq[PieceNote]
 
-  final def impaired(quality: PieceQuality.Value): Piece =
-    if (this.quality.id < quality.id) withQuality(quality)
-    else this
-
-  protected def withQuality(quality: PieceQuality.Value): Piece
-
-  def withNote(note: String): Piece
+  def withNote(note: PieceNote): Piece
 }
 
 sealed case class Atom(
   size: InfoSize,
   repr: Option[String],
-  quality: PieceQuality.Value = PieceQuality.Good,
-  notes: Seq[String] = List()
+  notes: Seq[PieceNote] = List()
 ) extends Piece {
-  protected override def withQuality(quality: PieceQuality.Value): Atom = copy(quality = quality)
-  override def withNote(note: String): Piece = copy(notes = notes :+ note)
+  override def withNote(note: PieceNote): Piece = copy(notes = notes :+ note)
 }
 
 sealed case class SubPiece(name: String, offset: InfoSize, piece: Piece)
@@ -53,9 +46,7 @@ sealed case class Molecule(
   size: InfoSize,
   repr: Option[String],
   children: Seq[SubPiece],
-  quality: PieceQuality.Value = PieceQuality.Good,
-  notes: Seq[String] = List()
+  notes: Seq[PieceNote] = List()
 ) extends Piece {
-  protected override def withQuality(quality: PieceQuality.Value): Molecule = copy(quality = quality)
-  override def withNote(note: String): Piece = copy(notes = notes :+ note)
+  override def withNote(note: PieceNote): Piece = copy(notes = notes :+ note)
 }

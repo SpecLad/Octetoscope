@@ -29,8 +29,7 @@ trait MoleculeBuilderDissector[Value] extends Dissector[Value] {
     } catch {
       case trunc: MoleculeBuilderDissector.TruncatedException =>
         if (!builder.hasChildren) throw trunc.getCause
-        builder.impair(PieceQuality.Broken)
-        builder.addNote("truncated at \"%s\"".format(trunc.subPieceName))
+        builder.addNote(PieceQuality.Broken, "truncated at \"%s\"".format(trunc.subPieceName))
     }
     (builder.build(), value)
   }

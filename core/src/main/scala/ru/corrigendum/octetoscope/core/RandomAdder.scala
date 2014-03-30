@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,8 +26,7 @@ class RandomAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder)
        dissector.dissect(blob, initialOffset + offset)
     } catch {
       case _: IndexOutOfBoundsException =>
-        builder.impair(PieceQuality.Broken)
-        builder.addNote("\"%s\" is out of bounds".format(name))
+        builder.addNote(PieceQuality.Broken, "\"%s\" is out of bounds".format(name))
         return dissector.defaultValue
     }
 

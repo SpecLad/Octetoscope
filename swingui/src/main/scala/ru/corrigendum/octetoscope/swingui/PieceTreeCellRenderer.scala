@@ -19,19 +19,40 @@
 package ru.corrigendum.octetoscope.swingui
 
 import javax.swing.tree.{DefaultTreeCellRenderer, TreeCellRenderer}
-import javax.swing.JTree
-import java.awt.Component
+import javax.swing.{BorderFactory, JLabel, JPanel, JTree}
+import java.awt.{Color, FlowLayout, Component}
 
 private class PieceTreeCellRenderer extends TreeCellRenderer {
   private val wrapped = new DefaultTreeCellRenderer
   wrapped.putClientProperty("html.disable", java.lang.Boolean.TRUE)
+
+  private val panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 3, 0))
+  panel.setOpaque(false)
+  private val noteBorder = BorderFactory.createCompoundBorder(
+    BorderFactory.createLineBorder(Color.BLACK, 1),
+    BorderFactory.createEmptyBorder(0, 2, 0, 2)
+  )
 
   override def getTreeCellRendererComponent(
       tree: JTree, value: Any, selected: Boolean, expanded: Boolean,
       leaf: Boolean, row: Int, hasFocus: Boolean): Component = {
     val node = value.asInstanceOf[PieceTreeNode]
     val component = wrapped.getTreeCellRendererComponent(tree, node.text, selected, expanded, leaf, row, hasFocus)
-    component.setForeground(node.color)
-    component
+
+    panel.removeAll()
+    panel.add(component)
+
+    for (note <- node.notes) {
+      val label = new JLabel(note._2)
+
+      label.setBorder(noteBorder)
+      label.setBackground(note._1)
+      label.setForeground(Color.BLACK)
+      label.setOpaque(true)
+
+      panel.add(label)
+    }
+
+    panel
   }
 }

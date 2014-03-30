@@ -23,7 +23,7 @@ import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 
 private class PieceTreeNode(data: DisplayTreeNode) extends DefaultMutableTreeNode {
   val text = data.text
-  val color = data.color
+  val notes = data.notes
 
   private[this] var _childrenThunk: Option[() => Seq[DisplayTreeNode]] = data.getChildren
 

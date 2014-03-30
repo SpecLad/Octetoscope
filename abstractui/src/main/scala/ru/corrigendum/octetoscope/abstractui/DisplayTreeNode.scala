@@ -20,4 +20,6 @@ package ru.corrigendum.octetoscope.abstractui
 
 import java.awt.Color
 
-sealed case class DisplayTreeNode(text: String, color: Color, getChildren: Option[() => Seq[DisplayTreeNode]])
+sealed case class DisplayTreeNode(
+  text: String, notes: Seq[(Color, String)], getChildren: Option[() => Seq[DisplayTreeNode]]
+)

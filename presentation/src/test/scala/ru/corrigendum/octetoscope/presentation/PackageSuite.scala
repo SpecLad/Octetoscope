@@ -36,11 +36,11 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - atom - with value") {
-    presentPiece(Atom(Bytes(5), Some("alpha"))) mustBe DisplayTreeNode("WHOLE: alpha", GoodColor, None)
+    presentPiece(Atom(Bytes(5), Some("alpha"))) mustBe DisplayTreeNode("WHOLE: alpha", Nil, None)
   }
 
   test("presentPiece - atom - without value") {
-    presentPiece(Atom(Bytes(2), None)) mustBe DisplayTreeNode("WHOLE", GoodColor, None)
+    presentPiece(Atom(Bytes(2), None)) mustBe DisplayTreeNode("WHOLE", Nil, None)
   }
 
   test("presentPiece - molecule") {
@@ -51,32 +51,22 @@ class PackageSuite extends FunSuite {
 
     val displayed = presentPiece(molecule)
     displayed.text mustBe "WHOLE: beta"
-    displayed.color mustBe GoodColor
+    displayed.notes mustBe Nil
     displayed.getChildren.value() mustBe Seq(
-      DisplayTreeNode("one: gamma", GoodColor, None),
-      DisplayTreeNode("two", GoodColor, None)
+      DisplayTreeNode("one: gamma", Nil, None),
+      DisplayTreeNode("two", Nil, None)
     )
   }
 
-  test("presentPiece - without value - with note") {
-    presentPiece(Atom(Bytes(2), None, notes = Seq("note"))) mustBe
-      DisplayTreeNode("WHOLE (note)", GoodColor, None)
-  }
-
-  test("presentPiece - with value - with note") {
-    presentPiece(Atom(Bytes(2), Some("delta"), notes = Seq("note"))) mustBe
-      DisplayTreeNode("WHOLE: delta (note)", GoodColor, None)
+  test("presentPiece - with note") {
+    for (quality <- PieceQuality.values)
+      presentPiece(Atom(Bytes(2), None, quality = quality, notes = Seq("note"))) mustBe
+        DisplayTreeNode("WHOLE", Seq((QualityColors(quality), "note")), None)
   }
 
   test("presentPiece - multiple notes") {
     presentPiece(Atom(Bytes(2), None, notes = Seq("note 1", "note 2"))) mustBe
-      DisplayTreeNode("WHOLE (note 1; note 2)", GoodColor, None)
-  }
-
-  test("presentPiece - varying quality") {
-    for (quality <- PieceQuality.values)
-      presentPiece(Atom(Bytes(2), None, quality = quality)) mustBe
-        DisplayTreeNode("WHOLE", QualityColors(quality), None)
+      DisplayTreeNode("WHOLE", Seq((GoodColor, "note 1"), (GoodColor, "note 2")), None)
   }
 }
 

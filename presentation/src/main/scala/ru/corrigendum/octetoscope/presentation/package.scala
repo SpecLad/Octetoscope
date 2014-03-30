@@ -47,12 +47,11 @@ package object presentation {
       for (repr <- np.piece.repr)
         displayText ++= ": " ++= repr
 
-      if (np.piece.notes.nonEmpty)
-        np.piece.notes.addString(displayText, " (", "; ", ")")
+      val color = QualityColors(np.piece.quality)
 
       DisplayTreeNode(
         displayText.result(),
-        QualityColors(np.piece.quality),
+        np.piece.notes.map((color, _)),
         np.piece match {
           case _: Atom => None
           case m: Molecule => Some(() => m.children.map(helper))

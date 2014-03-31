@@ -57,16 +57,16 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - with note") {
-    for (quality <- PieceQuality.values)
-      presentPiece(Atom(Bytes(2), None, notes = Seq(PieceNote(quality, "note")))) mustBe
+    for (quality <- Quality.values)
+      presentPiece(Atom(Bytes(2), None, notes = Seq(Note(quality, "note")))) mustBe
         DisplayTreeNode("WHOLE", Seq((QualityColors(quality), "note")), None)
   }
 
   test("presentPiece - multiple notes") {
     val actual = presentPiece(Atom(Bytes(2), None, notes =
-      Seq(PieceNote(PieceQuality.Good, "note 1"), PieceNote(PieceQuality.Bad, "note 2"))))
+      Seq(Note(Quality.Good, "note 1"), Note(Quality.Bad, "note 2"))))
     val expected = DisplayTreeNode("WHOLE",
-      Seq((QualityColors(PieceQuality.Good), "note 1"), (QualityColors(PieceQuality.Bad), "note 2")), None)
+      Seq((QualityColors(Quality.Good), "note 1"), (QualityColors(Quality.Bad), "note 2")), None)
     actual mustBe expected
   }
 }

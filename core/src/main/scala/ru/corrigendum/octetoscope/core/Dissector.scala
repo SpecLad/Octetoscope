@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@ trait DissectorO[+Value] {
   def dissectO(input: Blob, offset: InfoSize = InfoSize()): (Piece, Option[Value])
 
   def +?(constraint: Constraint[Value]): DissectorO[Value] =
-    SpecialDissectors.constrainedO(this, constraint, PieceQuality.Dubious)
+    SpecialDissectors.constrainedO(this, constraint, Quality.Dubious)
   def +(constraint: Constraint[Value]): DissectorO[Value] =
-    SpecialDissectors.constrainedO(this, constraint, PieceQuality.Bad)
+    SpecialDissectors.constrainedO(this, constraint, Quality.Bad)
   def +!(constraint: Constraint[Value]): DissectorO[Value] =
-    SpecialDissectors.stronglyConstrainedO(this, constraint, PieceQuality.Bad)
+    SpecialDissectors.stronglyConstrainedO(this, constraint, Quality.Bad)
 }
 
 // A dissector that will always return a value.
@@ -42,7 +42,7 @@ trait Dissector[+Value] extends DissectorO[Value] {
   def dissect(input: Blob, offset: InfoSize = InfoSize()): (Piece, Value)
 
   override def +?(constraint: Constraint[Value]): Dissector[Value] =
-    SpecialDissectors.constrained(this, constraint, PieceQuality.Dubious)
+    SpecialDissectors.constrained(this, constraint, Quality.Dubious)
   override def +(constraint: Constraint[Value]): Dissector[Value] =
-    SpecialDissectors.constrained(this, constraint, PieceQuality.Bad)
+    SpecialDissectors.constrained(this, constraint, Quality.Bad)
 }

@@ -102,7 +102,7 @@ object PrimitiveDissectors {
 
   abstract private class AsciiStringGeneric(length: Int) extends Dissector[String] {
     protected def findLength(input: Blob, byteOffset: Long): Int
-    protected def assess(value: String): Seq[PieceNote] = Nil
+    protected def assess(value: String): Seq[Note] = Nil
 
     final override def dissect(input: Blob, offset: InfoSize) = {
       val Bytes(bo) = offset
@@ -130,9 +130,9 @@ object PrimitiveDissectors {
       actualLen
     }
 
-    override protected def assess(value: String): Seq[PieceNote] =
+    override protected def assess(value: String): Seq[Note] =
       if (value.length < length) super.assess(value)
-      else Seq(PieceNote(PieceQuality.Bad, "missing NUL terminator"))
+      else Seq(Note(Quality.Bad, "missing NUL terminator"))
   }
 
   def asciiZString(length: Int): Dissector[String] = new AsciiZString(length)
@@ -145,7 +145,7 @@ object PrimitiveDissectors {
         (Atom(Bytes(expected.length), Some(interpretation)), Some(()))
       } else {
         val note = "expected \"%s\" (0x%s)".format(interpretation, expected.map("%02x".format(_)).mkString)
-        (Atom(Bytes(expected.length), None, Seq(PieceNote(PieceQuality.Broken, note))), None)
+        (Atom(Bytes(expected.length), None, Seq(Note(Quality.Broken, note))), None)
       }
     }
   }

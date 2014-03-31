@@ -108,7 +108,7 @@ class AdderSuite extends FunSuite {
     inside(builder.build()) { case Molecule(size_, _, children, notes) =>
       size_ mustBe InfoSize()
       children mustBe empty
-      notes.loneElement.quality mustBe PieceQuality.Broken
+      notes.loneElement.pieceQuality mustBe Quality.Broken
       notes.loneElement.text must include ("\"omega\"")
     }
   }

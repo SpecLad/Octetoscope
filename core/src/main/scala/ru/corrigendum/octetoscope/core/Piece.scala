@@ -18,26 +18,26 @@
 
 package ru.corrigendum.octetoscope.core
 
-object PieceQuality extends Enumeration {
+object Quality extends Enumeration {
   val Good, Dubious, Bad, Broken = Value
 }
 
-sealed case class PieceNote(quality: PieceQuality.Value, text: String)
+sealed case class Note(pieceQuality: Quality.Value, text: String)
 
 abstract sealed class Piece {
   def size: InfoSize
   def repr: Option[String]
-  def notes: Seq[PieceNote]
+  def notes: Seq[Note]
 
-  def withNote(note: PieceNote): Piece
+  def withNote(note: Note): Piece
 }
 
 sealed case class Atom(
   size: InfoSize,
   repr: Option[String],
-  notes: Seq[PieceNote] = List()
+  notes: Seq[Note] = List()
 ) extends Piece {
-  override def withNote(note: PieceNote): Piece = copy(notes = notes :+ note)
+  override def withNote(note: Note): Piece = copy(notes = notes :+ note)
 }
 
 sealed case class SubPiece(name: String, offset: InfoSize, piece: Piece)
@@ -46,7 +46,7 @@ sealed case class Molecule(
   size: InfoSize,
   repr: Option[String],
   children: Seq[SubPiece],
-  notes: Seq[PieceNote] = List()
+  notes: Seq[Note] = List()
 ) extends Piece {
-  override def withNote(note: PieceNote): Piece = copy(notes = notes :+ note)
+  override def withNote(note: Note): Piece = copy(notes = notes :+ note)
 }

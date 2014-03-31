@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@ package ru.corrigendum.octetoscope.core
 
 trait Constraint[-Value] {
   def check(value: Value): Boolean
-  def note(quality: PieceQuality.Value): String
+  def note(quality: Quality.Value): String
 }
 
 trait ShouldMustConstraint[-Value] extends Constraint[Value] {
-  final override def note(quality: PieceQuality.Value): String =
-    if (quality.id <= PieceQuality.Dubious.id) shouldNote
+  final override def note(quality: Quality.Value): String =
+    if (quality.id <= Quality.Dubious.id) shouldNote
     else mustNote
 
   def shouldNote: String

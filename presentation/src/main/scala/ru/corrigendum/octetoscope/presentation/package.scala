@@ -24,10 +24,10 @@ import java.awt.Color
 
 package object presentation {
   private[presentation] val QualityColors = Map(
-    PieceQuality.Good -> Color.WHITE,
-    PieceQuality.Dubious -> Color.YELLOW,
-    PieceQuality.Bad -> Color.PINK,
-    PieceQuality.Broken -> new Color(255, 200, 255)
+    Quality.Good -> Color.WHITE,
+    Quality.Dubious -> Color.YELLOW,
+    Quality.Bad -> Color.PINK,
+    Quality.Broken -> new Color(255, 200, 255)
   )
 
   private[presentation] def presentVersionInfo(vi: VersionInfo): String = {
@@ -49,7 +49,7 @@ package object presentation {
 
       DisplayTreeNode(
         displayText.result(),
-        np.piece.notes.map(n => (QualityColors(n.quality), n.text)),
+        np.piece.notes.map(n => (QualityColors(n.pieceQuality), n.text)),
         np.piece match {
           case _: Atom => None
           case m: Molecule => Some(() => m.children.map(helper))

@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.core
 object CommonConstraints {
   private object AnyConstraint extends Constraint[Any] {
     override def check(value: Any): Boolean = true
-    override def note(quality: PieceQuality.Value): String =
+    override def note(quality: Quality.Value): String =
       throw new IllegalStateException("note requested for the any constraint")
   }
 

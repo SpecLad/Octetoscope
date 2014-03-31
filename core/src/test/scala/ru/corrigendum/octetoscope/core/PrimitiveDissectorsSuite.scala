@@ -105,7 +105,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(dissector, "123", (), 1, 2, 3)
 
     dissector.dissectO(new ArrayBlob(Array[Byte](4, 5, 6))) mustBe (
-      Atom(Bytes(3), None, Seq(PieceNote(PieceQuality.Broken, "expected \"123\" (0x010203)"))),
+      Atom(Bytes(3), None, Seq(Note(Quality.Broken, "expected \"123\" (0x010203)"))),
       None
     )
   }
@@ -114,7 +114,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
 object PrimitiveDissectorsSuite {
   def verifyGeneric[Value](
     dissector: DissectorO[Value], expectedRepr: Option[String], valueAssert: Option[Value] => Unit,
-    expectedNoteQuality: Option[PieceQuality.Value], bytes: Byte*
+    expectedNoteQuality: Option[Quality.Value], bytes: Byte*
   ) {
     for (padSize <- List(0, 1)) {
       val pad = List.fill(padSize)((-1).toByte)
@@ -125,7 +125,7 @@ object PrimitiveDissectorsSuite {
       inside(piece) { case Atom(size_, repr, notes) =>
         size_ mustBe Bytes(bytes.size)
         repr mustBe expectedRepr
-        expectedNoteQuality.foreach(q => notes.loneElement.quality mustBe q)
+        expectedNoteQuality.foreach(q => notes.loneElement.pieceQuality mustBe q)
       }
 
       valueAssert(value)
@@ -137,6 +137,6 @@ object PrimitiveDissectorsSuite {
   }
 
   def verifyBad[Value](dissector: DissectorO[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
-    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe Some(expectedValue), Some(PieceQuality.Bad), bytes: _*)
+    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe Some(expectedValue), Some(Quality.Bad), bytes: _*)
   }
 }

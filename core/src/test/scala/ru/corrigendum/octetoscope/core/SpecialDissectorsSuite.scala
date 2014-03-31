@@ -24,7 +24,7 @@ import ru.corrigendum.octetoscope.core.mocks.{MockDissectorO, MockConstraint, Mo
 
 class SpecialDissectorsSuite extends FunSuite {
   test("transformed") {
-    val note = PieceNote(PieceQuality.Good, "transformed")
+    val note = Note(Quality.Good, "transformed")
     val transform = (piece: Piece, value: String) => (piece.withNote(note), value.toInt)
 
     val transformed = SpecialDissectors.transformed(MockDissector, transform)
@@ -38,7 +38,7 @@ class SpecialDissectorsSuite extends FunSuite {
   }
 
   test("constrained - satisfied") {
-    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, PieceQuality.Dubious)
+    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, Quality.Dubious)
 
     val blob = new ArrayBlob(Array[Byte]('a', 'b'))
 
@@ -46,19 +46,19 @@ class SpecialDissectorsSuite extends FunSuite {
   }
 
   test("constrained - unsatisfied") {
-    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, PieceQuality.Dubious)
+    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, Quality.Dubious)
 
     val blob = new ArrayBlob(Array[Byte]('a'))
 
     val (piece, value) = constrained.dissect(blob)
 
-    piece mustBe Atom(Bytes(1), Some("a"), Seq(PieceNote(PieceQuality.Dubious, "constrained (Dubious)")))
+    piece mustBe Atom(Bytes(1), Some("a"), Seq(Note(Quality.Dubious, "constrained (Dubious)")))
     value mustBe "a"
   }
 
   test("transformedO - None") {
     val transform = (piece: Piece, value: String) =>
-      (piece.withNote(PieceNote(PieceQuality.Good, "transformed")), Some(value + "!"))
+      (piece.withNote(Note(Quality.Good, "transformed")), Some(value + "!"))
 
     val transformed = SpecialDissectors.transformedO(MockDissectorO, transform)
 
@@ -66,7 +66,7 @@ class SpecialDissectorsSuite extends FunSuite {
   }
 
   test("transformedO - Some") {
-    val note = PieceNote(PieceQuality.Good, "transformed")
+    val note = Note(Quality.Good, "transformed")
 
     val transform = (piece: Piece, value: String) => (piece.withNote(note), Some(value.toInt))
 
@@ -81,13 +81,13 @@ class SpecialDissectorsSuite extends FunSuite {
   }
 
   test("constrainedO - None") {
-    val constrained = SpecialDissectors.constrainedO(MockDissectorO, MockConstraint, PieceQuality.Dubious)
+    val constrained = SpecialDissectors.constrainedO(MockDissectorO, MockConstraint, Quality.Dubious)
 
     constrained.dissectO(null) mustBe MockDissectorO.dissectO(null)
   }
 
   test("constrainedO - Some - satisfied") {
-    val constrained = SpecialDissectors.constrainedO(MockDissector, MockConstraint, PieceQuality.Dubious)
+    val constrained = SpecialDissectors.constrainedO(MockDissector, MockConstraint, Quality.Dubious)
 
     val blob = new ArrayBlob(Array[Byte]('a', 'b'))
 
@@ -95,24 +95,24 @@ class SpecialDissectorsSuite extends FunSuite {
   }
 
   test("constrainedO - Some - unsatisfied") {
-    val constrained = SpecialDissectors.constrainedO(MockDissector, MockConstraint, PieceQuality.Dubious)
+    val constrained = SpecialDissectors.constrainedO(MockDissector, MockConstraint, Quality.Dubious)
 
     val blob = new ArrayBlob(Array[Byte]('a'))
 
     val (piece, value) = constrained.dissectO(blob)
 
-    piece mustBe Atom(Bytes(1), Some("a"), Seq(PieceNote(PieceQuality.Dubious, "constrained (Dubious)")))
+    piece mustBe Atom(Bytes(1), Some("a"), Seq(Note(Quality.Dubious, "constrained (Dubious)")))
     value mustBe Some("a")
   }
 
   test("stronglyConstrainedO - None") {
-    val constrained = SpecialDissectors.stronglyConstrainedO(MockDissectorO, MockConstraint, PieceQuality.Dubious)
+    val constrained = SpecialDissectors.stronglyConstrainedO(MockDissectorO, MockConstraint, Quality.Dubious)
 
     constrained.dissectO(null) mustBe MockDissectorO.dissectO(null)
   }
 
   test("stronglyConstrainedO - Some - satisfied") {
-    val constrained = SpecialDissectors.stronglyConstrainedO(MockDissector, MockConstraint, PieceQuality.Dubious)
+    val constrained = SpecialDissectors.stronglyConstrainedO(MockDissector, MockConstraint, Quality.Dubious)
 
     val blob = new ArrayBlob(Array[Byte]('a', 'b'))
 
@@ -120,13 +120,13 @@ class SpecialDissectorsSuite extends FunSuite {
   }
 
   test("stronglyConstrainedO - Some - unsatisfied") {
-    val constrained = SpecialDissectors.stronglyConstrainedO(MockDissector, MockConstraint, PieceQuality.Dubious)
+    val constrained = SpecialDissectors.stronglyConstrainedO(MockDissector, MockConstraint, Quality.Dubious)
 
     val blob = new ArrayBlob(Array[Byte]('a'))
 
     val (piece, value) = constrained.dissectO(blob)
 
-    piece mustBe Atom(Bytes(1), Some("a"), Seq(PieceNote(PieceQuality.Dubious, "constrained (Dubious)")))
+    piece mustBe Atom(Bytes(1), Some("a"), Seq(Note(Quality.Dubious, "constrained (Dubious)")))
     value mustBe None
   }
 }

@@ -51,29 +51,29 @@ object SpecialDissectors {
   ): DissectorO[NewValue] = new TransformedO(old, transform)
 
   def constrained[Value](
-    dissector: Dissector[Value], constraint: Constraint[Value], quality: PieceQuality.Value
+    dissector: Dissector[Value], constraint: Constraint[Value], quality: Quality.Value
   ): Dissector[Value] = {
     def transform(piece: Piece, value: Value) =
       if (constraint.check(value)) (piece, value)
-      else (piece.withNote(PieceNote(quality, constraint.note(quality))), value)
+      else (piece.withNote(Note(quality, constraint.note(quality))), value)
     transformed(dissector, transform)
   }
 
   def constrainedO[Value](
-    dissector: DissectorO[Value], constraint: Constraint[Value], quality: PieceQuality.Value
+    dissector: DissectorO[Value], constraint: Constraint[Value], quality: Quality.Value
   ): DissectorO[Value] = {
     def transform(piece: Piece, value: Value) =
       if (constraint.check(value)) (piece, Some(value))
-      else (piece.withNote(PieceNote(quality, constraint.note(quality))), Some(value))
+      else (piece.withNote(Note(quality, constraint.note(quality))), Some(value))
     transformedO(dissector, transform)
   }
 
   def stronglyConstrainedO[Value](
-    dissector: DissectorO[Value], constraint: Constraint[Value], quality: PieceQuality.Value
+    dissector: DissectorO[Value], constraint: Constraint[Value], quality: Quality.Value
   ): DissectorO[Value] = {
     def transform(piece: Piece, value: Value) =
       if (constraint.check(value)) (piece, Some(value))
-      else (piece.withNote(PieceNote(quality, constraint.note(quality))), None)
+      else (piece.withNote(Note(quality, constraint.note(quality))), None)
     transformedO(dissector, transform)
   }
 }

@@ -26,7 +26,7 @@ class RandomAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder)
        dissector.dissect(blob, initialOffset + offset)
     } catch {
       case _: IndexOutOfBoundsException =>
-        builder.addNote(PieceQuality.Broken, "\"%s\" is out of bounds".format(name))
+        builder.addNote(Quality.Broken, "\"%s\" is out of bounds".format(name))
         return dissector.defaultValue
     }
 

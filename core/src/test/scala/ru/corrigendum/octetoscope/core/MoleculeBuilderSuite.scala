@@ -53,11 +53,11 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("with notes") {
-    builder.addNote(PieceQuality.Dubious, "foo")
-    builder.addNote(PieceQuality.Bad, "bar")
+    builder.addNote(Quality.Dubious, "foo")
+    builder.addNote(Quality.Bad, "bar")
     builder.build() mustBe Molecule(InfoSize(), None, Seq(), notes = Seq(
-      PieceNote(PieceQuality.Dubious, "foo"),
-      PieceNote(PieceQuality.Bad, "bar"))
+      Note(Quality.Dubious, "foo"),
+      Note(Quality.Bad, "bar"))
     )
   }
 

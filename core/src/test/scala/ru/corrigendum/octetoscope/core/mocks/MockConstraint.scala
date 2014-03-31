@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 
 package ru.corrigendum.octetoscope.core.mocks
 
-import ru.corrigendum.octetoscope.core.{PieceQuality, Constraint}
+import ru.corrigendum.octetoscope.core.{Quality, Constraint}
 
 object MockConstraint extends Constraint[String] {
   override def check(value: String): Boolean = value.length > 1
-  override def note(quality: PieceQuality.Value): String = "constrained (" + quality.toString + ")"
+  override def note(quality: Quality.Value): String = "constrained (" + quality.toString + ")"
 }

@@ -23,8 +23,8 @@ import org.scalatest.MustMatchers._
 
 class PieceSuite extends FunSuite {
   test("withNote") {
-    val note1 = PieceNote(PieceQuality.Dubious, "foo")
-    val note2 = PieceNote(PieceQuality.Bad, "bar")
+    val note1 = Note(Quality.Dubious, "foo")
+    val note2 = Note(Quality.Bad, "bar")
     Atom(InfoSize(), None, notes = Seq(note1)).withNote(note2).notes mustBe Seq(note1, note2)
     Molecule(InfoSize(), None, Seq(), notes = Seq(note2)).withNote(note1).notes mustBe Seq(note2, note1)
   }

@@ -33,7 +33,7 @@ object Common {
       value.y = Some(add("x", component))
       value.z = Some(add("z", component))
       for (x <- value.x; y <- value.y; z <- value.z)
-        builder.setRepr("(%s, %s, %s)".formatLocal(Locale.ROOT, x, y, z))
+        builder.setReprLazy("(%s, %s, %s)".formatLocal(Locale.ROOT, x, y, z))
     }
   }
 

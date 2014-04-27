@@ -105,7 +105,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(input, offset, builder)
       val s = add("s", sInt16L)
       val t = add("t", sInt16L)
-      builder.setRepr("(%d, %d)".format(s, t))
+      builder.setReprLazy("(%d, %d)".format(s, t))
     }
   }
 
@@ -128,7 +128,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
         sInt16L + nonNegative + validTexCoordIndex, formatSeq))
 
       if (vi.length == 3 && ti.length == 3)
-        builder.setRepr(formatSeq((vi, ti).zipped.map(_ + "/" + _)))
+        builder.setReprLazy(formatSeq((vi, ti).zipped.map(_ + "/" + _)))
     }
   }
 
@@ -141,7 +141,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
       val lni = add("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
 
       for (x <- coords.x; y <- coords.y; z <- coords.z)
-        builder.setRepr("(%s, %s, %s) | #%s".format(x, y, z, lni))
+        builder.setReprLazy("(%s, %s, %s) | #%s".format(x, y, z, lni))
     }
   }
 
@@ -152,7 +152,8 @@ object MD2 extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(input, offset, builder)
       add("Scale", new Vector3(float32L))
       add("Translation", new Vector3(float32L))
-      builder.setRepr("\"" + add("Name", asciiZString(16)) + "\"")
+      val name = add("Name", asciiZString(16))
+      builder.setReprLazy("\"" + name + "\"")
 
       for (numVertices <- numVertices)
         add("Vertices", array(numVertices, "Vertex", FrameVertex))
@@ -201,7 +202,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
       val t = add("Texture t", float32L)
       val ind = add("Index", sInt32L + nonNegative + validVertexIndex)
 
-      builder.setRepr("%d / (%f, %f)".formatLocal(Locale.ROOT, ind, s, t))
+      builder.setReprLazy("%d / (%f, %f)".formatLocal(Locale.ROOT, ind, s, t))
     }
   }
 
@@ -215,7 +216,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
       value.typ = add("Type", OpenGLCommandType)
 
       for (typ <- value.typ) {
-        builder.setRepr(typ.toString)
+        builder.setReprLazy(typ.toString)
 
         val numVerts = typ match {
           case TriangleFan(n) => n

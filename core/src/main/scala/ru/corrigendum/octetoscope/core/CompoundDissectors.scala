@@ -42,7 +42,7 @@ object CompoundDissectors {
 
       for (i <- 0 until size) value += add("%s #%d".format(itemName, i), itemDissector)
 
-      reprFuncMaybe.foreach(f => builder.setRepr(f(value)))
+      reprFuncMaybe.foreach(f => builder.setReprLazy(f(value)))
     }
   }
 

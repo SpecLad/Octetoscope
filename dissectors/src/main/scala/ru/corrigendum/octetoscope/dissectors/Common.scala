@@ -30,7 +30,7 @@ object Common {
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Vector3.Value[T]], value: Value[T]) {
       val add = new SequentialAdder(input, offset, builder)
       value.x = Some(add("x", component))
-      value.y = Some(add("x", component))
+      value.y = Some(add("y", component))
       value.z = Some(add("z", component))
       for (x <- value.x; y <- value.y; z <- value.z)
         builder.setReprLazy("(%s, %s, %s)".formatLocal(Locale.ROOT, x, y, z))

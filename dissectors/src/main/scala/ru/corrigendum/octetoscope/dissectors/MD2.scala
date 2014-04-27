@@ -139,8 +139,7 @@ object MD2 extends MoleculeBuilderUnitDissector {
       val coordsC = add.getContents("Coordinates", new Vector3(uInt8))
       val lniC = add.getContents("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
 
-      for (coordsRepr <- coordsC.reprO)
-        builder.setReprLazy("%s | #%s".format(coordsRepr, lniC.repr))
+      builder.setReprLazyO(coordsC.reprO.map("%s | #%s".format(_, lniC.repr)))
     }
   }
 

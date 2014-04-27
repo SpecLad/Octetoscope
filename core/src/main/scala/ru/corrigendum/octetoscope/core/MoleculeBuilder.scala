@@ -27,11 +27,16 @@ class MoleculeBuilder[+V](value: V) { mb =>
   private[this] var hasChildren_ = false
 
   def setRepr(repr: String) { this.contents = new EagerContents(value, Some(repr)) }
-  def setReprLazy(repr: => String) {
+
+  def setReprLazyO(reprOption: => Option[String]) {
     this.contents = new Contents[V] {
       override val value: V = mb.value
-      override def reprO: Option[String] = Some(repr)
+      override def reprO: Option[String] = reprOption
     }
+  }
+
+  def setReprLazy(repr: => String) {
+    setReprLazyO(Some(repr))
   }
 
   def addChild(name: String, offset: InfoSize, piece: PlainPiece) {

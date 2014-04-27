@@ -1,3 +1,5 @@
+env:
+  - TERM=dumb
 language: scala
 jdk:
   - openjdk7

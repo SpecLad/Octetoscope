@@ -44,7 +44,7 @@ package object presentation {
       val displayText = StringBuilder.newBuilder
       displayText ++= np.name
 
-      for (repr <- np.piece.repr)
+      for (repr <- np.piece.contents.reprO)
         displayText ++= ": " ++= repr
 
       DisplayTreeNode(

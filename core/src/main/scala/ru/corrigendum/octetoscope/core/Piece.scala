@@ -61,7 +61,6 @@ class EagerContents[+V](v: V, r: Option[String] = None) extends Contents[V] {
 abstract sealed class Piece[+C <: Contents[Any]] {
   def size: InfoSize
   def contents: C
-  def repr: Option[String] = contents.reprO
   def notes: Seq[Note]
 
   def withNote(note: Note): Piece[C]

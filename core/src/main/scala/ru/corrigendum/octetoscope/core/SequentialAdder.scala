@@ -23,19 +23,8 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder[Any]) {
   var internalOffset = InfoSize()
 
-  private def handleOutOfBounds[T](name: String, body: => T) =
-    try {
-      body
-    } catch {
-      case e: IndexOutOfBoundsException =>
-        throw new MoleculeBuilderDissector.TruncatedException(e, name)
-    }
-
   def apply[V](name: String, dissector: DissectorC[V]): V = {
-    val piece = handleOutOfBounds(name, dissector.dissect(blob, initialOffset + internalOffset))
-    builder.addChild(name, internalOffset, piece)
-    internalOffset += piece.size
-    piece.contents.value
+    getContents(name, dissector).value
   }
 
   def filtered[V](name: String, dissector: DissectorC[V])(criticalConstraints: Constraint[V]*): Option[V] = {
@@ -43,5 +32,18 @@ class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuil
     criticalConstraints.foldLeft[Option[V]](Some(apply(name, actualDissector))) { (opt, constraint) =>
       opt.filter(constraint.check)
     }
+  }
+
+  def getContents[V, C <: Contents[V]](name: String, dissector: Dissector[V, C]): C = {
+    val piece = try {
+      dissector.dissect(blob, initialOffset + internalOffset)
+    } catch {
+      case e: IndexOutOfBoundsException =>
+        throw new MoleculeBuilderDissector.TruncatedException(e, name)
+    }
+
+    builder.addChild(name, internalOffset, piece)
+    internalOffset += piece.size
+    piece.contents
   }
 }

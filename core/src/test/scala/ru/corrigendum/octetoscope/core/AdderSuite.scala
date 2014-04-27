@@ -33,7 +33,7 @@ class AdderSuite extends FunSuite {
 
     val adder = new SequentialAdder(blob, Bytes(1), builder)
     adder("alpha", sInt32L) mustBe 1
-    adder("beta", sInt32L) mustBe 2
+    adder.getContents("beta", sInt32L) mustBe new ToStringContents(2)
 
     builder.build() mustBe Molecule(Bytes(8), EmptyContents, Seq(
       SubPiece("alpha", Bytes(0), Atom(Bytes(4), new ToStringContents[Int](1))),

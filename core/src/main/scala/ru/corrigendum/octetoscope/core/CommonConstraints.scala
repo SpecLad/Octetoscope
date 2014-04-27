@@ -39,33 +39,35 @@ object CommonConstraints {
    */
   def any: Constraint[Any] = AnyConstraint
 
-  def nonNegative[T](implicit arithm: Numeric[T]) = new ShouldMustConstraint[T] {
+  def nonNegative[T](implicit arithm: Numeric[T]): ShouldMustConstraint[T] = new ShouldMustConstraint[T] {
     override def check(value: T): Boolean = arithm.signum(value) >= 0
     override def shouldNote: String = "should be non-negative"
     override def mustNote: String = "must be non-negative"
   }
 
-  def positive[T](implicit arithm: Numeric[T]) = new ShouldMustConstraint[T] {
+  def positive[T](implicit arithm: Numeric[T]): ShouldMustConstraint[T] = new ShouldMustConstraint[T] {
     override def check(value: T): Boolean = arithm.signum(value) > 0
     override def shouldNote: String = "should be positive"
     override def mustNote: String = "must be positive"
   }
 
-  def equalTo[T](expected: T, meaning: String) = new ShouldMustConstraint[T] {
+  def equalTo[T](expected: T, meaning: String): ShouldMustConstraint[T] = new ShouldMustConstraint[T] {
     override def shouldNote: String = "should equal %s (%s)".format(expected, meaning)
     override def mustNote: String = "must equal %s (%s)".format(expected, meaning)
     override def check(value: T): Boolean = value == expected
   }
 
-  def noMoreThan[T](limit: T, meaning: String)(implicit ord: Ordering[T]) = new ShouldMustConstraint[T] {
-    override def shouldNote: String = "should be no more than %s (%s)".format(limit, meaning)
-    override def mustNote: String = "must be no more than %s (%s)".format(limit, meaning)
-    override def check(value: T): Boolean = ord.lteq(value, limit)
-  }
+  def noMoreThan[T](limit: T, meaning: String)(implicit ord: Ordering[T]): ShouldMustConstraint[T] =
+    new ShouldMustConstraint[T] {
+      override def shouldNote: String = "should be no more than %s (%s)".format(limit, meaning)
+      override def mustNote: String = "must be no more than %s (%s)".format(limit, meaning)
+      override def check(value: T): Boolean = ord.lteq(value, limit)
+    }
 
-  def lessThan[T](limit: T, meaning: String)(implicit ord: Ordering[T]) = new ShouldMustConstraint[T] {
-    override def shouldNote: String = "should be less than %s (%s)".format(limit, meaning)
-    override def mustNote: String = "must be less than %s (%s)".format(limit, meaning)
-    override def check(value: T): Boolean = ord.lt(value, limit)
-  }
+  def lessThan[T](limit: T, meaning: String)(implicit ord: Ordering[T]): ShouldMustConstraint[T] =
+    new ShouldMustConstraint[T] {
+      override def shouldNote: String = "should be less than %s (%s)".format(limit, meaning)
+      override def mustNote: String = "must be less than %s (%s)".format(limit, meaning)
+      override def check(value: T): Boolean = ord.lt(value, limit)
+    }
 }

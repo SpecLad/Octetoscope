@@ -19,7 +19,6 @@
 package ru.corrigendum.octetoscope.dissectors
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import java.util.Locale
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
@@ -103,9 +102,9 @@ object MD2 extends MoleculeBuilderUnitDissector {
   private object TexCoordPair extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       val add = new SequentialAdder(input, offset, builder)
-      val s = add("s", sInt16L)
-      val t = add("t", sInt16L)
-      builder.setReprLazy("(%d, %d)".format(s, t))
+      val sc = add.getContents("s", sInt16L)
+      val tc = add.getContents("t", sInt16L)
+      builder.setReprLazy("(%s, %s)".format(sc.repr, tc.repr))
     }
   }
 
@@ -137,11 +136,11 @@ object MD2 extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       val add = new SequentialAdder(input, offset, builder)
 
-      val coords = add("Coordinates", new Vector3(uInt8))
-      val lni = add("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
+      val coordsC = add.getContents("Coordinates", new Vector3(uInt8))
+      val lniC = add.getContents("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
 
-      for (x <- coords.x; y <- coords.y; z <- coords.z)
-        builder.setReprLazy("(%s, %s, %s) | #%s".format(x, y, z, lni))
+      for (coordsRepr <- coordsC.reprO)
+        builder.setReprLazy("%s | #%s".format(coordsRepr, lniC.repr))
     }
   }
 
@@ -152,8 +151,8 @@ object MD2 extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(input, offset, builder)
       add("Scale", new Vector3(float32L))
       add("Translation", new Vector3(float32L))
-      val name = add("Name", asciiZString(16))
-      builder.setReprLazy("\"" + name + "\"")
+      val nameC = add.getContents("Name", asciiZString(16))
+      builder.setReprLazy(nameC.repr)
 
       for (numVertices <- numVertices)
         add("Vertices", array(numVertices, "Vertex", FrameVertex))
@@ -198,11 +197,11 @@ object MD2 extends MoleculeBuilderUnitDissector {
 
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       val add = new SequentialAdder(input, offset, builder)
-      val s = add("Texture s", float32L)
-      val t = add("Texture t", float32L)
-      val ind = add("Index", sInt32L + nonNegative + validVertexIndex)
+      val sc = add.getContents("Texture s", float32L)
+      val tc = add.getContents("Texture t", float32L)
+      val indC = add.getContents("Index", sInt32L + nonNegative + validVertexIndex)
 
-      builder.setReprLazy("%d / (%f, %f)".formatLocal(Locale.ROOT, ind, s, t))
+      builder.setReprLazy("%s / (%s, %s)".format(indC.repr, sc.repr, tc.repr))
     }
   }
 

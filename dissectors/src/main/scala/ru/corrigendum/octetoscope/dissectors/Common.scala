@@ -19,21 +19,23 @@
 package ru.corrigendum.octetoscope.dissectors
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import java.util.Locale
 import ru.corrigendum.octetoscope.core._
 
 object Common {
-  class Vector3[T](component: DissectorC[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {
+  class Vector3[T](component: DissectorCR[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {
     import Vector3.Value
 
     override def defaultValue: Value[T] = Value(None, None, None)
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Vector3.Value[T]], value: Value[T]) {
       val add = new SequentialAdder(input, offset, builder)
-      value.x = Some(add("x", component))
-      value.y = Some(add("y", component))
-      value.z = Some(add("z", component))
-      for (x <- value.x; y <- value.y; z <- value.z)
-        builder.setReprLazy("(%s, %s, %s)".formatLocal(Locale.ROOT, x, y, z))
+      val xc = add.getContents("x", component)
+      value.x = Some(xc.value)
+      val yc = add.getContents("y", component)
+      value.y = Some(yc.value)
+      val zc = add.getContents("z", component)
+      value.z = Some(zc.value)
+
+      builder.setReprLazy("(%s, %s, %s)".format(xc.repr, yc.repr, zc.repr))
     }
   }
 

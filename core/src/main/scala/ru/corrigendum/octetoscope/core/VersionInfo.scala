@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ object VersionInfo {
 
     VersionInfo(
       releaseVersion = props.getProperty("releaseVersion", "unknown"),
-      extraCommits = Option(props.getProperty("extraCommits")).map(_.toInt).getOrElse(0),
+      extraCommits = Option(props.getProperty("extraCommits")).fold(0)(_.toInt),
       commitHash = props.getProperty("commitHash", "0" * 40),
       dirty = Option(props.getProperty("dirty")).exists(_.toBoolean)
     )

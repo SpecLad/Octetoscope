@@ -23,49 +23,75 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 
 object PrimitiveDissectors {
-  private val _numberAtomCache: Array[Array[Atom]] =
-    Array.tabulate(4, 256) { (byteSize, value) => Atom(Bytes(byteSize + 1), Some(value.toString)) }
+  private val NumCachedSizes = 4
+  private val NumCachedNumbers = 256
+
+  private def makeNumberAtomCache[V: Numeric]: Array[Array[AtomCR[V]]] =
+    Array.tabulate(NumCachedSizes, NumCachedNumbers) {
+      (byteSize, value) => Atom(
+        Bytes(byteSize + 1),
+        new ToStringContents[V](implicitly[Numeric[V]].fromInt(value)))
+    }
+
+  private val byteAtomCache = makeNumberAtomCache[Byte]
+  private val shortAtomCache = makeNumberAtomCache[Short]
+  private val intAtomCache = makeNumberAtomCache[Int]
+
+  private def numberIsCached(byteSize: Int, value: Int) =
+    byteSize > 0 && byteSize <= NumCachedSizes &&
+    value >= 0 && value < NumCachedNumbers
+
+  private def getNumberAtom(byteSize: Int, value: Byte) =
+    if (numberIsCached(byteSize, value))
+      byteAtomCache(byteSize - 1)(value)
+    else
+      Atom(Bytes(byteSize), new ToStringContents[Byte](value))
+
+  private def getNumberAtom(byteSize: Int, value: Short) =
+    if (numberIsCached(byteSize, value))
+      shortAtomCache(byteSize - 1)(value)
+    else
+      Atom(Bytes(byteSize), new ToStringContents[Short](value))
 
   private def getNumberAtom(byteSize: Int, value: Int) =
-    if (byteSize > 0 && byteSize <= _numberAtomCache.length &&
-        value >= 0 && value < _numberAtomCache(byteSize - 1).length)
-      _numberAtomCache(byteSize - 1)(value)
+    if (numberIsCached(byteSize, value))
+      intAtomCache(byteSize - 1)(value)
     else
-      Atom(Bytes(byteSize), Some(value.toString))
+      Atom(Bytes(byteSize), new ToStringContents[Int](value))
 
-  private object SInt8 extends Dissector[Byte] {
-    override def dissect(input: Blob, offset: InfoSize): (Piece, Byte) = {
+  private object SInt8 extends DissectorCR[Byte] {
+    override def dissect(input: Blob, offset: InfoSize): AtomCR[Byte] = {
       val Bytes(bo) = offset
       val value = input(bo)
-      (getNumberAtom(1, value), value)
+      getNumberAtom(1, value)
     }
   }
 
-  def sInt8: Dissector[Byte] = SInt8
+  def sInt8: DissectorCR[Byte] = SInt8
 
-  private object UInt8 extends Dissector[Short] {
-    override def dissect(input: Blob, offset: InfoSize): (Piece, Short) = {
+  private object UInt8 extends DissectorCR[Short] {
+    override def dissect(input: Blob, offset: InfoSize): AtomCR[Short] = {
       val Bytes(bo) = offset
       val byte = input(bo)
       val value = if (byte >= 0) byte else 256 + byte
-      (getNumberAtom(1, value), value.toShort)
+      getNumberAtom(1, value.toShort)
     }
   }
 
-  def uInt8: Dissector[Short] = UInt8
+  def uInt8: DissectorCR[Short] = UInt8
 
-  private object SInt16L extends Dissector[Short] {
-    override def dissect(input: Blob, offset: InfoSize) = {
+  private object SInt16L extends DissectorCR[Short] {
+    override def dissect(input: Blob, offset: InfoSize): AtomCR[Short] = {
       val Bytes(bo) = offset
 
       val value = ((input(bo) & 0xFF) |
         ((input(bo + 1) & 0xFF) << 8)).toShort
 
-      (getNumberAtom(2, value), value)
+      getNumberAtom(2, value)
     }
   }
 
-  def sInt16L: Dissector[Short] = SInt16L
+  def sInt16L: DissectorCR[Short] = SInt16L
 
   def readInt32L(input: Blob, offset: InfoSize) = {
     val Bytes(bo) = offset
@@ -75,42 +101,49 @@ object PrimitiveDissectors {
       ((input(bo + 3) & 0xFF) << 24)
   }
 
-  private object SInt32L extends Dissector[Int] {
-    override def dissect(input: Blob, offset: InfoSize) = {
+  private object SInt32L extends DissectorCR[Int] {
+    override def dissect(input: Blob, offset: InfoSize): AtomCR[Int] = {
       val value = readInt32L(input, offset)
 
-      (getNumberAtom(4, value), value)
+      getNumberAtom(4, value)
     }
   }
 
-  def sInt32L: Dissector[Int] = SInt32L
+  def sInt32L: DissectorCR[Int] = SInt32L
 
-  private object Float32L extends Dissector[Float] {
-    override def dissect(input: Blob, offset: InfoSize) = {
+  private object Float32L extends DissectorCR[Float] {
+    override def dissect(input: Blob, offset: InfoSize): AtomCR[Float] = {
       val int = readInt32L(input, offset)
       val float = java.lang.Float.intBitsToFloat(int)
 
-      if (float.isNaN)
-        (Atom(Bytes(4), Some("%sNaN(0x%06x)".format(if (int < 0) "-" else "", int & 0x7FFFFF))), Float.NaN)
-      else
-        // 9 digits is the minimum number to ensure uniqueness
-        (Atom(Bytes(4), Some("%.9g".formatLocal(Locale.ROOT, float))), float)
+      Atom(Bytes(4), new ContentsR[Float] {
+        override val value: Float = float
+        override def repr: String =
+          if (float.isNaN) "%sNaN(0x%06x)".format(if (int < 0) "-" else "", int & 0x7FFFFF)
+          else "%.9g".formatLocal(Locale.ROOT, float) // 9 digits is the minimum number to ensure uniqueness
+      })
     }
   }
 
-  def float32L: Dissector[Float] = Float32L
+  def float32L: DissectorCR[Float] = Float32L
 
-  abstract private class AsciiStringGeneric(length: Int) extends Dissector[String] {
+  abstract private class AsciiStringGeneric(length: Int) extends DissectorCR[String] {
     protected def findLength(input: Blob, byteOffset: Long): Int
     protected def assess(value: String): Seq[Note] = Nil
 
-    final override def dissect(input: Blob, offset: InfoSize) = {
+    final override def dissect(input: Blob, offset: InfoSize): AtomCR[String] = {
       val Bytes(bo) = offset
 
-      val value = new String(input.slice(bo, bo + findLength(input, bo)).toArray,
+      val string = new String(input.slice(bo, bo + findLength(input, bo)).toArray,
         StandardCharsets.US_ASCII)
 
-      (Atom(Bytes(length), Some("\"" + value + "\""), assess(value)), value)
+      Atom(
+        Bytes(length),
+        new ContentsR[String] {
+          override val value: String = string
+          override def repr: String = "\"" + value + "\""
+        },
+        assess(string))
     }
   }
 
@@ -118,7 +151,7 @@ object PrimitiveDissectors {
     override protected def findLength(input: Blob, byteOffset: Long): Int = length
   }
 
-  def asciiString(length: Int): Dissector[String] = new AsciiString(length)
+  def asciiString(length: Int): DissectorCR[String] = new AsciiString(length)
 
   private class AsciiZString(length: Int) extends AsciiStringGeneric(length) {
     override protected def findLength(input: Blob, byteOffset: Long): Int = {
@@ -135,20 +168,26 @@ object PrimitiveDissectors {
       else Seq(Note(Quality.Bad, "missing NUL terminator"))
   }
 
-  def asciiZString(length: Int): Dissector[String] = new AsciiZString(length)
+  def asciiZString(length: Int): DissectorCR[String] = new AsciiZString(length)
 
-  private class Magic(expected: Array[Byte], interpretation: String) extends DissectorO[Unit] {
-    override def dissectO(input: Blob, offset: InfoSize): (Piece, Option[Unit]) = {
+  private class Magic(expected: Array[Byte], interpretation: String) extends DissectorC[Option[Unit]] {
+    override def dissect(input: Blob, offset: InfoSize): AtomC[Option[Unit]] = {
       val Bytes(bo) = offset
 
       if (input.slice(bo, bo + expected.length).toArray.sameElements(expected)) {
-        (Atom(Bytes(expected.length), Some(interpretation)), Some(()))
+        Atom(Bytes(expected.length), new Contents[Option[Unit]] {
+          override val value: Option[Unit] = Some(())
+          override def reprO: Option[String] = Some(interpretation)
+        })
       } else {
         val note = "expected \"%s\" (0x%s)".format(interpretation, expected.map("%02x".format(_)).mkString)
-        (Atom(Bytes(expected.length), None, Seq(Note(Quality.Broken, note))), None)
+        Atom(Bytes(expected.length), new Contents[Option[Unit]] {
+          override val value: Option[Unit] = None
+          override def reprO: Option[String] = None
+        }, Seq(Note(Quality.Broken, note)))
       }
     }
   }
 
-  def magic(expected: Array[Byte], interpretation: String): DissectorO[Unit] = new Magic(expected, interpretation)
+  def magic(expected: Array[Byte], interpretation: String): DissectorC[Option[Unit]] = new Magic(expected, interpretation)
 }

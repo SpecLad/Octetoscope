@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,22 +22,22 @@ import scala.collection.mutable
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 object CompoundDissectors {
-  private class Array(size: Int, itemName: String, itemDissector: DissectorO[Any]) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+  private class Array(size: Int, itemName: String, itemDissector: PlainDissector) extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       val add = new SequentialAdder(input, offset, builder)
 
       for (i <- 0 until size) add("%s #%d".format(itemName, i), itemDissector)
     }
   }
 
-  def array(size: Int, itemName: String, itemDissector: DissectorO[Any]): MoleculeBuilderUnitDissector =
+  def array(size: Int, itemName: String, itemDissector: PlainDissector): MoleculeBuilderUnitDissector =
     new Array(size, itemName, itemDissector)
 
-  private class CollectingArray[T](
-    size: Int, itemName: String, itemDissector: Dissector[T], reprFuncMaybe: Option[Seq[T] => String]
-  ) extends MoleculeBuilderDissector[mutable.Buffer[T]] {
-    override def defaultValue: mutable.Buffer[T] = new mutable.ArrayBuffer[T](size)
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: mutable.Buffer[T]) {
+  private class CollectingArray[V](
+    size: Int, itemName: String, itemDissector: DissectorC[V], reprFuncMaybe: Option[Seq[V] => String]
+  ) extends MoleculeBuilderDissector[mutable.Buffer[V]] {
+    override def defaultValue: mutable.Buffer[V] = new mutable.ArrayBuffer[V](size)
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[mutable.Buffer[V]], value: mutable.Buffer[V]) {
       val add = new SequentialAdder(input, offset, builder)
 
       for (i <- 0 until size) value += add("%s #%d".format(itemName, i), itemDissector)
@@ -46,13 +46,13 @@ object CompoundDissectors {
     }
   }
 
-  def collectingArray[T](
-    size: Int, itemName: String, itemDissector: Dissector[T]
-  ): MoleculeBuilderDissector[mutable.Buffer[T]] =
-    new CollectingArray[T](size, itemName, itemDissector, None)
+  def collectingArray[V](
+    size: Int, itemName: String, itemDissector: DissectorC[V]
+  ): MoleculeBuilderDissector[mutable.Buffer[V]] =
+    new CollectingArray[V](size, itemName, itemDissector, None)
 
-  def collectingArray[T](
-    size: Int, itemName: String, itemDissector: Dissector[T], reprFunc: Seq[T] => String
-  ): MoleculeBuilderDissector[mutable.Buffer[T]] =
-    new CollectingArray[T](size, itemName, itemDissector, Some(reprFunc))
+  def collectingArray[V](
+    size: Int, itemName: String, itemDissector: DissectorC[V], reprFunc: Seq[V] => String
+  ): MoleculeBuilderDissector[mutable.Buffer[V]] =
+    new CollectingArray[V](size, itemName, itemDissector, Some(reprFunc))
 }

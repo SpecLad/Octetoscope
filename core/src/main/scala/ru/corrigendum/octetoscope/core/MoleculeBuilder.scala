@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.core
 
-class MoleculeBuilder {
+class MoleculeBuilder[+V](value: V) { mb =>
   private[this] val childrenBuilder = Seq.newBuilder[SubPiece]
   private[this] var repr: Option[String] = None
   private[this] var autoSize: InfoSize = InfoSize()
@@ -28,7 +28,7 @@ class MoleculeBuilder {
 
   def setRepr(repr: String) { this.repr = Some(repr) }
 
-  def addChild(name: String, offset: InfoSize, piece: Piece) {
+  def addChild(name: String, offset: InfoSize, piece: PlainPiece) {
     childrenBuilder += SubPiece(name, offset, piece)
     autoSize = List(autoSize, offset + piece.size).max
     hasChildren_ = true
@@ -36,8 +36,13 @@ class MoleculeBuilder {
 
   def addNote(quality: Quality.Value, text: String) { notes += Note(quality, text) }
 
-  def build(): Molecule =
-    Molecule(fixedSize.getOrElse(autoSize), repr, childrenBuilder.result(), notes.result())
+  def build(): MoleculeC[V] = {
+    val contents = new Contents[V] {
+      override val value = mb.value
+      override def reprO = repr
+    }
+    Molecule(fixedSize.getOrElse(autoSize), contents, childrenBuilder.result(), notes.result())
+  }
 
   def hasChildren: Boolean = hasChildren_
 

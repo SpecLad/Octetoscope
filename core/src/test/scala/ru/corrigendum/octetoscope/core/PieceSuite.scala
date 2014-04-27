@@ -25,7 +25,58 @@ class PieceSuite extends FunSuite {
   test("withNote") {
     val note1 = Note(Quality.Dubious, "foo")
     val note2 = Note(Quality.Bad, "bar")
-    Atom(InfoSize(), None, notes = Seq(note1)).withNote(note2).notes mustBe Seq(note1, note2)
-    Molecule(InfoSize(), None, Seq(), notes = Seq(note2)).withNote(note1).notes mustBe Seq(note2, note1)
+    Atom(InfoSize(), EmptyContents, notes = Seq(note1)).withNote(note2).notes mustBe Seq(note1, note2)
+    Molecule(InfoSize(), EmptyContents, Seq(), notes = Seq(note2)).withNote(note1).notes mustBe Seq(note2, note1)
+  }
+
+  test("ToStringContents") {
+    val obj = new Object {
+      override def toString: String = "foo"
+    }
+    val cont = new ToStringContents[Object](obj)
+    cont.value must be theSameInstanceAs obj
+    cont.repr mustBe "foo"
+  }
+
+  test("Contents.equals") {
+    val cont1 = new Contents[Int] {
+      override val value: Int = 5
+      override def reprO: Option[String] = Some("abc")
+    }
+    val cont2 = new Contents[Short] {
+      override val value: Short = 5
+      override def reprO: Option[String] = Some("abc")
+    }
+    val cont3 = new Contents[Int] {
+      override val value: Int = 4
+      override def reprO: Option[String] = Some("abc")
+    }
+    val cont4 = new Contents[Int] {
+      override val value: Int = 5
+      override def reprO: Option[String] = Some("def")
+    }
+
+    cont1.equals(null) mustBe false
+    cont1.equals(new Object) mustBe false
+    cont1.equals(cont2) mustBe true
+    cont1.equals(cont3) mustBe false
+    cont1.equals(cont4) mustBe false
+  }
+
+  test("Contents.toString") {
+    val cont = new Contents[Int] {
+      override val value: Int = 5
+      override def reprO: Option[String] = Some("abc")
+    }
+    cont.toString mustBe "Contents(5, Some(abc))"
+  }
+
+  test("ContentsR.reprO") {
+    val cont = new ContentsR[Int] {
+      override def repr: String = "foo"
+      override val value: Int = 0
+    }
+
+    cont.reprO mustBe Some("foo")
   }
 }

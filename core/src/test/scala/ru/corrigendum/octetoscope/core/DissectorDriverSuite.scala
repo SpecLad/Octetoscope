@@ -23,13 +23,12 @@ import org.scalatest.FunSuite
 import ru.corrigendum.octetoscope.core.mocks.{MockDissector, MockBinaryReader}
 import java.nio.charset.StandardCharsets
 import java.io.File
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class DissectorDriverSuite extends FunSuite {
   test("dissect") {
     val reader = new MockBinaryReader(new ArrayBlob("magic".getBytes(StandardCharsets.US_ASCII)))
     val driver = new DissectorDriverImpl(reader, MockDissector)
-    driver.dissect(DissectorDriverSuite.FakePath) mustBe Atom(Bytes(5), Some("magic"))
+    driver.dissect(DissectorDriverSuite.FakePath) mustBe Atom(Bytes(5), new ToStringContents("magic"))
   }
 }
 

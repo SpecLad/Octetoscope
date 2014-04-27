@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,14 +16,21 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.core.mocks
+package ru.corrigendum.octetoscope
 
-import ru.corrigendum.octetoscope.core.{Bytes, Atom, InfoSize, DissectorO}
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-import java.nio.charset.StandardCharsets
+package object core {
+  type PieceC[V] = Piece[Contents[V]]
+  type AtomC[V] = Atom[Contents[V]]
+  type MoleculeC[V] = Molecule[Contents[V]]
+  type DissectorC[V] = Dissector[V, Contents[V]]
 
-object MockDissectorO extends DissectorO[String] {
-  override def dissectO(input: Blob, offset: InfoSize) = {
-    (Atom(Bytes(1), None), None)
-  }
+  type PieceCR[V] = Piece[ContentsR[V]]
+  type AtomCR[V] = Atom[ContentsR[V]]
+  type MoleculeCR[V] = Molecule[ContentsR[V]]
+  type DissectorCR[V] = Dissector[V, ContentsR[V]]
+
+  type PlainPiece = PieceC[Any]
+  type PlainAtom = AtomC[Any]
+  type PlainMolecule = MoleculeC[Any]
+  type PlainDissector = DissectorC[Any]
 }

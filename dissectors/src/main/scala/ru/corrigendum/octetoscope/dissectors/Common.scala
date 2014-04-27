@@ -23,15 +23,15 @@ import java.util.Locale
 import ru.corrigendum.octetoscope.core._
 
 object Common {
-  class Vector3[T](component: DissectorO[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {
+  class Vector3[T](component: DissectorC[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {
     import Vector3.Value
 
     override def defaultValue: Value[T] = Value(None, None, None)
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value[T]) {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Vector3.Value[T]], value: Value[T]) {
       val add = new SequentialAdder(input, offset, builder)
-      value.x = add("x", component)
-      value.y = add("y", component)
-      value.z = add("z", component)
+      value.x = Some(add("x", component))
+      value.y = Some(add("x", component))
+      value.z = Some(add("z", component))
       for (x <- value.x; y <- value.y; z <- value.z)
         builder.setRepr("(%s, %s, %s)".formatLocal(Locale.ROOT, x, y, z))
     }

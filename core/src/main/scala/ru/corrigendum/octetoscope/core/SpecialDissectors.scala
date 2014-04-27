@@ -21,59 +21,19 @@ package ru.corrigendum.octetoscope.core
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 object SpecialDissectors {
-  private class Transformed[-OldValue, +NewValue](
-    old: Dissector[OldValue], transform: (Piece, OldValue) => (Piece, NewValue)
-  ) extends Dissector[NewValue] {
-    override def dissect(input: Blob, offset: InfoSize): (Piece, NewValue) = {
-      val (piece, value) = old.dissect(input, offset)
-      transform(piece, value)
-    }
+  private class Transformed[V, C <: Contents[V]](
+    old: Dissector[V, C], transform: Piece[C] => Piece[C]
+  ) extends Dissector[V, C] {
+    override def dissect(input: Blob, offset: InfoSize): Piece[C] = transform(old.dissect(input, offset))
   }
 
-  def transformed[OldValue, NewValue](
-    old: Dissector[OldValue], transform: (Piece, OldValue) => (Piece, NewValue)
-  ): Dissector[NewValue] = new Transformed(old, transform)
+  def transformed[V, C <: Contents[V]](
+    old: Dissector[V, C], transform: Piece[C] => Piece[C]
+  ): Dissector[V, C] = new Transformed(old, transform)
 
-  private class TransformedO[-OldValue, +NewValue](
-    old: DissectorO[OldValue], transform: (Piece, OldValue) => (Piece, Option[NewValue])
-  ) extends DissectorO[NewValue] {
-    override def dissectO(input: Blob, offset: InfoSize): (Piece, Option[NewValue]) = {
-      val (piece, valueO) = old.dissectO(input, offset)
-      valueO match {
-        case None => (piece, None)
-        case Some(value) => transform(piece, value)
-      }
-    }
-  }
-
-  def transformedO[OldValue, NewValue](
-    old: DissectorO[OldValue], transform: (Piece, OldValue) => (Piece, Option[NewValue])
-  ): DissectorO[NewValue] = new TransformedO(old, transform)
-
-  def constrained[Value](
-    dissector: Dissector[Value], constraint: Constraint[Value], quality: Quality.Value
-  ): Dissector[Value] = {
-    def transform(piece: Piece, value: Value) =
-      if (constraint.check(value)) (piece, value)
-      else (piece.withNote(Note(quality, constraint.note(quality))), value)
-    transformed(dissector, transform)
-  }
-
-  def constrainedO[Value](
-    dissector: DissectorO[Value], constraint: Constraint[Value], quality: Quality.Value
-  ): DissectorO[Value] = {
-    def transform(piece: Piece, value: Value) =
-      if (constraint.check(value)) (piece, Some(value))
-      else (piece.withNote(Note(quality, constraint.note(quality))), Some(value))
-    transformedO(dissector, transform)
-  }
-
-  def stronglyConstrainedO[Value](
-    dissector: DissectorO[Value], constraint: Constraint[Value], quality: Quality.Value
-  ): DissectorO[Value] = {
-    def transform(piece: Piece, value: Value) =
-      if (constraint.check(value)) (piece, Some(value))
-      else (piece.withNote(Note(quality, constraint.note(quality))), None)
-    transformedO(dissector, transform)
+  def constrained[V, C <: Contents[V]](
+    dissector: Dissector[V, C], constraint: Constraint[V], quality: Quality.Value
+  ): Dissector[V, C] = {
+    transformed(dissector, (piece: Piece[C]) => constraint.apply(piece, quality))
   }
 }

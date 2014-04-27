@@ -21,6 +21,10 @@ package ru.corrigendum.octetoscope.core
 trait Constraint[-Value] {
   def check(value: Value): Boolean
   def note(quality: Quality.Value): String
+
+  final def apply[C <: Contents[Value]](piece: Piece[C], quality: Quality.Value): Piece[C] =
+    if (check(piece.contents.value)) piece
+    else piece.withNote(Note(quality, note(quality)))
 }
 
 trait ShouldMustConstraint[-Value] extends Constraint[Value] {

@@ -22,42 +22,34 @@ import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
 import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.core.mocks.MockDissector
 
 class DissectorSuite extends FunSuite {
-  test("Dissector.dissectO") {
-    val blob = new ArrayBlob(Array[Byte](1, 2))
-    val result = MockDissector.dissect(blob)
-    val resultO = MockDissector.dissectO(blob)
-
-    resultO._1 mustBe result._1
-    resultO._2 mustBe Some(result._2)
-  }
-
   test("MoleculeBuilderDissector.dissect") {
     case class Value(var i: Int)
 
+    val child = Atom(Bytes(1), new ToStringContents("a"))
+
     val mbd = new MoleculeBuilderDissector[Value] {
       override def defaultValue: Value = Value(1)
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Value], value: Value) {
         value.i mustBe 1
         value.i = 2
-        builder.addChild("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
+        builder.addChild("alpha", Bytes(1), child)
       }
     }
 
-    mbd.dissect(Blob.empty) mustBe (
-      Molecule(Bytes(2), None, Seq(
-        SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
-      )),
-      Value(2)
-    )
+    mbd.dissect(Blob.empty) mustBe
+      Molecule(Bytes(2), new EagerContents(Value(2)), Seq(
+        SubPiece("alpha", Bytes(1), child)
+      ))
   }
 
   test("MoleculeBuilderUnitDissector.dissectMB") {
+    val child = Atom(Bytes(1), new ToStringContents("a"))
+
     val mbud = new MoleculeBuilderUnitDissector {
-      override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
-        builder.addChild("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
+      override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+        builder.addChild("alpha", Bytes(1), child)
       }
     }
 
@@ -65,8 +57,8 @@ class DissectorSuite extends FunSuite {
     mbud.dissectMB(Blob.empty, InfoSize(), builder, ())
 
     builder.build() mustBe
-      Molecule(Bytes(2), None, Seq(
-        SubPiece("alpha", Bytes(1), Atom(Bytes(1), Some("a")))
+      Molecule(Bytes(2), EmptyContents, Seq(
+        SubPiece("alpha", Bytes(1), child)
       ))
   }
 
@@ -75,7 +67,7 @@ class DissectorSuite extends FunSuite {
 
     val truncated = new MoleculeBuilderDissector[Unit] {
       override def defaultValue = Unit
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit], value: Unit) {
         throw new MoleculeBuilderDissector.TruncatedException(cause, "alpha")
       }
     }
@@ -87,21 +79,21 @@ class DissectorSuite extends FunSuite {
   test("MoleculeBuilderDissector - truncated - non-empty") {
     case class Value(var i: Int)
 
-    val child = Atom(Bytes(1), None)
+    val child = Atom(Bytes(1), EmptyContents)
 
     val truncated = new MoleculeBuilderDissector[Value] {
       override def defaultValue = Value(0)
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Value], value: Value) {
         value.i = 1
         builder.addChild("alpha", InfoSize(), child)
         throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "beta")
       }
     }
 
-    val (molecule, value) = truncated.dissect(Blob.empty)
+    val molecule = truncated.dissect(Blob.empty)
     molecule.children mustBe Seq(SubPiece("alpha", InfoSize(), child))
     molecule.notes.loneElement.pieceQuality mustBe Quality.Broken
     molecule.notes.loneElement.text must include ("\"beta\"")
-    value.i mustBe 1
+    molecule.contents.value.i mustBe 1
   }
 }

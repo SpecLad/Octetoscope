@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,15 +18,15 @@
 
 package ru.corrigendum.octetoscope.presentation.mocks
 
-import ru.corrigendum.octetoscope.core.{Piece, DissectorDriver}
-import java.io.{IOException, File}
+import ru.corrigendum.octetoscope.core.{PlainPiece, DissectorDriver}
+import java.io.File
 
 class MockDissectorDriver extends DissectorDriver {
-  override def dissect(path: File): Piece = {
+  override def dissect(path: File): PlainPiece = {
     exception.foreach(throw _)
     result
   }
 
-  var result: Piece = _
+  var result: PlainPiece = _
   var exception: Option[Exception] = None
 }

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@ import ru.corrigendum.octetoscope.core._
 import java.nio.charset.StandardCharsets
 import ru.corrigendum.octetoscope.core.Atom
 
-object MockDissector extends Dissector[String] {
+object MockDissector extends DissectorCR[String] {
   override def dissect(input: Blob, offset: InfoSize) = {
     val str = new String(input.slice(offset.bytes).toArray, StandardCharsets.US_ASCII)
 
-    (Atom(Bytes(input.size) - offset, Some(str)), str)
+    Atom(Bytes(input.size) - offset, new ToStringContents(str))
   }
 }

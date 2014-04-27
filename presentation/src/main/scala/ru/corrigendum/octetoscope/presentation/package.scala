@@ -39,7 +39,7 @@ package object presentation {
     )
   }
 
-  private[presentation] def presentPiece(piece: Piece): DisplayTreeNode = {
+  private[presentation] def presentPiece(piece: PlainPiece): DisplayTreeNode = {
     def helper(np: SubPiece): DisplayTreeNode = {
       val displayText = StringBuilder.newBuilder
       displayText ++= np.name
@@ -51,8 +51,8 @@ package object presentation {
         displayText.result(),
         np.piece.notes.map(n => (QualityColors(n.pieceQuality), n.text)),
         np.piece match {
-          case _: Atom => None
-          case m: Molecule => Some(() => m.children.map(helper))
+          case _: PlainAtom => None
+          case m: PlainMolecule => Some(() => m.children.map(helper))
         }
       )
     }

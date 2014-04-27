@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder) {
+class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder[Any]) {
   var internalOffset = InfoSize()
 
   private def handleOutOfBounds[T](name: String, body: => T) =
@@ -31,17 +31,17 @@ class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuil
         throw new MoleculeBuilderDissector.TruncatedException(e, name)
     }
 
-  def apply[Value](name: String, dissector: DissectorO[Value]): Option[Value] = {
-    val (piece, value) = handleOutOfBounds(name, dissector.dissectO(blob, initialOffset + internalOffset))
+  def apply[V](name: String, dissector: DissectorC[V]): V = {
+    val piece = handleOutOfBounds(name, dissector.dissect(blob, initialOffset + internalOffset))
     builder.addChild(name, internalOffset, piece)
     internalOffset += piece.size
-    value
+    piece.contents.value
   }
 
-  def apply[Value](name: String, dissector: Dissector[Value]): Value = {
-    val (piece, value) = handleOutOfBounds(name, dissector.dissect(blob, initialOffset + internalOffset))
-    builder.addChild(name, internalOffset, piece)
-    internalOffset += piece.size
-    value
+  def filtered[V](name: String, dissector: DissectorC[V])(criticalConstraints: Constraint[V]*): Option[V] = {
+    val actualDissector = criticalConstraints.foldLeft(dissector) { _ + _ }
+    criticalConstraints.foldLeft[Option[V]](Some(apply(name, actualDissector))) { (opt, constraint) =>
+      opt.filter(constraint.check)
+    }
   }
 }

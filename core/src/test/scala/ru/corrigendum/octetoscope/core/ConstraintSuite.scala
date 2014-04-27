@@ -36,4 +36,21 @@ class ConstraintSuite extends FunSuite {
     constraint.note(Quality.Bad) mustBe "must"
     constraint.note(Quality.Broken) mustBe "must"
   }
+
+  test("Constraint.apply") {
+    val piece = Atom(InfoSize(), EmptyContents)
+
+    val c1 = new Constraint[Any] {
+      override def check(value: Any): Boolean = true
+      override def note(quality: Quality.Value): String = throw new NotImplementedError()
+    }
+    val c2 = new Constraint[Any] {
+      override def check(value: Any): Boolean = false
+      override def note(quality: Quality.Value): String = quality.toString
+    }
+
+    c1.apply(piece, Quality.Bad) mustBe piece
+    c2.apply(c2.apply(piece, Quality.Good), Quality.Dubious) mustBe
+      piece.withNote(Note(Quality.Good, "Good")).withNote(Note(Quality.Dubious, "Dubious"))
+  }
 }

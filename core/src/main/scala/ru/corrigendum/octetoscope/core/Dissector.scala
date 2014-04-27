@@ -20,29 +20,11 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-// A dissector that may or may not return a value. The O is for Option.
-trait DissectorO[+Value] {
-  def dissectO(input: Blob, offset: InfoSize = InfoSize()): (Piece, Option[Value])
+trait Dissector[+V, +C <: Contents[V]] {
+  def dissect(input: Blob, offset: InfoSize = InfoSize()): Piece[C]
 
-  def +?(constraint: Constraint[Value]): DissectorO[Value] =
-    SpecialDissectors.constrainedO(this, constraint, Quality.Dubious)
-  def +(constraint: Constraint[Value]): DissectorO[Value] =
-    SpecialDissectors.constrainedO(this, constraint, Quality.Bad)
-  def +!(constraint: Constraint[Value]): DissectorO[Value] =
-    SpecialDissectors.stronglyConstrainedO(this, constraint, Quality.Bad)
-}
-
-// A dissector that will always return a value.
-trait Dissector[+Value] extends DissectorO[Value] {
-  final override def dissectO(input: Blob, offset: InfoSize = InfoSize()): (Piece, Option[Value]) = {
-    val (piece, value) = dissect(input, offset)
-    (piece, Some(value))
-  }
-
-  def dissect(input: Blob, offset: InfoSize = InfoSize()): (Piece, Value)
-
-  override def +?(constraint: Constraint[Value]): Dissector[Value] =
+  def +?(constraint: Constraint[V]): Dissector[V, C] =
     SpecialDissectors.constrained(this, constraint, Quality.Dubious)
-  override def +(constraint: Constraint[Value]): Dissector[Value] =
+  def +(constraint: Constraint[V]): Dissector[V, C] =
     SpecialDissectors.constrained(this, constraint, Quality.Bad)
 }

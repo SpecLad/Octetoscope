@@ -25,28 +25,27 @@ import PrimitiveDissectors._
 import CompoundDissectors._
 
 class CompoundDissectorsSuite extends FunSuite {
-  def arrayTest[T](dissector: Dissector[T], repr: Option[String], value: T) {
+  def arrayTest[C <: Contents[Any]](dissector: Dissector[Any, C], contents: C) {
     val blob = new ArrayBlob("afoobarbazb".getBytes(StandardCharsets.US_ASCII))
 
-    dissector.dissect(blob, Bytes(1)) mustBe (
-      Molecule(Bytes(9), repr, Seq(
-        SubPiece("Item #0", Bytes(0), Atom(Bytes(3), Some("\"foo\""))),
-        SubPiece("Item #1", Bytes(3), Atom(Bytes(3), Some("\"bar\""))),
-        SubPiece("Item #2", Bytes(6), Atom(Bytes(3), Some("\"baz\"")))
-      )),
-      value)
+    dissector.dissect(blob, Bytes(1)) mustBe
+      Molecule(Bytes(9), contents, Seq(
+        SubPiece("Item #0", Bytes(0), Atom(Bytes(3), new EagerContents("foo", Some("\"foo\"")))),
+        SubPiece("Item #1", Bytes(3), Atom(Bytes(3), new EagerContents("bar", Some("\"bar\"")))),
+        SubPiece("Item #2", Bytes(6), Atom(Bytes(3), new EagerContents("baz", Some("\"baz\""))))
+      ))
   }
 
   test("array") {
-    arrayTest(array(3, "Item", asciiString(3)), None, ())
+    arrayTest(array(3, "Item", asciiString(3)), EmptyContents)
   }
 
   test("collectingArray") {
-    arrayTest(collectingArray(3, "Item", asciiString(3)), None, Seq("foo", "bar", "baz"))
+    arrayTest(collectingArray(3, "Item", asciiString(3)), new EagerContents(Seq("foo", "bar", "baz"), None))
   }
 
   test("collectingArray - with repr func") {
     arrayTest(collectingArray(3, "Item", asciiString(3), (seq: Seq[Any]) => seq.mkString(" - ")),
-      Some("foo - bar - baz"), Seq("foo", "bar", "baz"))
+      new EagerContents(Seq("foo", "bar", "baz"), Some("foo - bar - baz")))
   }
 }

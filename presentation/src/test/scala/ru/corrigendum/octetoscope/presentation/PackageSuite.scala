@@ -34,18 +34,18 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - atom - with value") {
-    presentPiece(Atom(Bytes(5), Some("alpha"))) mustBe DisplayTreeNode("WHOLE: alpha", Nil, None)
+    presentPiece(Atom(Bytes(5), new EagerContents((), Some("alpha")))) mustBe DisplayTreeNode("WHOLE: alpha", Nil, None)
   }
 
   test("presentPiece - atom - without value") {
-    presentPiece(Atom(Bytes(2), None)) mustBe DisplayTreeNode("WHOLE", Nil, None)
+    presentPiece(Atom(Bytes(2), EmptyContents)) mustBe DisplayTreeNode("WHOLE", Nil, None)
   }
 
   test("presentPiece - molecule") {
     val molecule =
-      Molecule(Bytes(100), Some("beta"), Seq(
-        SubPiece("one", Bytes(0), Atom(Bytes(10), Some("gamma"))),
-        SubPiece("two", Bytes(50), Atom(Bytes(10), None))))
+      Molecule(Bytes(100), new EagerContents((), Some("beta")), Seq(
+        SubPiece("one", Bytes(0), Atom(Bytes(10), new EagerContents((), Some("gamma")))),
+        SubPiece("two", Bytes(50), Atom(Bytes(10), EmptyContents))))
 
     val displayed = presentPiece(molecule)
     displayed.text mustBe "WHOLE: beta"
@@ -58,12 +58,12 @@ class PackageSuite extends FunSuite {
 
   test("presentPiece - with note") {
     for (quality <- Quality.values)
-      presentPiece(Atom(Bytes(2), None, notes = Seq(Note(quality, "note")))) mustBe
+      presentPiece(Atom(Bytes(2), EmptyContents, notes = Seq(Note(quality, "note")))) mustBe
         DisplayTreeNode("WHOLE", Seq((QualityColors(quality), "note")), None)
   }
 
   test("presentPiece - multiple notes") {
-    val actual = presentPiece(Atom(Bytes(2), None, notes =
+    val actual = presentPiece(Atom(Bytes(2), EmptyContents, notes =
       Seq(Note(Quality.Good, "note 1"), Note(Quality.Bad, "note 2"))))
     val expected = DisplayTreeNode("WHOLE",
       Seq((QualityColors(Quality.Good), "note 1"), (QualityColors(Quality.Bad), "note 2")), None)

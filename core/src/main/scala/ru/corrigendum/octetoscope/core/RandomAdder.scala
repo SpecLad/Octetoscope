@@ -20,9 +20,9 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-class RandomAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder) {
+class RandomAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder[Any]) {
   def apply[Value](name: String, offset: InfoSize, dissector: MoleculeBuilderDissector[Value]): Value = {
-    val (piece, value) = try {
+    val piece = try {
        dissector.dissect(blob, initialOffset + offset)
     } catch {
       case _: IndexOutOfBoundsException =>
@@ -31,6 +31,6 @@ class RandomAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder)
     }
 
     builder.addChild(name, offset, piece)
-    value
+    piece.contents.value
   }
 }

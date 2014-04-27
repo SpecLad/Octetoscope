@@ -23,6 +23,7 @@ import org.scalatest.MustMatchers._
 import org.scalatest.Inside._
 import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
+import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class AdderSuite extends FunSuite {
@@ -32,11 +33,11 @@ class AdderSuite extends FunSuite {
 
     val adder = new SequentialAdder(blob, Bytes(1), builder)
     adder("alpha", sInt32L) mustBe 1
-    adder("beta", sInt32L.asInstanceOf[DissectorO[Int]]) mustBe Some(2)
+    adder("beta", sInt32L) mustBe 2
 
-    builder.build() mustBe Molecule(Bytes(8), None, Seq(
-      SubPiece("alpha", Bytes(0), Atom(Bytes(4), Some("1"))),
-      SubPiece("beta", Bytes(4), Atom(Bytes(4), Some("2")))
+    builder.build() mustBe Molecule(Bytes(8), EmptyContents, Seq(
+      SubPiece("alpha", Bytes(0), Atom(Bytes(4), new ToStringContents[Int](1))),
+      SubPiece("beta", Bytes(4), Atom(Bytes(4), new ToStringContents[Int](2)))
     ))
   }
 
@@ -49,20 +50,32 @@ class AdderSuite extends FunSuite {
     exc.subPieceName mustBe "alpha"
   }
 
-  test("sequential adder - throw - DissectorO") {
+  test("sequential adder - throw") {
     sequentialAdderThrowTest { (adder, cause) =>
-      adder("alpha", new DissectorO[Unit] {
-        override def dissectO(input: Blob, offset: InfoSize): (Piece, Option[Unit]) = throw cause
+      adder("alpha", new DissectorC[Unit] {
+        override def dissect(input: Blob, offset: InfoSize) = throw cause
       })
     }
   }
 
-  test("sequential adder - throw - Dissector") {
-    sequentialAdderThrowTest { (adder, cause) =>
-      adder("alpha", new Dissector[Unit] {
-        override def dissect(input: Blob, offset: InfoSize): (Piece, Unit) = throw cause
-      })
-    }
+  test("sequential adder - filtered") {
+    val blob = new ArrayBlob(Array[Byte](1, 2, 3))
+    val builder = new MoleculeBuilder
+
+    val adder = new SequentialAdder(blob, Bytes(0), builder)
+    val c1 = lessThan(2.toByte, "two")
+    val c2 = lessThan(3.toByte, "three")
+
+    adder.filtered("alpha", sInt8)(c1, c2) mustBe Some(1)
+    adder.filtered("beta", sInt8)(c1, c2) mustBe None
+    adder.filtered("gamma", sInt8)(c1, c2) mustBe None
+
+    val molecule = builder.build()
+
+    molecule.children(0).piece.notes mustBe Nil
+    molecule.children(1).piece.notes mustBe Seq(Note(Quality.Bad, c1.note(Quality.Bad)))
+    molecule.children(2).piece.notes mustBe Seq(
+      Note(Quality.Bad, c1.note(Quality.Bad)), Note(Quality.Bad, c2.note(Quality.Bad)))
   }
 
   test("random adder") {
@@ -72,19 +85,19 @@ class AdderSuite extends FunSuite {
 
     val dissector = new MoleculeBuilderDissector[Value] {
       def defaultValue: Value = Value(0)
-      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
+      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Value], value: Value) {
         value.i = 1
         offset mustBe Bytes(3)
-        builder.addChild("alpha", Bytes(0), Atom(Bytes(1), None))
+        builder.addChild("alpha", Bytes(0), Atom(Bytes(1), EmptyContents))
       }
     }
 
     val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
     adder("omega", Bytes(2), dissector) mustBe Value(1)
 
-    builder.build() mustBe Molecule(Bytes(3), None, Seq(
-      SubPiece("omega", Bytes(2), Molecule(Bytes(1), None, Seq(
-        SubPiece("alpha", Bytes(0), Atom(Bytes(1), None))
+    builder.build() mustBe Molecule(Bytes(3), EmptyContents, Seq(
+      SubPiece("omega", Bytes(2), Molecule(Bytes(1), new EagerContents(Value(1)), Seq(
+        SubPiece("alpha", Bytes(0), Atom(Bytes(1), EmptyContents))
       )))
     ))
   }
@@ -96,7 +109,7 @@ class AdderSuite extends FunSuite {
 
     val dissector = new MoleculeBuilderDissector[Value] {
       def defaultValue: Value = Value(0)
-      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
+      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Value], value: Value) {
         value.i = 1
         throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "alpha")
       }

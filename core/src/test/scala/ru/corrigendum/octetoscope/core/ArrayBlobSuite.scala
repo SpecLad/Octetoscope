@@ -34,8 +34,8 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("apply - out of range") {
-    an [IndexOutOfBoundsException] should be thrownBy { blob(5) }
-    an [IndexOutOfBoundsException] should be thrownBy { blob(-1) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob(5) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob(-1) }
   }
 
   test("toArray") {
@@ -55,10 +55,10 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("slice - out of range") {
-    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(-1, 4) }
-    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(5, 6) }
-    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(2, 6) }
-    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(-2, -1) }
-    an [IndexOutOfBoundsException] should be thrownBy { blob.slice(4, 2) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(-1, 4) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(5, 6) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(2, 6) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(-2, -1) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(4, 2) }
   }
 }

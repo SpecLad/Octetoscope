@@ -54,7 +54,7 @@ object MDL extends MoleculeBuilderUnitDissector {
       add("Skin width", sInt32L + positive +? divisibleBy(4))
       add("Skin height", sInt32L + positive +? noMoreThan(480, "MAX_LBM_HEIGHT"))
 
-      add.filtered("Number of vertices", sInt32L +? noMoreThan(200, "MAXALIASVERTS"))(positive)
+      add.filtered("Number of vertices", sInt32L +? noMoreThan(2000, "MAXALIASVERTS"))(positive)
       add.filtered("Number of triangles", sInt32L)(positive)
       add.filtered("Number of frames", sInt32L)(positive)
 

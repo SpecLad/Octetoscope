@@ -48,17 +48,6 @@ object MD2 extends MoleculeBuilderUnitDissector {
       val version = add("Version", sInt32L + equalTo(8, "ALIAS_VERSION"))
       if (version != 8) return
 
-      /*
-        Quake II doesn't check every field below to be positive,
-        but the dissector does it anyway, because negative values make
-        no sense for them.
-
-        The "no more than" checks only produce warnings, because they're
-        engine limitations and not imposed by the format itself. Source
-        ports, for example, could omit these checks and support a wider
-        range of values.
-      */
-
       add("Skin width", sInt32L + positive)
       add("Skin height", sInt32L + positive +? noMoreThan(480, "MAX_LBM_HEIGHT"))
       value.frameSize = add.filtered("Frame size", sInt32L)(nonNegative)

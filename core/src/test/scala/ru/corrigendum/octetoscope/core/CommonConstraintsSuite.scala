@@ -59,4 +59,15 @@ class CommonConstraintsSuite extends FunSuite {
     c.shouldNote must (include ("1") and include ("ONE"))
     c.mustNote must (include ("1") and include ("ONE"))
   }
+
+  test("divisibleBy") {
+    val c = CommonConstraints.divisibleBy(5)
+    c.check(0) mustBe true
+    c.check(1) mustBe false
+    c.check(-1) mustBe false
+    c.check(10) mustBe true
+    c.check(-10) mustBe true
+    c.shouldNote must include("5")
+    c.mustNote must include("5")
+  }
 }

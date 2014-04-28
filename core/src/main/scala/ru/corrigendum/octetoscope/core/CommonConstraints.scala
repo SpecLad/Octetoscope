@@ -70,4 +70,11 @@ object CommonConstraints {
       override def mustNote: String = "must be less than %s (%s)".format(limit, meaning)
       override def check(value: T): Boolean = ord.lt(value, limit)
     }
+
+  def divisibleBy[T](factor: T)(implicit arithm: Integral[T]): ShouldMustConstraint[T] = new ShouldMustConstraint[T] {
+    override def check(value: T): Boolean = arithm.rem(value, factor) == 0
+    override def shouldNote: String = "should be divisible by %s".format(factor)
+    override def mustNote: String = "must be divisible by %s".format(factor)
+  }
+
 }

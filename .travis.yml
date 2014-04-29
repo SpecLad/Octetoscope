@@ -4,3 +4,5 @@ language: scala
 jdk:
   - openjdk7
   - oraclejdk7
+install: ./gradlew --stacktrace assemble
+script: ./gradlew --stacktrace check

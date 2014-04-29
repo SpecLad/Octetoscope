@@ -51,7 +51,7 @@ class MainPresenter(strings: PresentationStrings,
             case None =>
             case Some(path) =>
               val piece = try {
-                dissectorDriver.dissect(path)
+                dissectorDriver(path)
               } catch {
                 case ioe: IOException =>
                   boxer.showMessageBox(strings.errorReadingFile(ioe.getMessage))

@@ -95,7 +95,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     val tab = view.tabs.loneElement
     tab.title mustBe "cadabra"
     tab.toolTip mustBe MainPresenterSuite.FakePath.toString
-    tab.tree mustBe presentPiece(dissectorDriver.dissect(MainPresenterSuite.FakePath))
+    tab.tree mustBe presentPiece(dissectorDriver(MainPresenterSuite.FakePath))
 
     view.title mustBe "Blarf - cadabra"
   }

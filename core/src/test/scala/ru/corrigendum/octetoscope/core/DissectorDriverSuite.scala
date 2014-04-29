@@ -27,8 +27,8 @@ import java.io.File
 class DissectorDriverSuite extends FunSuite {
   test("dissect") {
     val reader = new MockBinaryReader(new ArrayBlob("magic".getBytes(StandardCharsets.US_ASCII)))
-    val driver = new DissectorDriverImpl(reader, MockDissector)
-    driver.dissect(DissectorDriverSuite.FakePath) mustBe Atom(Bytes(5), new ToStringContents("magic"))
+    val driver = getDissectorDriver(reader, MockDissector)
+    driver(DissectorDriverSuite.FakePath) mustBe Atom(Bytes(5), new ToStringContents("magic"))
   }
 }
 

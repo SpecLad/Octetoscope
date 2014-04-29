@@ -18,6 +18,9 @@
 
 package ru.corrigendum.octetoscope
 
+import java.io.File
+import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
+
 package object core {
   type PieceC[V] = Piece[Contents[V]]
   type AtomC[V] = Atom[Contents[V]]
@@ -33,4 +36,9 @@ package object core {
   type PlainAtom = AtomC[Any]
   type PlainMolecule = MoleculeC[Any]
   type PlainDissector = DissectorC[Any]
+
+  type DissectorDriver = File => PlainPiece
+
+  def getDissectorDriver(reader: BinaryReader, defaultDissector: PlainDissector): DissectorDriver =
+    (path: File) => defaultDissector.dissect(reader.readWhole(path))
 }

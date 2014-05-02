@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.dissectors
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core._
 
-object Common {
+private object Common {
   class Vector3[T](component: DissectorCR[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {
     import Vector3.Value
 

@@ -24,7 +24,7 @@ import ru.corrigendum.octetoscope.abstractui.MainView
 import org.scalatest.MustMatchers._
 import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
-import ru.corrigendum.octetoscope.core.{EagerContents, Bytes, Atom, VersionInfo}
+import ru.corrigendum.octetoscope.core._
 import java.io.{IOException, File}
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
@@ -77,9 +77,9 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     boxer.messages mustBe List(strings.errorReadingFile(exception.getMessage))
   }
 
-  test("open command - IndexOutOfBoundsException") {
+  test("open command - TooSmallToDissectException") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
-    dissectorDriver.exception = Some(new IndexOutOfBoundsException)
+    dissectorDriver.exception = Some(new TooSmallToDissectException(null))
 
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 

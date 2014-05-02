@@ -23,12 +23,22 @@ import org.scalatest.FunSuite
 import ru.corrigendum.octetoscope.core.mocks.{MockDissector, MockBinaryReader}
 import java.nio.charset.StandardCharsets
 import java.io.File
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class DissectorDriverSuite extends FunSuite {
-  test("dissect") {
+  test("success") {
     val reader = new MockBinaryReader(new ArrayBlob("magic".getBytes(StandardCharsets.US_ASCII)))
     val driver = getDissectorDriver(reader, MockDissector)
     driver(DissectorDriverSuite.FakePath) mustBe Atom(Bytes(5), new ToStringContents("magic"))
+  }
+
+  test("failure - file too small") {
+    val reader = new MockBinaryReader(Blob.empty)
+    val driver = getDissectorDriver(reader, new PlainDissector {
+      override def dissect(input: Blob, offset: InfoSize): PlainPiece = throw new IndexOutOfBoundsException
+    })
+
+    a [TooSmallToDissectException] must be thrownBy driver(DissectorDriverSuite.FakePath)
   }
 }
 

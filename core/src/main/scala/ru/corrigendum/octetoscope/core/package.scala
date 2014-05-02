@@ -39,6 +39,15 @@ package object core {
 
   type DissectorDriver = File => PlainPiece
 
+  class TooSmallToDissectException(cause: Throwable) extends Exception(cause)
+
   def getDissectorDriver(reader: BinaryReader, defaultDissector: PlainDissector): DissectorDriver =
-    (path: File) => defaultDissector.dissect(reader.readWhole(path))
+    (path: File) =>
+      try {
+        defaultDissector.dissect(reader.readWhole(path))
+      } catch {
+        // This should happen rarely, if ever, since most dissectors will return truncated
+        // molecules instead of throwing.
+        case iobe: IndexOutOfBoundsException => throw new TooSmallToDissectException(iobe)
+      }
 }

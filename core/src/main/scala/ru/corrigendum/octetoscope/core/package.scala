@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope
 
 import java.io.File
-import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
+import ru.corrigendum.octetoscope.abstractinfra.{Blob, BinaryReader}
 
 package object core {
   type PieceC[V] = Piece[Contents[V]]
@@ -37,14 +37,19 @@ package object core {
   type PlainMolecule = MoleculeC[Any]
   type PlainDissector = DissectorC[Any]
 
+  type Detector = Blob => Option[PlainDissector]
+
   type DissectorDriver = File => PlainPiece
 
   class TooSmallToDissectException(cause: Throwable) extends Exception(cause)
+  class DetectionFailedException extends Exception
 
-  def getDissectorDriver(reader: BinaryReader, defaultDissector: PlainDissector): DissectorDriver =
+  def getDissectorDriver(reader: BinaryReader, detector: Detector): DissectorDriver =
     (path: File) =>
       try {
-        defaultDissector.dissect(reader.readWhole(path))
+        val blob = reader.readWhole(path)
+        val dissector = detector(blob).getOrElse(throw new DetectionFailedException)
+        dissector.dissect(blob)
       } catch {
         // This should happen rarely, if ever, since most dissectors will return truncated
         // molecules instead of throwing.

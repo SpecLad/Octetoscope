@@ -28,17 +28,24 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 class DissectorDriverSuite extends FunSuite {
   test("success") {
     val reader = new MockBinaryReader(new ArrayBlob("magic".getBytes(StandardCharsets.US_ASCII)))
-    val driver = getDissectorDriver(reader, MockDissector)
+    val driver = getDissectorDriver(reader, Function.const(Some(MockDissector)))
     driver(DissectorDriverSuite.FakePath) mustBe Atom(Bytes(5), new ToStringContents("magic"))
   }
 
   test("failure - file too small") {
     val reader = new MockBinaryReader(Blob.empty)
-    val driver = getDissectorDriver(reader, new PlainDissector {
+    val driver = getDissectorDriver(reader, Function.const(Some(new PlainDissector {
       override def dissect(input: Blob, offset: InfoSize): PlainPiece = throw new IndexOutOfBoundsException
-    })
+    })))
 
     a [TooSmallToDissectException] must be thrownBy driver(DissectorDriverSuite.FakePath)
+  }
+
+  test("failure - detection failed") {
+    val reader = new MockBinaryReader(Blob.empty)
+    val driver = getDissectorDriver(reader, Function.const(None))
+
+    a [DetectionFailedException] must be thrownBy driver(DissectorDriverSuite.FakePath)
   }
 }
 

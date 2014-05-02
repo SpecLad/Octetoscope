@@ -87,6 +87,16 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     boxer.messages mustBe List(strings.fileTooSmallToDissect())
   }
 
+  test("open command - DetectionFailedException") {
+    view.selectedFile = Some(MainPresenterSuite.FakePath)
+    dissectorDriver.exception = Some(new DetectionFailedException)
+
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+
+    view.tabs must have size 0
+    boxer.messages mustBe List(strings.cantDetectFileFormat())
+  }
+
   test("open command - successful") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
     dissectorDriver.result = MainPresenterSuite.FakePiece

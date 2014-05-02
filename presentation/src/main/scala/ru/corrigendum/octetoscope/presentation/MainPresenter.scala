@@ -20,7 +20,7 @@ package ru.corrigendum.octetoscope.presentation
 
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.abstractui.MainView._
-import ru.corrigendum.octetoscope.core.{TooSmallToDissectException, DissectorDriver, VersionInfo}
+import ru.corrigendum.octetoscope.core.{DetectionFailedException, TooSmallToDissectException, DissectorDriver, VersionInfo}
 import ru.corrigendum.octetoscope.abstractui.MainView.CommandEvent
 import java.io.IOException
 
@@ -58,6 +58,9 @@ class MainPresenter(strings: PresentationStrings,
                   return
                 case _: TooSmallToDissectException =>
                   boxer.showMessageBox(strings.fileTooSmallToDissect())
+                  return
+                case _: DetectionFailedException =>
+                  boxer.showMessageBox(strings.cantDetectFileFormat())
                   return
               }
 

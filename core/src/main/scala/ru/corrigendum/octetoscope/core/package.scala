@@ -55,4 +55,12 @@ package object core {
         // molecules instead of throwing.
         case iobe: IndexOutOfBoundsException => throw new TooSmallToDissectException(iobe)
       }
+
+  def getDetector(magicMap: Seq[Pair[Array[Byte], PlainDissector]]): Detector =
+    (blob: Blob) => {
+      magicMap.find {
+        case (magic, dissector) =>
+          magic.length <= blob.size && blob.slice(0, magic.length).toArray.sameElements(magic)
+      }.map(_._2)
+    }
 }

@@ -59,7 +59,7 @@ package object core {
   def getDetector(magicMap: Seq[Pair[Array[Byte], PlainDissector]]): Detector =
     (blob: Blob) => {
       magicMap.find {
-        case (magic, dissector) =>
+        case (magic, _) =>
           magic.length <= blob.size && blob.slice(0, magic.length).toArray.sameElements(magic)
       }.map(_._2)
     }

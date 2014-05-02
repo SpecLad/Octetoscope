@@ -32,17 +32,17 @@ import Common.Vector3
   available at <https://github.com/id-Software/Quake-2>.
 */
 
-object MD2 extends MoleculeBuilderUnitDissector {
+private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
+  val MagicBytes = Array[Byte]('I', 'D', 'P', '2')
+
   // Quake II's struct dmdl_t.
   private object Header extends MoleculeBuilderDissector[HeaderValue] {
-    private val magicBytes = Array[Byte]('I', 'D', 'P', '2')
-
     override def defaultValue = new HeaderValue
 
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[HeaderValue], value: HeaderValue) {
       val add = new SequentialAdder(input, offset, builder)
 
-      val correctMagic = add("Identification", magic(magicBytes, "IDP2")).isDefined
+      val correctMagic = add("Identification", magic(MagicBytes, "IDP2")).isDefined
       if (!correctMagic) return
 
       val version = add("Version", sInt32L + equalTo(8, "ALIAS_VERSION"))

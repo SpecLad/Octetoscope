@@ -31,15 +31,15 @@ import ru.corrigendum.octetoscope.dissectors.Common.Vector3
   available at <https://github.com/id-Software/Quake>.
 */
 
-object MDL extends MoleculeBuilderUnitDissector {
+private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
+  val MagicBytes = Array[Byte]('I', 'D', 'P', 'O')
+
   // Quake II's struct mdl_t.
   private object Header extends MoleculeBuilderUnitDissector {
-    private val magicBytes = Array[Byte]('I', 'D', 'P', 'O')
-
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       val add = new SequentialAdder(input, offset, builder)
 
-      val correctMagic = add("Identification", magic(magicBytes, "IDPO")).isDefined
+      val correctMagic = add("Identification", magic(MagicBytes, "IDPO")).isDefined
       if (!correctMagic) return
 
       val version = add("Version", sInt32L + equalTo(6, "ALIAS_VERSION"))

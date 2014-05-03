@@ -21,6 +21,7 @@ package ru.corrigendum.octetoscope.dissectors
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
+import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.dissectors.Common.Vector3
 
@@ -58,7 +59,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       add.filtered("Number of triangles", sInt32L)(positive)
       add.filtered("Number of frames", sInt32L)(positive)
 
-      add("Synchronization type", sInt32L) // TODO: change into an enum
+      add("Synchronization type", enum(sInt32L, Map(0 -> "ST_SYNC", 1 -> "ST_RAND")))
       add("Flags", sInt32L) // TODO: change into flags
       add("Size", float32L)
     }

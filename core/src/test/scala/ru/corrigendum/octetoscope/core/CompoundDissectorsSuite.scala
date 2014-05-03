@@ -20,6 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
+import org.scalatest.LoneElement._
 import java.nio.charset.StandardCharsets
 import PrimitiveDissectors._
 import CompoundDissectors._
@@ -47,5 +48,16 @@ class CompoundDissectorsSuite extends FunSuite {
   test("collectingArray - with repr func") {
     arrayTest(collectingArray(3, "Item", asciiString(3), (seq: Seq[Any]) => seq.mkString(" - ")),
       new EagerContents(Seq("foo", "bar", "baz"), Some("foo - bar - baz")))
+  }
+
+  test("enum") {
+    val blob = new ArrayBlob(Array[Byte](1, 2))
+    val dissector = enum(sInt8, Map(1.toByte -> "FOO"))
+    dissector.dissect(blob, Bytes(0)) mustBe Atom(Bytes(1), new EagerContents((), Some("1 -> FOO")))
+
+    val unknown = dissector.dissect(blob, Bytes(1))
+    unknown.size mustBe Bytes(1)
+    unknown.contents mustBe new EagerContents((), Some("2"))
+    unknown.notes.loneElement.pieceQuality mustBe Quality.Broken
   }
 }

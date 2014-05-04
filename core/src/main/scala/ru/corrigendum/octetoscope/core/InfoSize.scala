@@ -47,7 +47,7 @@ object InfoSize {
   def unapply(size: InfoSize): Option[(Long, Int)] = Some((size.bytes, size.bits))
   val BitsPerByte: Long = 8
 
-  private val _cache: Array[InfoSize] = Array.tabulate[InfoSize](256) { new InfoSize(_) }
+  private val _cache: Array[InfoSize] = Array.tabulate(256) { new InfoSize(_) }
 }
 
 object Bytes {

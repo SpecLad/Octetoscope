@@ -18,28 +18,33 @@
 
 package ru.corrigendum.octetoscope.core
 
-sealed class InfoSize(val bytes: Long = 0) extends Ordered[InfoSize] {
+sealed class InfoSize(val bytes: Long = 0, val bits: Int = 0) extends Ordered[InfoSize] {
   require(bytes >= 0)
+  require(bits >= 0 && bits < 8)
 
-  def totalBits: Long = bytes * InfoSize.BitsPerByte
-  def - (that: InfoSize): InfoSize = InfoSize(this.bytes - that.bytes)
-  def + (that: InfoSize): InfoSize = InfoSize(this.bytes + that.bytes)
+  def totalBits: Long = bytes * InfoSize.BitsPerByte + bits
+  def - (that: InfoSize): InfoSize = Bits(this.totalBits - that.totalBits)
+  def + (that: InfoSize): InfoSize = Bits(this.totalBits + that.totalBits)
 
-  override def compare(that: InfoSize): Int = this.bytes.compareTo(that.bytes)
+  override def compare(that: InfoSize): Int = this.totalBits.compareTo(that.totalBits)
 
   override def equals(obj: Any): Boolean = obj match {
-    case that: InfoSize => this.bytes == that.bytes
+    case that: InfoSize => this.bytes == that.bytes && this.bits == that.bits
     case _ => false
   }
 
-  override def hashCode(): Int = bytes.hashCode()
+  override def hashCode(): Int = (527 + bytes.hashCode()) * 31 + bits.hashCode()
 
-  override def toString: String = "Bytes(%d)".format(bytes)
+  override def toString: String =
+    if (bits == 0) if (bytes == 0) "InfoSize()" else "Bytes(%d)".format(bytes)
+    else if (bytes == 0) "Bits(%d)".format(bits) else "InfoSize(%d, %d)".format(bytes, bits)
 }
 
 object InfoSize {
-  def apply(bytes: Long = 0): InfoSize = if (bytes < _cache.length) _cache(bytes.toInt) else new InfoSize(bytes)
-  def unapply(size: InfoSize): Option[Long] = Some(size.bytes)
+  def apply(bytes: Long = 0, bits: Int = 0): InfoSize =
+    if (bytes < _cache.length && bits == 0) _cache(bytes.toInt) else new InfoSize(bytes, bits)
+
+  def unapply(size: InfoSize): Option[(Long, Int)] = Some((size.bytes, size.bits))
   val BitsPerByte: Long = 8
 
   private val _cache: Array[InfoSize] = Array.tabulate[InfoSize](256) { new InfoSize(_) }
@@ -47,5 +52,10 @@ object InfoSize {
 
 object Bytes {
   def apply(bytes: Long) = InfoSize(bytes)
-  def unapply(size: InfoSize) = InfoSize.unapply(size)
+  def unapply(size: InfoSize): Option[Long] = if (size.bits == 0) Some(size.bytes) else None
+}
+
+object Bits {
+  def apply(bits: Long) = InfoSize(bits / InfoSize.BitsPerByte, (bits % InfoSize.BitsPerByte).toInt)
+  def unapply(size: InfoSize): Option[Long] = Some(size.totalBits)
 }

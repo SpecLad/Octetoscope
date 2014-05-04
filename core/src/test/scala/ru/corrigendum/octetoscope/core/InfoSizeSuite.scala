@@ -22,34 +22,60 @@ import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
 
 class InfoSizeSuite extends FunSuite {
+  test("factories") {
+    InfoSize(3, 4) mustBe new InfoSize(3, 4)
+    Bytes(3) mustBe new InfoSize(3, 0)
+    Bits(3) mustBe new InfoSize(0, 3)
+    Bits(28) mustBe new InfoSize(3, 4)
+  }
+
+  test("extractors") {
+    InfoSize.unapply(InfoSize(3, 4)) mustBe Some((3, 4))
+    Bytes.unapply(InfoSize(3, 4)) mustBe None
+    Bytes.unapply(Bytes(3)) mustBe Some(3)
+    Bits.unapply(InfoSize(3, 4)) mustBe Some(28)
+  }
+
   test("totalBits") {
-    Bytes(0).totalBits mustBe 0
+    InfoSize().totalBits mustBe 0
     Bytes(3).totalBits mustBe 24
+    Bits(3).totalBits mustBe 3
+    InfoSize(3, 3).totalBits mustBe 27
   }
 
   test("plus") {
-    (Bytes(4) + InfoSize()) mustBe Bytes(4)
-    (Bytes(4) + Bytes(1)) mustBe Bytes(5)
+    val augend = InfoSize(3, 4)
+    (augend + InfoSize()) mustBe augend
+    (augend + InfoSize(1, 3)) mustBe InfoSize(4, 7)
+    (augend + InfoSize(1, 5)) mustBe InfoSize(5, 1)
   }
 
   test("minus") {
-    (Bytes(4) - Bytes(4)) mustBe InfoSize()
-    (Bytes(8) - Bytes(4)) mustBe Bytes(4)
+    val minuend = InfoSize(3, 4)
+    (minuend - InfoSize()) mustBe minuend
+    (minuend - InfoSize(1, 3)) mustBe InfoSize(2, 1)
+    (minuend - InfoSize(1, 5)) mustBe InfoSize(1, 7)
   }
 
   test("compare") {
-    Bytes(5) must be < Bytes(7)
-    Bytes(5) must be > Bytes(3)
-    Bytes(5).compareTo(Bytes(5)) mustBe 0
+    InfoSize(3, 5) must be < InfoSize(4, 3)
+    InfoSize(3, 5) must be < InfoSize(3, 7)
+    InfoSize(3, 5).compare(InfoSize(3, 5)) mustBe 0
+    InfoSize(3, 5) must be > InfoSize(3, 3)
+    InfoSize(3, 5) must be > InfoSize(2, 7)
   }
 
   test("equals") {
-    Bytes(3).equals(null) mustBe false
-    Bytes(3).equals(Bytes(1)) mustBe false
-    Bytes(3).equals(Bytes(3)) mustBe true
+    InfoSize(3, 5).equals(null) mustBe false
+    InfoSize(3, 5).equals(InfoSize(3, 4)) mustBe false
+    InfoSize(3, 5).equals(InfoSize(4, 5)) mustBe false
+    InfoSize(3, 5).equals(InfoSize(3, 5)) mustBe true
   }
 
   test("toString") {
-    Bytes(9).toString mustBe "Bytes(9)"
+    InfoSize().toString mustBe "InfoSize()"
+    InfoSize(9, 0).toString mustBe "Bytes(9)"
+    InfoSize(0, 5).toString mustBe "Bits(5)"
+    InfoSize(9, 5).toString mustBe "InfoSize(9, 5)"
   }
 }

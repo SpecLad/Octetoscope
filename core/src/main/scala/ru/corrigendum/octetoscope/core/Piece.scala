@@ -39,7 +39,7 @@ trait Contents[+V] {
 }
 
 trait ContentsR[+V] extends Contents[V] {
-  override def reprO: Option[String] = Some(repr)
+  final override def reprO: Option[String] = Some(repr)
   def repr: String
 }
 

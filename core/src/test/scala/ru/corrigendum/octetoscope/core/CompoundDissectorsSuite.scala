@@ -31,9 +31,9 @@ class CompoundDissectorsSuite extends FunSuite {
 
     dissector.dissect(blob, Bytes(1)) mustBe
       Molecule(Bytes(9), contents, Seq(
-        SubPiece("Item #0", Bytes(0), Atom(Bytes(3), new EagerContents("foo", Some("\"foo\"")))),
-        SubPiece("Item #1", Bytes(3), Atom(Bytes(3), new EagerContents("bar", Some("\"bar\"")))),
-        SubPiece("Item #2", Bytes(6), Atom(Bytes(3), new EagerContents("baz", Some("\"baz\""))))
+        SubPiece("Item #0", Bytes(0), Atom(Bytes(3), new EagerContentsR("foo", "\"foo\""))),
+        SubPiece("Item #1", Bytes(3), Atom(Bytes(3), new EagerContentsR("bar", "\"bar\""))),
+        SubPiece("Item #2", Bytes(6), Atom(Bytes(3), new EagerContentsR("baz", "\"baz\"")))
       ))
   }
 
@@ -57,11 +57,11 @@ class CompoundDissectorsSuite extends FunSuite {
     }
 
     val dissector = enum(sInt8, Map(1.toByte -> foo))
-    dissector.dissect(blob, Bytes(0)) mustBe Atom(Bytes(1), new EagerContents(Some(foo), Some("1 -> FOO")))
+    dissector.dissect(blob, Bytes(0)) mustBe Atom(Bytes(1), new EagerContentsR(Some(foo), "1 -> FOO"))
 
     val unknown = dissector.dissect(blob, Bytes(1))
     unknown.size mustBe Bytes(1)
-    unknown.contents mustBe new EagerContents(None, Some("2"))
+    unknown.contents mustBe new EagerContentsR(None, "2")
     unknown.notes.loneElement.pieceQuality mustBe Quality.Broken
   }
 }

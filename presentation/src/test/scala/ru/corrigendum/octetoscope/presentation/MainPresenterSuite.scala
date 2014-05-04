@@ -134,5 +134,5 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
 object MainPresenterSuite {
   private val FakePath = new File("/abra/cadabra")
-  private val FakePiece = Atom(Bytes(5), new EagerContents((), Some("dummy")))
+  private val FakePiece = Atom(Bytes(5), new EagerContentsR((), "dummy"))
 }

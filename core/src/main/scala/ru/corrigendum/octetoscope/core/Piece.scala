@@ -58,6 +58,11 @@ class EagerContents[+V](v: V, r: Option[String] = None) extends Contents[V] {
   override def reprO: Option[String] = r
 }
 
+class EagerContentsR[+V](v: V, r: String) extends ContentsR[V] {
+  override val value: V = v
+  override def repr: String = r
+}
+
 abstract sealed class Piece[+C <: Contents[Any]] {
   def size: InfoSize
   def contents: C

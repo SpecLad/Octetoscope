@@ -34,7 +34,7 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - atom - with value") {
-    presentPiece(Atom(Bytes(5), new EagerContents((), Some("alpha")))) mustBe DisplayTreeNode("WHOLE: alpha", Nil, None)
+    presentPiece(Atom(Bytes(5), new EagerContentsR((), "alpha"))) mustBe DisplayTreeNode("WHOLE: alpha", Nil, None)
   }
 
   test("presentPiece - atom - without value") {
@@ -43,8 +43,8 @@ class PackageSuite extends FunSuite {
 
   test("presentPiece - molecule") {
     val molecule =
-      Molecule(Bytes(100), new EagerContents((), Some("beta")), Seq(
-        SubPiece("one", Bytes(0), Atom(Bytes(10), new EagerContents((), Some("gamma")))),
+      Molecule(Bytes(100), new EagerContentsR((), "beta"), Seq(
+        SubPiece("one", Bytes(0), Atom(Bytes(10), new EagerContentsR((), "gamma"))),
         SubPiece("two", Bytes(50), Atom(Bytes(10), EmptyContents))))
 
     val displayed = presentPiece(molecule)

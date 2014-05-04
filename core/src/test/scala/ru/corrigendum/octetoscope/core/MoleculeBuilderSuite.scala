@@ -54,7 +54,7 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   }
 
   test("with children") {
-    val alpha = SubPiece("alpha", Bytes(0), Atom(Bytes(1), new EagerContents((), Some("a"))))
+    val alpha = SubPiece("alpha", Bytes(0), Atom(Bytes(1), new EagerContentsR((), "a")))
     val beta = SubPiece("beta", Bytes(2), Atom(Bytes(2), EmptyContents))
     val gamma = SubPiece("gamma", Bytes(1), Atom(Bytes(1), EmptyContents))
 

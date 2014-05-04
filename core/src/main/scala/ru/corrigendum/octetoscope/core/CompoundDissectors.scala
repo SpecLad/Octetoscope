@@ -56,26 +56,26 @@ object CompoundDissectors {
   ): MoleculeBuilderDissector[mutable.Buffer[V]] =
     new CollectingArray[V](size, itemName, itemDissector, Some(reprFunc))
 
-  private class Enum[V](underlying: DissectorCR[V], enumerators: Map[V, String]) extends DissectorCR[Unit] {
-    override def dissect(input: Blob, offset: InfoSize): AtomCR[Unit] = {
+  private class Enum[V, E](underlying: DissectorCR[V], enumerators: Map[V, E]) extends DissectorCR[Option[E]] {
+    override def dissect(input: Blob, offset: InfoSize): AtomCR[Option[E]] = {
       val piece = underlying.dissect(input, offset)
       val contents = piece.contents
 
       enumerators.get(contents.value) match {
         case Some(enumerator) =>
-          Atom(piece.size, new ContentsR[Unit] {
-            override def repr: String = contents.repr + " -> " + enumerator
-            override val value: Unit = ()
+          Atom(piece.size, new ContentsR[Option[E]] {
+            override def repr: String = contents.repr + " -> " + enumerator.toString
+            override val value: Option[E] = Some(enumerator)
           })
         case None =>
-          Atom(piece.size, new ContentsR[Unit] {
+          Atom(piece.size, new ContentsR[Option[E]] {
             override def repr: String = contents.repr
-            override val value: Unit = ()
+            override val value: Option[E] = None
           }, Seq(Note(Quality.Broken, "unknown enumerator")))
       }
     }
   }
 
-  def enum[V](underlying: DissectorCR[V], enumerators: Map[V, String]): DissectorCR[Unit] =
-    new Enum[V](underlying, enumerators)
+  def enum[V, E](underlying: DissectorCR[V], enumerators: Map[V, E]): DissectorCR[Option[E]] =
+    new Enum[V, E](underlying, enumerators)
 }

@@ -52,12 +52,16 @@ class CompoundDissectorsSuite extends FunSuite {
 
   test("enum") {
     val blob = new ArrayBlob(Array[Byte](1, 2))
-    val dissector = enum(sInt8, Map(1.toByte -> "FOO"))
-    dissector.dissect(blob, Bytes(0)) mustBe Atom(Bytes(1), new EagerContents((), Some("1 -> FOO")))
+    val foo = new Object {
+      override def toString: String = "FOO"
+    }
+
+    val dissector = enum(sInt8, Map(1.toByte -> foo))
+    dissector.dissect(blob, Bytes(0)) mustBe Atom(Bytes(1), new EagerContents(Some(foo), Some("1 -> FOO")))
 
     val unknown = dissector.dissect(blob, Bytes(1))
     unknown.size mustBe Bytes(1)
-    unknown.contents mustBe new EagerContents((), Some("2"))
+    unknown.contents mustBe new EagerContents(None, Some("2"))
     unknown.notes.loneElement.pieceQuality mustBe Quality.Broken
   }
 }

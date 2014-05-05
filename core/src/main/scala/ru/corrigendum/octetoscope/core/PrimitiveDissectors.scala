@@ -190,4 +190,15 @@ object PrimitiveDissectors {
   }
 
   def magic(expected: Array[Byte], interpretation: String): DissectorC[Option[Unit]] = new Magic(expected, interpretation)
+
+  private object Bit extends DissectorCR[Boolean] {
+    override def dissect(input: Blob, offset: InfoSize): PieceCR[Boolean] = {
+      val byte = input(offset.bytes)
+      val bit = (byte & (1 << (7 - offset.bits))) != 0
+
+      Atom(Bits(1), new EagerContentsR(bit, if(bit) "Set" else "Unset"))
+    }
+  }
+
+  def bit: DissectorCR[Boolean] = Bit
 }

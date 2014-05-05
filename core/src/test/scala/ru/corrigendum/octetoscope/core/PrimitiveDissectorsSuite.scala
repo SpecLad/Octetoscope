@@ -106,6 +106,12 @@ class PrimitiveDissectorsSuite extends FunSuite {
     dissector.dissect(new ArrayBlob(Array[Byte](4, 5, 6))) mustBe
       Atom(Bytes(3), new EagerContents(None), Seq(Note(Quality.Broken, "expected \"123\" (0x010203)")))
   }
+
+  test("bit") {
+    val blob = new ArrayBlob(Array[Byte](0x40, 0x7B))
+    bit.dissect(blob, InfoSize(0, 1)) mustBe Atom(Bits(1), new EagerContentsR(true, "Set"))
+    bit.dissect(blob, InfoSize(1, 5)) mustBe Atom(Bits(1), new EagerContentsR(false, "Unset"))
+  }
 }
 
 object PrimitiveDissectorsSuite {

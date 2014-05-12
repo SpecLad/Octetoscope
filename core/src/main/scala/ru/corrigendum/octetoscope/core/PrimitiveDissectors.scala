@@ -175,16 +175,10 @@ object PrimitiveDissectors {
       val Bytes(bo) = offset
 
       if (input.slice(bo, bo + expected.length).toArray.sameElements(expected)) {
-        Atom(Bytes(expected.length), new Contents[Option[Unit]] {
-          override val value: Option[Unit] = Some(())
-          override def reprO: Option[String] = Some(interpretation)
-        })
+        Atom(Bytes(expected.length), new EagerContents(Some(()), Some(interpretation)))
       } else {
         val note = "expected \"%s\" (0x%s)".format(interpretation, expected.map("%02x".format(_)).mkString)
-        Atom(Bytes(expected.length), new Contents[Option[Unit]] {
-          override val value: Option[Unit] = None
-          override def reprO: Option[String] = None
-        }, Seq(Note(Quality.Broken, note)))
+        Atom(Bytes(expected.length), new EagerContents(None, None), Seq(Note(Quality.Broken, note)))
       }
     }
   }

@@ -109,8 +109,8 @@ class PrimitiveDissectorsSuite extends FunSuite {
 
   test("bit") {
     val blob = new ArrayBlob(Array[Byte](0x40, 0x7B))
-    bit.dissect(blob, InfoSize(0, 1)) mustBe Atom(Bits(1), new EagerContentsR(true, "Set"))
-    bit.dissect(blob, InfoSize(1, 5)) mustBe Atom(Bits(1), new EagerContentsR(false, "Unset"))
+    bit.dissect(blob, InfoSize(0, 1)) mustBe Atom(Bits(1), new EagerContentsR(true, "True"))
+    bit.dissect(blob, InfoSize(1, 5)) mustBe Atom(Bits(1), new EagerContentsR(false, "False"))
   }
 }
 

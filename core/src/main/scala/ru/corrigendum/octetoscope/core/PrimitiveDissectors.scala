@@ -190,7 +190,7 @@ object PrimitiveDissectors {
       val byte = input(offset.bytes)
       val bit = (byte & (1 << (7 - offset.bits))) != 0
 
-      Atom(Bits(1), new EagerContentsR(bit, if(bit) "Set" else "Unset"))
+      Atom(Bits(1), new EagerContentsR(bit, if(bit) "True" else "False"))
     }
   }
 

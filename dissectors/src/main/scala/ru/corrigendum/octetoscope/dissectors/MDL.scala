@@ -36,8 +36,10 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   val MagicBytes = Array[Byte]('I', 'D', 'P', 'O')
 
   // Quake II's struct mdl_t.
-  private object Header extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+  private object Header extends MoleculeBuilderDissector[HeaderValue] {
+    override def defaultValue: HeaderValue = new HeaderValue
+
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[HeaderValue], value: HeaderValue) {
       val add = new SequentialAdder(input, offset, builder)
 
       val correctMagic = add("Identification", magic(MagicBytes, "IDPO")).isDefined
@@ -51,9 +53,9 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       add("Bounding radius", float32L)
       add("Eye position", new Vector3(float32L))
 
-      add("Number of skins", sInt32L + positive)
-      add("Skin width", sInt32L + positive +? divisibleBy(4))
-      add("Skin height", sInt32L + positive +? noMoreThan(480, "MAX_LBM_HEIGHT"))
+      value.numSkins = add.filtered("Number of skins", sInt32L)(positive)
+      value.skinWidth = add.filtered("Skin width", sInt32L +? divisibleBy(4))(positive)
+      value.skinHeight = add.filtered("Skin height", sInt32L +? noMoreThan(480, "MAX_LBM_HEIGHT"))(positive)
 
       add.filtered("Number of vertices", sInt32L +? noMoreThan(2000, "MAXALIASVERTS"))(positive)
       add.filtered("Number of triangles", sInt32L)(positive)
@@ -67,10 +69,40 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     }
   }
 
+  private class HeaderValue {
+    var numSkins: Option[Int] = None
+    var skinWidth: Option[Int] = None
+    var skinHeight: Option[Int] = None
+  }
+
+  private class Skin(width: Int, height: Int) extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+      val add = new SequentialAdder(input, offset, builder)
+
+      add("Type", enum(sInt32L, Map(0 -> "ALIAS_SKIN_SINGLE", 1 -> "ALIAS_SKIN_GROUP"))) match {
+        case Some("ALIAS_SKIN_SINGLE") =>
+          builder.setRepr("Single skin")
+          add("Rows", array(height, "Row", array(width, "Color index", uInt8)))
+        case Some("ALIAS_SKIN_GROUP") =>
+          for (numSkins <- add.filtered("Number of skins", sInt32L)(positive))
+          {
+            builder.setRepr("Skin group (%d skins)".format(numSkins))
+            add("Skin intervals", array(numSkins, "Interval", float32L + positive))
+            add("Skins", array(numSkins, "Skin", array(height, "Row", array(width, "Color index", uInt8))))
+          }
+        case _ =>
+      }
+    }
+  }
+
   override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
     builder.setRepr("Quake model")
 
     val add = new SequentialAdder(input, offset, builder)
-    add("Header", Header)
+
+    val header = add("Header", Header)
+
+    for (numSkins <- header.numSkins; skinWidth <- header.skinWidth; skinHeight <- header.skinHeight)
+      add("Skins", array(numSkins, "Skin", new Skin(skinWidth, skinHeight)))
   }
 }

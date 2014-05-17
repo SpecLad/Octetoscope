@@ -60,7 +60,9 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       add.filtered("Number of frames", sInt32L)(positive)
 
       add("Synchronization type", enum(sInt32L, Map(0 -> "ST_SYNC", 1 -> "ST_RAND")))
-      add("Flags", sInt32L) // TODO: change into flags
+      add("Flags", bitField(32, Map(
+        7L -> "EF_ROCKET", 6L -> "EF_GRENADE", 5L -> "EF_GIB",     4L -> "EF_ROTATE",
+        3L -> "EF_TRACER", 2L -> "EF_ZOMGIB",  1L -> "EF_TRACER2", 0L -> "EF_TRACER3")))
       add("Size", float32L)
     }
   }

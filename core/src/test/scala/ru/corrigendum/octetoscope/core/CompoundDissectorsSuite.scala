@@ -64,4 +64,37 @@ class CompoundDissectorsSuite extends FunSuite {
     unknown.contents mustBe new EagerContentsR(None, "2")
     unknown.notes.loneElement.pieceQuality mustBe Quality.Broken
   }
+
+  private def bitFieldTest(byte: Byte, repr: String) {
+    val blob = new ArrayBlob(Array[Byte](byte))
+    val dissector = bitField(4, Map(1L -> "A", 2L -> "B"))
+    val piece = dissector.dissect(blob, Bits(2)).asInstanceOf[PlainMolecule]
+
+    piece mustBe Molecule(
+      Bits(4),
+      new EagerContentsR((), repr),
+      Seq(
+        SubPiece("Bit #0 (unknown)", Bits(0), bit.dissect(blob, Bits(2))),
+        SubPiece("A", Bits(1), bit.dissect(blob, Bits(3))),
+        SubPiece("B", Bits(2), bit.dissect(blob, Bits(4))),
+        SubPiece("Bit #3 (unknown)", Bits(3), bit.dissect(blob, Bits(5)))
+      ),
+      Nil)
+  }
+
+  test("bitField - no bits set") {
+    bitFieldTest(0x42, "<>")
+  }
+
+  test("bitField - known bit set") {
+    bitFieldTest(0x4a, "<B>")
+  }
+
+  test("bitField - unknown bit set") {
+    bitFieldTest(0x62, "<#0>")
+  }
+
+  test("bitField - multiple bits set") {
+    bitFieldTest(0x56, "<A | #3>")
+  }
 }

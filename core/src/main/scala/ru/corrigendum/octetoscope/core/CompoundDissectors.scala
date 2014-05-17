@@ -78,4 +78,26 @@ object CompoundDissectors {
 
   def enum[V, E](underlying: DissectorCR[V], enumerators: Map[V, E]): DissectorCR[Option[E]] =
     new Enum[V, E](underlying, enumerators)
+
+  private class BitField(totalBits: Long, namedBits: Map[Long, String]) extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+      val add = new SequentialAdder(input, offset, builder)
+
+      val setBitNames = IndexedSeq.newBuilder[String]
+
+      for (i <- 0L until totalBits)
+        namedBits.get(i) match {
+          case Some(name) =>
+            if (add(name, PrimitiveDissectors.bit))
+              setBitNames += name
+          case None =>
+            if (add("Bit #%d (unknown)".format(i), PrimitiveDissectors.bit))
+              setBitNames += "#" + i
+        }
+
+      builder.setRepr(setBitNames.result().mkString("<", " | ", ">"))
+    }
+  }
+
+  def bitField(totalBits: Long, namedBits: Map[Long, String]): DissectorC[Unit] = new BitField(totalBits, namedBits)
 }

@@ -70,9 +70,11 @@ class CompoundDissectorsSuite extends FunSuite {
     val dissector = bitField(4, Map(1L -> "A", 2L -> "B"))
     val piece = dissector.dissect(blob, Bits(2)).asInstanceOf[PlainMolecule]
 
+    val value = (if ((byte & 0x10) != 0) Set("A") else Set()) ++ (if ((byte & 0x08) != 0) Set("B") else Set())
+
     piece mustBe Molecule(
       Bits(4),
-      new EagerContentsR((), repr),
+      new EagerContentsR(value, repr),
       Seq(
         SubPiece("Bit #0 (unknown)", Bits(0), bit.dissect(blob, Bits(2))),
         SubPiece("A", Bits(1), bit.dissect(blob, Bits(3))),

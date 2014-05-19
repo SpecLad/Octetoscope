@@ -79,7 +79,9 @@ object CompoundDissectors {
   def enum[V, E](underlying: DissectorCR[V], enumerators: Map[V, E]): DissectorCR[Option[E]] =
     new Enum[V, E](underlying, enumerators)
 
-  private class BitField(totalBits: Long, namedBits: Map[Long, String])
+  private val bitSbz = PrimitiveDissectors.bit +? CommonConstraints.`false`
+
+  private class BitField(totalBits: Long, namedBits: Map[Long, String], sbz: Set[String])
       extends MoleculeBuilderDissector[mutable.Set[String]] {
     override def defaultValue: mutable.Set[String] = mutable.Set()
 
@@ -93,7 +95,7 @@ object CompoundDissectors {
       for (i <- 0L until totalBits)
         namedBits.get(i) match {
           case Some(name) =>
-            if (add(name, PrimitiveDissectors.bit)) {
+            if (add(name, if (sbz(name)) bitSbz else PrimitiveDissectors.bit)) {
               setBitNames += name
               value += name
             }
@@ -106,6 +108,8 @@ object CompoundDissectors {
     }
   }
 
-  def bitField(totalBits: Long, namedBits: Map[Long, String]): DissectorC[collection.Set[String]] =
-    new BitField(totalBits, namedBits)
+  def bitField(totalBits: Long,
+               namedBits: Map[Long, String],
+               sbz: Set[String] = Set.empty): DissectorC[collection.Set[String]] =
+    new BitField(totalBits, namedBits, sbz)
 }

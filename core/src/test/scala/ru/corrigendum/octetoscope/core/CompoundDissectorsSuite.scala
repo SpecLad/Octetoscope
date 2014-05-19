@@ -99,4 +99,13 @@ class CompoundDissectorsSuite extends FunSuite {
   test("bitField - multiple bits set") {
     bitFieldTest(0x56, "<A | #3>")
   }
+
+  test("bitField - should be zero") {
+    val blob = new ArrayBlob(Array[Byte](0x01))
+    val dissector = bitField(2, Map(0L -> "A", 1L -> "B"), sbz = Set("A", "B"))
+    val piece = dissector.dissect(blob, Bits(6)).asInstanceOf[PlainMolecule]
+
+    piece.children(0).piece mustBe bit.dissect(blob, Bits(6))
+    piece.children(1).piece mustBe (bit +? CommonConstraints.`false`).dissect(blob, Bits(7))
+  }
 }

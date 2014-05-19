@@ -70,4 +70,9 @@ class CommonConstraintsSuite extends FunSuite {
     c.shouldNote must include("5")
     c.mustNote must include("5")
   }
+
+  test("false") {
+    CommonConstraints.`false`.check(true) mustBe false
+    CommonConstraints.`false`.check(false) mustBe true
+  }
 }

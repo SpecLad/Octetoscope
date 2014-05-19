@@ -77,4 +77,9 @@ object CommonConstraints {
     override def mustNote: String = "must be divisible by %s".format(factor)
   }
 
+  def `false`: ShouldMustConstraint[Boolean] = new ShouldMustConstraint[Boolean] {
+    override def check(value: Boolean): Boolean = !value
+    override def shouldNote: String = "should be false"
+    override def mustNote: String = "must be false"
+  }
 }

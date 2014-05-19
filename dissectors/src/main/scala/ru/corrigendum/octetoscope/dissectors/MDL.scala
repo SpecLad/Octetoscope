@@ -57,7 +57,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       value.skinWidth = add.filtered("Skin width", sInt32L +? divisibleBy(4))(positive)
       value.skinHeight = add.filtered("Skin height", sInt32L +? noMoreThan(480, "MAX_LBM_HEIGHT"))(positive)
 
-      add.filtered("Number of vertices", sInt32L +? noMoreThan(2000, "MAXALIASVERTS"))(positive)
+      value.numVertices = add.filtered("Number of vertices", sInt32L +? noMoreThan(2000, "MAXALIASVERTS"))(positive)
       add.filtered("Number of triangles", sInt32L)(positive)
       add.filtered("Number of frames", sInt32L)(positive)
 
@@ -73,6 +73,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     var numSkins: Option[Int] = None
     var skinWidth: Option[Int] = None
     var skinHeight: Option[Int] = None
+    var numVertices: Option[Int] = None
   }
 
   private class Skin(width: Int, height: Int) extends MoleculeBuilderUnitDissector {
@@ -94,6 +95,28 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     }
   }
 
+  // Quake's struct stvert_t.
+  private object TexCoordPair extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+      val add = new SequentialAdder(input, offset, builder)
+
+      /* The only bit that really makes sense to be set here is ALIAS_ONSEAM; the other bits
+         are set by Quake itself during rendering (see R_AliasPreparePoints). However, Quake blindly
+         uses the entire bit field as the initial value without checking that the other bits are
+         unset or clearing them; thus those bits should take effect if set in the file. */
+      val onSeamBits = add("On seam", bitField(32,
+        Map(2L -> "ALIAS_ONSEAM", 3L -> "ALIAS_Z_CLIP", 4L -> "ALIAS_BOTTOM_CLIP",
+            5L -> "ALIAS_RIGHT_CLIP", 6L -> "ALIAS_TOP_CLIP", 7L -> "ALIAS_LEFT_CLIP"),
+        sbz = Set("ALIAS_Z_CLIP", "ALIAS_BOTTOM_CLIP", "ALIAS_RIGHT_CLIP", "ALIAS_TOP_CLIP", "ALIAS_LEFT_CLIP")))
+
+      val sc = add.getContents("s", sInt32L)
+      val tc = add.getContents("t", sInt32L)
+
+      builder.setReprLazy("(%s, %s)%s".format(sc.repr, tc.repr,
+        if (onSeamBits("ALIAS_ONSEAM")) " (on seam)" else ""))
+    }
+  }
+
   override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
     builder.setRepr("Quake model")
 
@@ -101,7 +124,11 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
     val header = add("Header", Header)
 
-    for (numSkins <- header.numSkins; skinWidth <- header.skinWidth; skinHeight <- header.skinHeight)
+    for (numSkins <- header.numSkins; skinWidth <- header.skinWidth; skinHeight <- header.skinHeight) {
       add("Skins", array(numSkins, "Skin", new Skin(skinWidth, skinHeight)))
+
+      for (numVertices <- header.numVertices)
+        add("Texture coordinates", array(numVertices, "Texture coordinate pair", TexCoordPair))
+    }
   }
 }

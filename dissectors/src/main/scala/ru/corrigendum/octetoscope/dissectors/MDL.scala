@@ -83,14 +83,13 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
         case Some("ALIAS_SKIN_SINGLE") =>
           builder.setRepr("Single skin")
           add("Rows", array(height, "Row", array(width, "Color index", uInt8)))
-        case Some("ALIAS_SKIN_GROUP") =>
+        case _ => // Quake doesn't explicitly check for ALIAS_SKIN_GROUP
           for (numSkins <- add.filtered("Number of skins", sInt32L)(positive))
           {
             builder.setRepr("Skin group (%d skins)".format(numSkins))
             add("Skin intervals", array(numSkins, "Interval", float32L + positive))
             add("Skins", array(numSkins, "Skin", array(height, "Row", array(width, "Color index", uInt8))))
           }
-        case _ =>
       }
     }
   }

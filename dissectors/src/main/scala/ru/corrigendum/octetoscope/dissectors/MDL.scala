@@ -58,7 +58,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       value.skinHeight = add.filtered("Skin height", sInt32L +? noMoreThan(480, "MAX_LBM_HEIGHT"))(positive)
 
       value.numVertices = add.filtered("Number of vertices", sInt32L +? noMoreThan(2000, "MAXALIASVERTS"))(positive)
-      add.filtered("Number of triangles", sInt32L)(positive)
+      value.numTriangles = add.filtered("Number of triangles", sInt32L)(positive)
       add.filtered("Number of frames", sInt32L)(positive)
 
       add("Synchronization type", enum(sInt32L, Map(0 -> "ST_SYNC", 1 -> "ST_RAND")))
@@ -74,6 +74,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     var skinWidth: Option[Int] = None
     var skinHeight: Option[Int] = None
     var numVertices: Option[Int] = None
+    var numTriangles: Option[Int] = None
   }
 
   private class Skin(width: Int, height: Int) extends MoleculeBuilderUnitDissector {
@@ -117,6 +118,25 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     }
   }
 
+  // Quake's struct dtriangle_t
+  private class Triangle(numVertices: Int) extends MoleculeBuilderUnitDissector {
+    val lessThanNumVertices = lessThan(numVertices, "the number of vertices")
+
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+      val add = new SequentialAdder(input, offset, builder)
+      /* Quake occasionally compares these values for equality, so we
+         don't just treat any non-zero value as Front. */
+      val faceDirection = add("Face direction", enum(sInt32L, Map(0 -> "Back", 1 -> "Front"))).getOrElse("???")
+
+      def formatSeq(elements: Seq[Any]) = elements.mkString("(", ", ", ")")
+
+      val vic = add.getContents("Vertex indices",
+        collectingArray(3, "Index", sInt32L + nonNegative + lessThanNumVertices, formatSeq))
+
+      builder.setReprLazyO(vic.reprO.map("%s %s".format(faceDirection, _)))
+    }
+  }
+
   override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
     builder.setRepr("Quake model")
 
@@ -127,8 +147,12 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     for (numSkins <- header.numSkins; skinWidth <- header.skinWidth; skinHeight <- header.skinHeight) {
       add("Skins", array(numSkins, "Skin", new Skin(skinWidth, skinHeight)))
 
-      for (numVertices <- header.numVertices)
+      for (numVertices <- header.numVertices) {
         add("Texture coordinates", array(numVertices, "Texture coordinate pair", TexCoordPair))
+
+        for (numTriangles <- header.numTriangles)
+          add("Triangles", array(numTriangles, "Triangle", new Triangle(numVertices)))
+      }
     }
   }
 }

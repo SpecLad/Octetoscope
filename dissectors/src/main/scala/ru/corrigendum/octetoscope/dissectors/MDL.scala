@@ -64,7 +64,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       add("Synchronization type", enum(sInt32L, Map(0 -> "ST_SYNC", 1 -> "ST_RAND")))
       add("Flags", bitField(32, Map(
         7L -> "EF_ROCKET", 6L -> "EF_GRENADE", 5L -> "EF_GIB",     4L -> "EF_ROTATE",
-        3L -> "EF_TRACER", 2L -> "EF_ZOMGIB",  1L -> "EF_TRACER2", 0L -> "EF_TRACER3")))
+        3L -> "EF_TRACER", 2L -> "EF_ZOMGIB",  1L -> "EF_TRACER2", 0L -> "EF_TRACER3"), unnamedReason = "unused"))
       add("Size", float32L)
     }
   }
@@ -108,7 +108,8 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       val onSeamBits = add("On seam", bitField(32,
         Map(2L -> "ALIAS_ONSEAM", 3L -> "ALIAS_Z_CLIP", 4L -> "ALIAS_BOTTOM_CLIP",
             5L -> "ALIAS_RIGHT_CLIP", 6L -> "ALIAS_TOP_CLIP", 7L -> "ALIAS_LEFT_CLIP"),
-        sbz = Set("ALIAS_Z_CLIP", "ALIAS_BOTTOM_CLIP", "ALIAS_RIGHT_CLIP", "ALIAS_TOP_CLIP", "ALIAS_LEFT_CLIP")))
+        sbz = Set("ALIAS_Z_CLIP", "ALIAS_BOTTOM_CLIP", "ALIAS_RIGHT_CLIP", "ALIAS_TOP_CLIP", "ALIAS_LEFT_CLIP"),
+        unnamedReason = "unused"))
 
       val sc = add.getContents("s", sInt32L)
       val tc = add.getContents("t", sInt32L)

@@ -99,10 +99,10 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct dtriangle_t
   private class Triangle(numVertices: Option[Int], numTexCoords: Option[Int]) extends MoleculeBuilderUnitDissector {
-    val validVertexIndex = numVertices
+    val lessThanNumVertices = numVertices
       .map(num => if (num > Short.MaxValue) any else lessThan(num.toShort, "the number of vertices"))
       .getOrElse(any)
-    val validTexCoordIndex = numTexCoords
+    val lessThanNumTexCoords = numTexCoords
       .map(num => if (num > Short.MaxValue) any else lessThan(num.toShort, "the number of texture coordinate pairs"))
       .getOrElse(any)
 
@@ -111,9 +111,9 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       def formatSeq(elements: Seq[Any]) = elements.mkString("(", ", ", ")")
 
       val vi = add("Vertex indices", collectingArray(3, "Index",
-        sInt16L + nonNegative + validVertexIndex, formatSeq))
+        sInt16L + nonNegative + lessThanNumVertices, formatSeq))
       val ti = add("Texture coordinate pair indices", collectingArray(3, "Index",
-        sInt16L + nonNegative + validTexCoordIndex, formatSeq))
+        sInt16L + nonNegative + lessThanNumTexCoords, formatSeq))
 
       if (vi.length == 3 && ti.length == 3)
         builder.setReprLazy(formatSeq((vi, ti).zipped.map(_ + "/" + _)))

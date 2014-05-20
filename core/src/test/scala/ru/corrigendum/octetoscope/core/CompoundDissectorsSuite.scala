@@ -67,7 +67,7 @@ class CompoundDissectorsSuite extends FunSuite {
 
   private def bitFieldTest(byte: Byte, repr: String) {
     val blob = new ArrayBlob(Array[Byte](byte))
-    val dissector = bitField(4, Map(1L -> "A", 2L -> "B"))
+    val dissector = bitField(4, Map(1L -> "A", 2L -> "B"), unnamedReason = "xyzzy")
     val piece = dissector.dissect(blob, Bits(2)).asInstanceOf[PlainMolecule]
 
     val value = (if ((byte & 0x10) != 0) Set("A") else Set()) ++ (if ((byte & 0x08) != 0) Set("B") else Set())
@@ -76,10 +76,10 @@ class CompoundDissectorsSuite extends FunSuite {
       Bits(4),
       new EagerContentsR(value, repr),
       Seq(
-        SubPiece("Bit #0 (unknown)", Bits(0), bit.dissect(blob, Bits(2))),
+        SubPiece("Bit #0 (xyzzy)", Bits(0), bit.dissect(blob, Bits(2))),
         SubPiece("A", Bits(1), bit.dissect(blob, Bits(3))),
         SubPiece("B", Bits(2), bit.dissect(blob, Bits(4))),
-        SubPiece("Bit #3 (unknown)", Bits(3), bit.dissect(blob, Bits(5)))
+        SubPiece("Bit #3 (xyzzy)", Bits(3), bit.dissect(blob, Bits(5)))
       ),
       Nil)
   }

@@ -81,7 +81,10 @@ object CompoundDissectors {
 
   private val bitSbz = PrimitiveDissectors.bit +? CommonConstraints.`false`
 
-  private class BitField(totalBits: Long, namedBits: Map[Long, String], sbz: Set[String])
+  private class BitField(totalBits: Long,
+                         namedBits: Map[Long, String],
+                         sbz: Set[String],
+                         unnamedReason: String)
       extends MoleculeBuilderDissector[mutable.Set[String]] {
     override def defaultValue: mutable.Set[String] = mutable.Set()
 
@@ -100,7 +103,7 @@ object CompoundDissectors {
               value += name
             }
           case None =>
-            if (add("Bit #%d (unknown)".format(i), PrimitiveDissectors.bit))
+            if (add("Bit #%d (%s)".format(i, unnamedReason), PrimitiveDissectors.bit))
               setBitNames += "#" + i
         }
 
@@ -110,6 +113,7 @@ object CompoundDissectors {
 
   def bitField(totalBits: Long,
                namedBits: Map[Long, String],
-               sbz: Set[String] = Set.empty): DissectorC[collection.Set[String]] =
-    new BitField(totalBits, namedBits, sbz)
+               sbz: Set[String] = Set.empty,
+               unnamedReason: String = "unknown"): DissectorC[collection.Set[String]] =
+    new BitField(totalBits, namedBits, sbz, unnamedReason)
 }

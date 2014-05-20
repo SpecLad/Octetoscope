@@ -181,13 +181,13 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   }
 
   private class OpenGLVertex(numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
-    val validVertexIndex = numVertices.map(lessThan(_, "number of vertices")).getOrElse(any)
+    val lessThanNumVertices = numVertices.map(lessThan(_, "number of vertices")).getOrElse(any)
 
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       val add = new SequentialAdder(input, offset, builder)
       val sc = add.getContents("Texture s", float32L)
       val tc = add.getContents("Texture t", float32L)
-      val indC = add.getContents("Index", sInt32L + nonNegative + validVertexIndex)
+      val indC = add.getContents("Index", sInt32L + nonNegative + lessThanNumVertices)
 
       builder.setReprLazy("%s / (%s, %s)".format(indC.repr, sc.repr, tc.repr))
     }

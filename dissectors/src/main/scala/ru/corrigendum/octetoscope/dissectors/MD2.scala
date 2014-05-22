@@ -121,7 +121,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   }
 
   // Quake II's struct dtrivertx_t
-  private object FrameVertex extends MoleculeBuilderUnitDissector {
+  private object Vertex extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       val add = new SequentialAdder(input, offset, builder)
 
@@ -143,7 +143,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       builder.setReprLazy(nameC.repr)
 
       for (numVertices <- numVertices)
-        add("Vertices", array(numVertices, "Vertex", FrameVertex))
+        add("Vertices", array(numVertices, "Vertex", Vertex))
     }
   }
 

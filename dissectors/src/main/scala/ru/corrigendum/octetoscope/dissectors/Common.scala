@@ -22,7 +22,7 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core._
 
 private object Common {
-  class Vector3[T](component: DissectorCR[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {
+  private class Vector3[T](component: DissectorCR[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {
     import Vector3.Value
 
     override def defaultValue: Value[T] = Value(None, None, None)
@@ -42,4 +42,6 @@ private object Common {
   object Vector3 {
     case class Value[T](var x: Option[T], var y: Option[T], var z: Option[T])
   }
+
+  def vector3[T](component: DissectorCR[T]): MoleculeDissectorC[Vector3.Value[T]] = new Vector3(component)
 }

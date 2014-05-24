@@ -23,7 +23,7 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
-import ru.corrigendum.octetoscope.dissectors.Common.Vector3
+import Common.vector3
 
 /*
   Quake models (*.mdl).
@@ -48,10 +48,10 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       val version = add("Version", sInt32L + equalTo(6, "ALIAS_VERSION"))
       if (version != 6) return
 
-      add("Scale", new Vector3(float32L))
-      add("Translation", new Vector3(float32L))
+      add("Scale", vector3(float32L))
+      add("Translation", vector3(float32L))
       add("Bounding radius", float32L)
-      add("Eye position", new Vector3(float32L))
+      add("Eye position", vector3(float32L))
 
       value.numSkins = add.filtered("Number of skins", sInt32L)(positive)
       value.skinWidth = add.filtered("Skin width", sInt32L +? divisibleBy(4))(positive)
@@ -144,7 +144,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       val add = new SequentialAdder(input, offset, builder)
 
-      val coordsC = add.getContents("Coordinates", new Vector3(uInt8))
+      val coordsC = add.getContents("Coordinates", vector3(uInt8))
       val lniC = add.getContents("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
 
       builder.setReprLazyO(coordsC.reprO.map("%s | #%s".format(_, lniC.repr)))
@@ -158,9 +158,9 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
       /* The bounding box corners are actually the same structure as
          Vertex, but let's show off the fact that the LNI is unused here. */
-      add("Bounding box minimum", new Vector3(uInt8))
+      add("Bounding box minimum", vector3(uInt8))
       add("Unused", uInt8)
-      add("Bounding box maximum", new Vector3(uInt8))
+      add("Bounding box maximum", vector3(uInt8))
       add("Unused", uInt8)
 
       val nameC = add.getContents("Name", asciiZString(16))
@@ -183,9 +183,9 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
           for (numFrames <- add.filtered("Number of frames", sInt32L)(positive)) {
             builder.setRepr("Frame group (%d frames)".format(numFrames))
 
-            add("Bounding box minimum", new Vector3(uInt8))
+            add("Bounding box minimum", vector3(uInt8))
             add("Unused", uInt8)
-            add("Bounding box maximum", new Vector3(uInt8))
+            add("Bounding box maximum", vector3(uInt8))
             add("Unused", uInt8)
 
             add("Frame intervals", array(numFrames, "Interval", float32L + positive))

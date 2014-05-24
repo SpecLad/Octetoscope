@@ -23,7 +23,7 @@ import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
-import Common.Vector3
+import Common.vector3
 
 /*
   Quake II models (*.md2).
@@ -125,7 +125,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       val add = new SequentialAdder(input, offset, builder)
 
-      val coordsC = add.getContents("Coordinates", new Vector3(uInt8))
+      val coordsC = add.getContents("Coordinates", vector3(uInt8))
       val lniC = add.getContents("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
 
       builder.setReprLazyO(coordsC.reprO.map("%s | #%s".format(_, lniC.repr)))
@@ -137,8 +137,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
     override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
       builder.fixSize(Bytes(frameSize))
       val add = new SequentialAdder(input, offset, builder)
-      add("Scale", new Vector3(float32L))
-      add("Translation", new Vector3(float32L))
+      add("Scale", vector3(float32L))
+      add("Translation", vector3(float32L))
       val nameC = add.getContents("Name", asciiZString(16))
       builder.setReprLazy(nameC.repr)
 

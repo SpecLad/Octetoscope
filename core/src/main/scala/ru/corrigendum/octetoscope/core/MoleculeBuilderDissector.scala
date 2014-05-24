@@ -20,7 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-trait MoleculeBuilderDissector[Value] extends DissectorC[Value] {
+trait MoleculeBuilderDissector[Value] extends MoleculeDissectorC[Value] {
   final override def dissect(input: Blob, offset: InfoSize): MoleculeC[Value] = {
     val value = defaultValue
     val builder = new MoleculeBuilder[Value](value)

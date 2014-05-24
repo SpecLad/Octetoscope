@@ -28,3 +28,7 @@ trait Dissector[+V, +C <: Contents[V]] {
   def +(constraint: Constraint[V]): Dissector[V, C] =
     SpecialDissectors.constrained(this, constraint, Quality.Bad)
 }
+
+trait MoleculeDissector[+V, +C <: Contents[V]] extends Dissector[V, C] {
+  override def dissect(input: Blob, offset: InfoSize = InfoSize()): Molecule[C]
+}

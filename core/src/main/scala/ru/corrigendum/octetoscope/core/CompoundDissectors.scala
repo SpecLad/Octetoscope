@@ -114,6 +114,6 @@ object CompoundDissectors {
   def bitField(totalBits: Long,
                namedBits: Map[Long, String],
                sbz: Set[String] = Set.empty,
-               unnamedReason: String = "unknown"): DissectorC[collection.Set[String]] =
+               unnamedReason: String = "unknown"): MoleculeDissectorC[collection.Set[String]] =
     new BitField(totalBits, namedBits, sbz, unnamedReason)
 }

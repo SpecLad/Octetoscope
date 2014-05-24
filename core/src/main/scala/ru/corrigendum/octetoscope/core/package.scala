@@ -26,16 +26,19 @@ package object core {
   type AtomC[V] = Atom[Contents[V]]
   type MoleculeC[V] = Molecule[Contents[V]]
   type DissectorC[V] = Dissector[V, Contents[V]]
+  type MoleculeDissectorC[V] = MoleculeDissector[V, Contents[V]]
 
   type PieceCR[V] = Piece[ContentsR[V]]
   type AtomCR[V] = Atom[ContentsR[V]]
   type MoleculeCR[V] = Molecule[ContentsR[V]]
   type DissectorCR[V] = Dissector[V, ContentsR[V]]
+  type MoleculeDissectorCR[V] = MoleculeDissector[V, ContentsR[V]]
 
   type PlainPiece = PieceC[Any]
   type PlainAtom = AtomC[Any]
   type PlainMolecule = MoleculeC[Any]
   type PlainDissector = DissectorC[Any]
+  type PlainMoleculeDissector = MoleculeDissectorC[Any]
 
   type Detector = Blob => Option[PlainDissector]
 

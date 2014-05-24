@@ -59,7 +59,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
       value.numVertices = add.filtered("Number of vertices", sInt32L +? noMoreThan(2000, "MAXALIASVERTS"))(positive)
       value.numTriangles = add.filtered("Number of triangles", sInt32L)(positive)
-      add.filtered("Number of frames", sInt32L)(positive)
+      value.numFrames = add.filtered("Number of frames", sInt32L)(positive)
 
       add("Synchronization type", enum(sInt32L, Map(0 -> "ST_SYNC", 1 -> "ST_RAND")))
       add("Flags", bitField(32, Map(
@@ -75,6 +75,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     var skinHeight: Option[Int] = None
     var numVertices: Option[Int] = None
     var numTriangles: Option[Int] = None
+    var numFrames: Option[Int] = None
   }
 
   private class Skin(width: Int, height: Int) extends MoleculeBuilderUnitDissector {
@@ -138,6 +139,62 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     }
   }
 
+  // Quake's struct trivertx_t.
+  private object Vertex extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+      val add = new SequentialAdder(input, offset, builder)
+
+      val coordsC = add.getContents("Coordinates", new Vector3(uInt8))
+      val lniC = add.getContents("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
+
+      builder.setReprLazyO(coordsC.reprO.map("%s | #%s".format(_, lniC.repr)))
+    }
+  }
+
+  // Quake's struct daliasframe_t.
+  private class SingleFrame(numVertices: Int) extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+      val add = new SequentialAdder(input, offset, builder)
+
+      /* The bounding box corners are actually the same structure as
+         Vertex, but let's show off the fact that the LNI is unused here. */
+      add("Bounding box minimum", new Vector3(uInt8))
+      add("Unused", uInt8)
+      add("Bounding box maximum", new Vector3(uInt8))
+      add("Unused", uInt8)
+
+      val nameC = add.getContents("Name", asciiZString(16))
+      builder.setReprLazy(nameC.repr)
+
+      add("Vertices", array(numVertices, "Vertex", Vertex))
+    }
+  }
+
+  private class Frame(numVertices: Int) extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+      val add = new SequentialAdder(input, offset, builder)
+
+      add("Type", enum(sInt32L, Map(0 -> "ALIAS_SINGLE", 1 -> "ALIAS_GROUP"))) match {
+        case Some("ALIAS_SINGLE") =>
+          val sfC = add.getContents("Single frame", new SingleFrame(numVertices))
+          builder.setReprLazyO(sfC.reprO.map("Single frame %s".format(_)))
+        case _ => // Quake doesn't explicitly check for ALIAS_GROUP
+          // Quake's struct daliasgroup_t.
+          for (numFrames <- add.filtered("Number of frames", sInt32L)(positive)) {
+            builder.setRepr("Frame group (%d frames)".format(numFrames))
+
+            add("Bounding box minimum", new Vector3(uInt8))
+            add("Unused", uInt8)
+            add("Bounding box maximum", new Vector3(uInt8))
+            add("Unused", uInt8)
+
+            add("Frame intervals", array(numFrames, "Interval", float32L + positive))
+            add("Frames", array(numFrames, "Frame", new SingleFrame(numVertices)))
+          }
+      }
+    }
+  }
+
   override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
     builder.setRepr("Quake model")
 
@@ -151,8 +208,12 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       for (numVertices <- header.numVertices) {
         add("Texture coordinates", array(numVertices, "Texture coordinate pair", TexCoordPair))
 
-        for (numTriangles <- header.numTriangles)
+        for (numTriangles <- header.numTriangles) {
           add("Triangles", array(numTriangles, "Triangle", new Triangle(numVertices)))
+
+          for (numFrames <- header.numFrames)
+            add("Frames", array(numFrames, "Frame", new Frame(numVertices)))
+        }
       }
     }
   }

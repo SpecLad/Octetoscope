@@ -88,15 +88,15 @@ class PrimitiveDissectorsSuite extends FunSuite {
   }
 
   test("asciiString") {
-    verify(asciiString(0), "\"\"", "")
-    verify(asciiString(4), "\"abcd\"", "abcd", 'a', 'b', 'c', 'd')
+    verify(asciiString(0), "\"\"", Some(""))
+    verify(asciiString(4), "\"abcd\"", Some("abcd"), 'a', 'b', 'c', 'd')
   }
 
   test("asciiZString") {
-    verify(asciiZString(4), "\"abc\"", "abc", 'a', 'b', 'c', 0)
-    verify(asciiZString(4), "\"ab\"", "ab", 'a', 'b', 0, 'd')
-    verifyBad(asciiZString(0), "\"\"", "")
-    verifyBad(asciiZString(4), "\"abcd\"", "abcd", 'a', 'b', 'c', 'd')
+    verify(asciiZString(4), "\"abc\"", Some("abc"), 'a', 'b', 'c', 0)
+    verify(asciiZString(4), "\"ab\"", Some("ab"), 'a', 'b', 0, 'd')
+    verifyBad(asciiZString(0), "\"\"", Some(""))
+    verifyBad(asciiZString(4), "\"abcd\"", Some("abcd"), 'a', 'b', 'c', 'd')
   }
 
   test("magic") {

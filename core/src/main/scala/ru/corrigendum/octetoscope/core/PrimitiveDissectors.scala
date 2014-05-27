@@ -127,11 +127,11 @@ object PrimitiveDissectors {
 
   def float32L: DissectorCR[Float] = Float32L
 
-  abstract private class AsciiStringGeneric(length: Int) extends DissectorCR[String] {
+  abstract private class AsciiStringGeneric(length: Int) extends DissectorCR[Option[String]] {
     protected def findLength(input: Blob, byteOffset: Long): Int
     protected def assess(value: String): Seq[Note] = Nil
 
-    final override def dissect(input: Blob, offset: InfoSize): AtomCR[String] = {
+    final override def dissect(input: Blob, offset: InfoSize): AtomCR[Option[String]] = {
       val Bytes(bo) = offset
 
       val string = new String(input.slice(bo, bo + findLength(input, bo)).toArray,
@@ -139,9 +139,9 @@ object PrimitiveDissectors {
 
       Atom(
         Bytes(length),
-        new ContentsR[String] {
-          override val value: String = string
-          override def repr: String = "\"" + value + "\""
+        new ContentsR[Option[String]] {
+          override val value: Option[String] = Some(string)
+          override def repr: String = "\"" + string + "\""
         },
         assess(string))
     }
@@ -151,7 +151,7 @@ object PrimitiveDissectors {
     override protected def findLength(input: Blob, byteOffset: Long): Int = length
   }
 
-  def asciiString(length: Int): DissectorCR[String] = new AsciiString(length)
+  def asciiString(length: Int): DissectorCR[Option[String]] = new AsciiString(length)
 
   private class AsciiZString(length: Int) extends AsciiStringGeneric(length) {
     override protected def findLength(input: Blob, byteOffset: Long): Int = {
@@ -168,7 +168,7 @@ object PrimitiveDissectors {
       else Seq(Note(Quality.Bad, "missing NUL terminator"))
   }
 
-  def asciiZString(length: Int): DissectorCR[String] = new AsciiZString(length)
+  def asciiZString(length: Int): DissectorCR[Option[String]] = new AsciiZString(length)
 
   private class Magic(expected: Array[Byte], interpretation: String) extends DissectorC[Option[Unit]] {
     override def dissect(input: Blob, offset: InfoSize): AtomC[Option[Unit]] = {

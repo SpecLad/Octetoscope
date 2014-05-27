@@ -31,9 +31,9 @@ class CompoundDissectorsSuite extends FunSuite {
 
     dissector.dissect(blob, Bytes(1)) mustBe
       Molecule(Bytes(9), contents, Seq(
-        SubPiece("Item #0", Bytes(0), Atom(Bytes(3), new EagerContentsR("foo", "\"foo\""))),
-        SubPiece("Item #1", Bytes(3), Atom(Bytes(3), new EagerContentsR("bar", "\"bar\""))),
-        SubPiece("Item #2", Bytes(6), Atom(Bytes(3), new EagerContentsR("baz", "\"baz\"")))
+        SubPiece("Item #0", Bytes(0), Atom(Bytes(3), new EagerContentsR(Some("foo"), "\"foo\""))),
+        SubPiece("Item #1", Bytes(3), Atom(Bytes(3), new EagerContentsR(Some("bar"), "\"bar\""))),
+        SubPiece("Item #2", Bytes(6), Atom(Bytes(3), new EagerContentsR(Some("baz"), "\"baz\"")))
       ))
   }
 
@@ -42,12 +42,13 @@ class CompoundDissectorsSuite extends FunSuite {
   }
 
   test("collectingArray") {
-    arrayTest(collectingArray(3, "Item", asciiString(3)), new EagerContents(Seq("foo", "bar", "baz"), None))
+    arrayTest(collectingArray(3, "Item", asciiString(3)),
+      new EagerContents(Seq(Some("foo"), Some("bar"), Some("baz")), None))
   }
 
   test("collectingArray - with repr func") {
-    arrayTest(collectingArray(3, "Item", asciiString(3), (seq: Seq[Any]) => seq.mkString(" - ")),
-      new EagerContents(Seq("foo", "bar", "baz"), Some("foo - bar - baz")))
+    arrayTest(collectingArray(3, "Item", asciiString(3), (seq: Seq[Option[Any]]) => seq.map(_.get).mkString(" - ")),
+      new EagerContents(Seq(Some("foo"), Some("bar"), Some("baz")), Some("foo - bar - baz")))
   }
 
   test("enum") {

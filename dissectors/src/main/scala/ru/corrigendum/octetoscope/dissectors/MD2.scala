@@ -160,18 +160,20 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   private object OpenGLCommandType extends DissectorCR[Option[OpenGLCommandTypeValue]] {
     override def dissect(input: Blob, offset: InfoSize): PieceCR[Option[OpenGLCommandTypeValue]] = {
-      val word = readInt32L(input, offset)
+      val intPiece = sInt32L.dissect(input, offset)
+      val word = intPiece.contents.value
+
       if (word == Int.MinValue)
         return Atom(Bytes(4),
           new ContentsR[Option[OpenGLCommandTypeValue]] {
-            override def repr: String = word.toString
+            override def repr: String = intPiece.contents.repr
             override val value = None
           },
           Seq(Note(Quality.Broken, "too many vertices for a triangle fan")))
 
       val cmdType = if (word < 0) TriangleFan(-word) else if (word > 0) TriangleStrip(word) else OpenGLEnd
       val piece = Atom(Bytes(4), new ContentsR[Option[OpenGLCommandTypeValue]] {
-        override def repr: String = "%d -> %s".format(word, cmdType)
+        override def repr: String = intPiece.contents.repr + " -> " + cmdType.toString
         override val value: Option[OpenGLCommandTypeValue] = Some(cmdType)
       })
 

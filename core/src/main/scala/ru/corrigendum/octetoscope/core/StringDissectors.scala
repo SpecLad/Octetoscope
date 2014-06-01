@@ -53,7 +53,7 @@ private object StringDissectors {
             case CoderResult.UNDERFLOW =>
               break()
             case CoderResult.OVERFLOW =>
-            // don't need to do anything
+              // don't need to do anything
             case _ =>
               val undecodedBytes = new Array[Byte](cr.length())
               inBuffer.get(undecodedBytes)

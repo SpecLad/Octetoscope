@@ -91,9 +91,19 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(asciiString(4), "\"abcd\"", Some("abcd"), 'a', 'b', 'c', 'd')
     verify(asciiString(999), "\"" + "abc" * 333 + "\"", Some("abc" * 333),
       Seq.fill(333)(Seq('a'.toByte, 'b'.toByte, 'c'.toByte)).flatten: _*)
+    verify(asciiString(34),
+      "NUL SOH STX ETX EOT ENQ ACK BEL " +
+        "BS HT LF VT FF CR SO SI " +
+        "DLE DC1 DC2 DC3 DC4 NAK SYN ETB " +
+        "CAN EM SUB ESC FS GS RS US " +
+        "DEL QUOTE",
+      Some(new String(('\0' to '\037').toArray :+ '\177' :+ '"')),
+      ((0 to 0x1F) :+ 0x7F :+ '"'.toInt).map(_.toByte): _*)
     verifyWithQualities(asciiString(2), "0xf1f2", None, Seq(Quality.Broken), 0xf1.toByte, 0xf2.toByte)
     verifyWithQualities(asciiString(5), "\"a\" 0xf1f2 \"bc\"", None, Seq(Quality.Broken),
       'a', 0xf1.toByte, 0xf2.toByte, 'b', 'c')
+    verifyWithQualities(asciiString(5), "\"1\" CR LF \"2\" 0xff", None, Seq(Quality.Broken),
+      '1', '\r', '\n', '2', 0xff.toByte)
   }
 
   test("asciiZString") {

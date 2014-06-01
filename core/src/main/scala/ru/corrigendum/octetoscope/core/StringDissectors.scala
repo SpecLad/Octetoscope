@@ -22,8 +22,24 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import java.nio.{CharBuffer, ByteBuffer}
 import java.nio.charset.{CoderResult, StandardCharsets}
 import scala.util.control.Breaks._
+import java.util.StringTokenizer
 
 private object StringDissectors {
+  /* The double quote is used to delimit printable characters in string reprs,
+     so to avoid ambiguity we treat it as a special character. The rest are
+     simply non-printable. */
+  val AsciiSpecialChars = Map(
+    '\0' -> "NUL", '\1' -> "SOH", '\2' -> "STX", '\3' -> "ETX",
+    '\4' -> "EOT", '\5' -> "ENQ", '\6' -> "ACK", '\7' -> "BEL",
+    '\10' -> "BS", '\11' -> "HT", '\12' -> "LF", '\13' -> "VT",
+    '\14' -> "FF", '\15' -> "CR", '\16' -> "SO", '\17' -> "SI",
+    '\20' -> "DLE", '\21' -> "DC1", '\22' -> "DC2", '\23' -> "DC3",
+    '\24' -> "DC4", '\25' -> "NAK", '\26' -> "SYN", '\27' -> "ETB",
+    '\30' -> "CAN", '\31' -> "EM", '\32' -> "SUB", '\33' -> "ESC",
+    '\34' -> "FS", '\35' -> "GS", '\36' -> "RS", '\37' -> "US",
+    '\177' -> "DEL", '"' -> "QUOTE"
+  )
+
   abstract class AsciiStringGeneric(length: Int) extends DissectorCR[Option[String]] {
     protected def findActualLength(input: Blob, byteOffset: Long): Int
     protected def assess(actualLength: Int): Seq[Note] = Nil
@@ -82,8 +98,17 @@ private object StringDissectors {
         case _ => None
       }
 
+      def stringifyDecodedChunk(chunk: String): String = {
+        import scala.collection.JavaConverters._
+        val tokenizer = new StringTokenizer(chunk, AsciiSpecialChars.keys.mkString, true)
+        tokenizer.asScala.map { o =>
+          val s = o.toString
+          AsciiSpecialChars.getOrElse(s.head, "\"" + s + "\"")
+        }.mkString(" ")
+      }
+
       def stringifyChunk(chunk: Chunk): String =
-        chunk.fold("0x" + _.map("%02x".format(_)).mkString, "\"" + _ + "\"")
+        chunk.fold("0x" + _.map("%02x".format(_)).mkString, stringifyDecodedChunk)
 
       Atom(
         Bytes(length),

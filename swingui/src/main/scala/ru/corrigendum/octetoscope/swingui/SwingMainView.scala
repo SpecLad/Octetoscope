@@ -20,23 +20,16 @@ package ru.corrigendum.octetoscope.swingui
 
 import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, UIStrings, MainView}
 import javax.swing._
-import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowListener}
+import java.awt.event.{WindowEvent, WindowListener}
 import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
 import java.awt.Dimension
 import javax.swing.event.{TreeExpansionEvent, TreeWillExpandListener, ChangeEvent, ChangeListener}
 import javax.swing.tree.DefaultTreeModel
 
 private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends SwingView(chooser) with MainView {
-  private[this] val menuBar = new JMenuBar()
   private[this] val tabPane = new JTabbedPane()
 
   {
-    val menuFile = new JMenu(strings.menuFile())
-    val menuHelp = new JMenu(strings.menuHelp())
-
-    menuBar.add(menuFile)
-    menuBar.add(menuHelp)
-
     frame.addWindowListener(new WindowListener {
       override def windowDeiconified(e: WindowEvent) {}
 
@@ -50,21 +43,10 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
       override def windowDeactivated(e: WindowEvent) {}
       override def windowIconified(e: WindowEvent) {}
     })
-
-    def newMenuItem(title: String, menu: JMenu, command: MainView.Command.Value) {
-      val item = new JMenuItem(title)
-      item.addActionListener(new ActionListener {
-        override def actionPerformed(e: ActionEvent) { publish(MainView.CommandEvent(command)) }
-      })
-      menu.add(item)
-    }
-
-    newMenuItem(strings.menuItemOpen(), menuFile, MainView.Command.Open)
-    newMenuItem(strings.menuItemQuit(), menuFile, MainView.Command.Quit)
-    newMenuItem(strings.menuItemAbout(), menuHelp, MainView.Command.About)
   }
 
-  frame.setJMenuBar(menuBar)
+  frame.setJMenuBar(createMenuBarFromDescription(MainView.menuDescription, strings,
+    (c: MainView.Command.Value) => publish(MainView.CommandEvent(c))))
   frame.setContentPane(tabPane)
   frame.setPreferredSize(new Dimension(800, 600))
   frame.pack()

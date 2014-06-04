@@ -43,6 +43,17 @@ object MainView {
     val Open, Quit, About = Value
   }
 
+  private val SM = SubMenuDescription
+  private val CI = CommandItemDescription
+  val menuDescription = Seq(
+    SM(_.menuFile(), Seq(
+      CI(_.menuItemOpen(), Command.Open),
+      CI(_.menuItemQuit(), Command.Quit)
+    )),
+    SM(_.menuHelp(), Seq(
+      CI(_.menuItemAbout(), Command.About)
+    )))
+
   abstract sealed class TabEvent
   case object TabClosedEvent extends TabEvent
   case object TabActivatedEvent extends TabEvent

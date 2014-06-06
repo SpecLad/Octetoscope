@@ -49,7 +49,8 @@ object MainView {
   private val CI = CommandItemDescription
   val menuDescription = Seq(
     SM(_.menuFile(), Seq(
-      CI(_.menuItemOpen(), Command.Open),
+      CI(_.menuItemOpen(), Command.Open,
+        shortcut = Some(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK))),
       SeparatorDescription,
       CI(_.menuItemQuit(), Command.Quit)
     )),

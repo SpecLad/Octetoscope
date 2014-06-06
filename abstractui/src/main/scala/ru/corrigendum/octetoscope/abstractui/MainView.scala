@@ -48,6 +48,7 @@ object MainView {
   val menuDescription = Seq(
     SM(_.menuFile(), Seq(
       CI(_.menuItemOpen(), Command.Open),
+      SeparatorDescription,
       CI(_.menuItemQuit(), Command.Quit)
     )),
     SM(_.menuHelp(), Seq(

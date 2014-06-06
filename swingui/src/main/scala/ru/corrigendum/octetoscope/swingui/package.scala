@@ -35,6 +35,7 @@ package object swingui {
         Some(createSubMenuFromDescription(smd))
       case ci: CommandItemDescription[T] =>
         val mi = new JMenuItem(ci.text(strings))
+        ci.shortcut.foreach(mi.setAccelerator)
         mi.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = invoke(ci.command)
         })

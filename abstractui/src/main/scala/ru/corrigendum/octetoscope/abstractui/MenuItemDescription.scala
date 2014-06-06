@@ -18,9 +18,11 @@
 
 package ru.corrigendum.octetoscope.abstractui
 
+import javax.swing.KeyStroke
+
 sealed abstract class MenuItemDescription[+T]
 
-sealed case class CommandItemDescription[+T](text: UIString, command: T)
+sealed case class CommandItemDescription[+T](text: UIString, command: T, shortcut: Option[KeyStroke] = None)
   extends MenuItemDescription[T]
 
 sealed case class SubMenuDescription[+T](text: UIString, items: Seq[MenuItemDescription[T]])

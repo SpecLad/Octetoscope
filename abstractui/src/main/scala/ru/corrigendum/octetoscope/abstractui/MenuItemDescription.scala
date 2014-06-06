@@ -25,3 +25,5 @@ sealed case class CommandItemDescription[+T](text: UIString, command: T)
 
 sealed case class SubMenuDescription[+T](text: UIString, items: Seq[MenuItemDescription[T]])
   extends MenuItemDescription[T]
+
+case object SeparatorDescription extends MenuItemDescription[Nothing]

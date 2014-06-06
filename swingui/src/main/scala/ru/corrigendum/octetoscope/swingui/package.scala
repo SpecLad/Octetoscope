@@ -18,9 +18,11 @@
 
 package ru.corrigendum.octetoscope
 
-import ru.corrigendum.octetoscope.abstractui.{CommandItemDescription, MenuItemDescription, UIStrings, SubMenuDescription}
-import javax.swing.{JMenuItem, JMenu, JMenuBar}
+import ru.corrigendum.octetoscope.abstractui._
+import javax.swing._
 import java.awt.event.{ActionEvent, ActionListener}
+import ru.corrigendum.octetoscope.abstractui.CommandItemDescription
+import ru.corrigendum.octetoscope.abstractui.SubMenuDescription
 
 package object swingui {
   def createMenuBarFromDescription[T](description: Seq[SubMenuDescription[T]],
@@ -28,22 +30,24 @@ package object swingui {
                                       invoke: T => Unit): JMenuBar = {
     val bar = new JMenuBar
 
-    def createMenuItemFromDescription(description: MenuItemDescription[T]): JMenuItem = description match {
+    def createMenuItemFromDescription(description: MenuItemDescription[T]): Option[JMenuItem] = description match {
       case smd: SubMenuDescription[T] =>
-        createSubMenuFromDescription(smd)
+        Some(createSubMenuFromDescription(smd))
       case ci: CommandItemDescription[T] =>
         val mi = new JMenuItem(ci.text(strings))
         mi.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = invoke(ci.command)
         })
-        mi
+        Some(mi)
+      case SeparatorDescription =>
+        None
     }
 
     def createSubMenuFromDescription(description: SubMenuDescription[T]): JMenu = {
       val menu = new JMenu(description.text(strings))
 
       for (item <- description.items)
-        menu.add(createMenuItemFromDescription(item))
+        createMenuItemFromDescription(item).fold(menu.addSeparator())(menu.add(_))
 
       menu
     }

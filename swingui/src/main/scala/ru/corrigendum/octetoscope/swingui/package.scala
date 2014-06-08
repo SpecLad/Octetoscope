@@ -20,11 +20,26 @@ package ru.corrigendum.octetoscope
 
 import ru.corrigendum.octetoscope.abstractui._
 import javax.swing._
-import java.awt.event.{ActionEvent, ActionListener}
+import java.awt.event.{KeyEvent, ActionEvent, ActionListener}
 import ru.corrigendum.octetoscope.abstractui.CommandItemDescription
 import ru.corrigendum.octetoscope.abstractui.SubMenuDescription
 
 package object swingui {
+  private val MnemonicStringPattern = """^((?:[^&]|&&)*)&(\p{javaLetterOrDigit})((?:[^&]|&&)*)$""".r
+
+  private def splitMnemonic(ampString: String): (String, Int) = {
+    val mnemonicMatchOpt = MnemonicStringPattern.findFirstMatchIn(ampString)
+    assert(mnemonicMatchOpt.isDefined)
+
+    val mnemonicMatch = mnemonicMatchOpt.get
+
+    val beforeMnemonic = mnemonicMatch.group(1).replace("&&", "&")
+    val mnemonic = mnemonicMatch.group(2)
+    val afterMnemonic = mnemonicMatch.group(3).replace("&&", "&")
+
+    (beforeMnemonic + mnemonic + afterMnemonic, beforeMnemonic.length)
+  }
+
   def createMenuBarFromDescription[T](description: Seq[SubMenuDescription[T]],
                                       strings: UIStrings,
                                       invoke: T => Unit): JMenuBar = {
@@ -34,7 +49,10 @@ package object swingui {
       case smd: SubMenuDescription[T] =>
         Some(createSubMenuFromDescription(smd))
       case ci: CommandItemDescription[T] =>
-        val mi = new JMenuItem(ci.text(strings))
+        val (text, mnemonicIndex) = splitMnemonic(ci.text(strings))
+        val mi = new JMenuItem(text)
+        mi.setMnemonic(KeyEvent.getExtendedKeyCodeForChar(text.charAt(mnemonicIndex)))
+        mi.setDisplayedMnemonicIndex(mnemonicIndex)
         ci.shortcut.foreach(mi.setAccelerator)
         mi.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = invoke(ci.command)
@@ -45,7 +63,10 @@ package object swingui {
     }
 
     def createSubMenuFromDescription(description: SubMenuDescription[T]): JMenu = {
-      val menu = new JMenu(description.text(strings))
+      val (text, mnemonicIndex) = splitMnemonic(description.text(strings))
+      val menu = new JMenu(text)
+      menu.setMnemonic(KeyEvent.getExtendedKeyCodeForChar(text.charAt(mnemonicIndex)))
+      menu.setDisplayedMnemonicIndex(mnemonicIndex)
 
       for (item <- description.items)
         createMenuItemFromDescription(item).fold(menu.addSeparator())(menu.add(_))

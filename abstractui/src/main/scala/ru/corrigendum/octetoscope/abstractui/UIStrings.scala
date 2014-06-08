@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,19 +21,19 @@ package ru.corrigendum.octetoscope.abstractui
 import ru.corrigendum.octetoscope.abstractinfra.Translation
 
 trait UIStrings {
-  @Translation(format = "File")
+  @Translation(format = "&File")
   def menuFile(): String
 
-  @Translation(format = "Open...")
+  @Translation(format = "&Open...")
   def menuItemOpen(): String
 
-  @Translation(format = "Quit")
+  @Translation(format = "&Quit")
   def menuItemQuit(): String
 
-  @Translation(format = "Help")
+  @Translation(format = "&Help")
   def menuHelp(): String
 
-  @Translation(format = "About")
+  @Translation(format = "&About")
   def menuItemAbout(): String
 
 }
@@ -42,7 +42,7 @@ object UIStrings {
   val translationMap: Map[String, Class[_ <: UIStrings]] = Map("ru" -> classOf[Ru])
 
   private trait Ru extends UIStrings {
-    @Translation(format = "Выход")
+    @Translation(format = "В&ыход")
     override def menuItemQuit(): String
   }
 }

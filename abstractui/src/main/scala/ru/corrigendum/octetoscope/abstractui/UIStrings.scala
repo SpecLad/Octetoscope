@@ -27,6 +27,9 @@ trait UIStrings {
   @Translation(format = "&Open...")
   def menuItemOpen(): String
 
+  @Translation(format = "&Close")
+  def menuItemClose(): String
+
   @Translation(format = "&Quit")
   def menuItemQuit(): String
 

@@ -36,6 +36,12 @@ class MainPresenter(strings: PresentationStrings,
 
   var numTabs = 0
 
+  private def closeTab(tab: MainView.Tab) {
+    tab.close()
+    numTabs -= 1
+    if (numTabs == 0) view.title = appName
+  }
+
   private object viewHandler extends MainView#Sub {
     override def notify(pub: MainView#Pub, event: Event) {
       event match {
@@ -69,6 +75,9 @@ class MainPresenter(strings: PresentationStrings,
               view.title = appName + " - " + path.getName
           }
 
+        case CommandEvent(MainView.Command.Close) =>
+          closeTab(pub.activeTab.get)
+
         case CommandEvent(_) => // workaround for bug SI-7206
       }
     }
@@ -78,9 +87,7 @@ class MainPresenter(strings: PresentationStrings,
     override def notify(pub: Tab#Pub, event: TabEvent) {
       event match {
         case TabClosedEvent =>
-          pub.close()
-          numTabs -= 1
-          if (numTabs == 0) view.title = appName
+          closeTab(pub)
 
         case TabActivatedEvent =>
           view.title = appName + " - " + title

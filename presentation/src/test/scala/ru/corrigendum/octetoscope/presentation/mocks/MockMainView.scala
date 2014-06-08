@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ class MockMainView extends MockView with MainView {
   private[this] var _disposed: Boolean = false
   private[this] var _visible: Boolean = false
   private[this] val _tabs = mutable.Buffer[MockTab]()
+  private[this] var _activeTabIndex: Int = _
 
   def disposed = _disposed
   def visible = _visible
@@ -47,12 +48,21 @@ class MockMainView extends MockView with MainView {
 
   override def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab = {
     _tabs += new MockTab(title, toolTip, root)
+    _activeTabIndex = _tabs.length - 1
     _tabs.last
+  }
+
+  override def activeTab: Option[Tab] = if (_activeTabIndex < _tabs.length) Some(_tabs(_activeTabIndex)) else None
+
+  def activateTab(newActiveIndex: Int) {
+    _activeTabIndex = newActiveIndex
+    _tabs(_activeTabIndex).trigger(MainView.TabActivatedEvent)
   }
 
   class MockTab(val title: String, val toolTip: String, val tree: DisplayTreeNode) extends Tab {
     override def close() {
       _tabs -= this
+      _activeTabIndex = 0
     }
 
     def trigger(event: MainView.TabEvent) {

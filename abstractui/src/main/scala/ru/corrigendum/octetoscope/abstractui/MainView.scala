@@ -34,6 +34,8 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
 
   // the new tab must be activated
   def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab
+
+  def activeTab: Option[MainView.Tab]
 }
 
 object MainView {
@@ -42,7 +44,7 @@ object MainView {
   sealed case class CommandEvent(command: Command.Value) extends Event
 
   object Command extends Enumeration {
-    val Open, Quit, About = Value
+    val Open, Close, Quit, About = Value
   }
 
   private val SM = SubMenuDescription
@@ -51,6 +53,8 @@ object MainView {
     SM(_.menuFile(), Seq(
       CI(_.menuItemOpen(), Command.Open,
         shortcut = Some(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK))),
+      CI(_.menuItemClose(), Command.Close,
+        shortcut = Some(KeyStroke.getKeyStroke('W', InputEvent.CTRL_DOWN_MASK))),
       SeparatorDescription,
       CI(_.menuItemQuit(), Command.Quit)
     )),

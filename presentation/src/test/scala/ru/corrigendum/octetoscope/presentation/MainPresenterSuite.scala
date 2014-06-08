@@ -116,12 +116,22 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
     view.selectedFile = Some(new File(MainPresenterSuite.FakePath, "alalazam"))
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
+    view.activateTab(0)
 
-    view.tabs.head.trigger(MainView.TabActivatedEvent)
     view.title mustBe "Blarf - cadabra"
   }
 
-  test("tab closing") {
+  test("tab closing via menu") {
+    view.selectedFile = Some(MainPresenterSuite.FakePath)
+    dissectorDriver.result = MainPresenterSuite.FakePiece
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+    view.trigger(MainView.CommandEvent(MainView.Command.Close))
+
+    view.tabs must have size 0
+    view.title mustBe "Blarf"
+  }
+
+  test("tab closing via close button") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
     dissectorDriver.result = MainPresenterSuite.FakePiece
     view.trigger(MainView.CommandEvent(MainView.Command.Open))

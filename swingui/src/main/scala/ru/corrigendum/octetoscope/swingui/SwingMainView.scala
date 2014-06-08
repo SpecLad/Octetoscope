@@ -109,6 +109,15 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     tab
   }
 
+  override def activeTab: Option[Tab] = {
+    val tabIndex = tabPane.getSelectedIndex
+    if (tabIndex == -1)
+      None
+    else
+      Some(tabPane.getTabComponentAt(tabIndex).asInstanceOf[JComponent]
+        .getClientProperty(SwingMainView.PropertyKeyTab).asInstanceOf[TabImpl])
+  }
+
   private class TabImpl(val component: JComponent) extends Tab {
     def triggerEvent(event: TabEvent) { publish(event); }
 

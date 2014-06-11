@@ -26,6 +26,7 @@ import ru.corrigendum.octetoscope.abstractui.SubMenuDescription
 
 package object swingui {
   private val MnemonicStringPattern = """^((?:[^&]|&&)*)&(\p{javaLetterOrDigit})((?:[^&]|&&)*)$""".r
+  private val CommandTag = new Object
 
   private def splitMnemonic(ampString: String): (String, Int) = {
     val mnemonicMatchOpt = MnemonicStringPattern.findFirstMatchIn(ampString)
@@ -57,6 +58,7 @@ package object swingui {
         mi.addActionListener(new ActionListener {
           override def actionPerformed(e: ActionEvent): Unit = invoke(ci.command)
         })
+        mi.putClientProperty(CommandTag, ci.command)
         Some(mi)
       case SeparatorDescription =>
         None
@@ -78,5 +80,22 @@ package object swingui {
       bar.add(createSubMenuFromDescription(menuDesc))
 
     bar
+  }
+
+  def findMenuItemsForCommand(bar: JMenuBar, command: Object): Seq[JMenuItem] = {
+    def findInMenu(menu: JMenu): Seq[JMenuItem] = for {
+      itemIndex <- 0 until menu.getItemCount
+      item = menu.getItem(itemIndex)
+      filteredItem <- item match {
+        case subMenu: JMenu => findInMenu(subMenu)
+        case null => Seq()
+        case _ => if (item.getClientProperty(CommandTag) eq command) Seq(item) else Seq()
+      }
+    } yield item
+
+    for {
+      menuIndex <- 0 until bar.getMenuCount
+      item <- findInMenu(bar.getMenu(menuIndex))
+    } yield item
   }
 }

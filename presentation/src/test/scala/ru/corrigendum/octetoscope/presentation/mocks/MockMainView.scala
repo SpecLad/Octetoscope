@@ -27,6 +27,7 @@ class MockMainView extends MockView with MainView {
   private[this] var _visible: Boolean = false
   private[this] val _tabs = mutable.Buffer[MockTab]()
   private[this] var _activeTabIndex: Int = _
+  private[this] var _disabledCommands = MainView.Command.ValueSet()
 
   def disposed = _disposed
   def visible = _visible
@@ -59,6 +60,12 @@ class MockMainView extends MockView with MainView {
     _tabs(_activeTabIndex).trigger(MainView.TabActivatedEvent)
   }
 
+  override def enableCommand(command: MainView.Command.Value) { _disabledCommands -= command }
+
+  override def disableCommand(command: MainView.Command.Value) { _disabledCommands += command }
+
+  def isCommandEnabled(command: MainView.Command.Value) = !_disabledCommands.contains(command)
+
   class MockTab(val title: String, val toolTip: String, val tree: DisplayTreeNode) extends Tab {
     override def close() {
       _tabs -= this
@@ -69,4 +76,5 @@ class MockMainView extends MockView with MainView {
       publish(event)
     }
   }
+
 }

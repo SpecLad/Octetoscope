@@ -118,6 +118,14 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
         .getClientProperty(SwingMainView.PropertyKeyTab).asInstanceOf[TabImpl])
   }
 
+  override def enableCommand(command: MainView.Command.Value) {
+    findMenuItemsForCommand(frame.getJMenuBar, command).foreach(_.setEnabled(true))
+  }
+
+  override def disableCommand(command: MainView.Command.Value) {
+    findMenuItemsForCommand(frame.getJMenuBar, command).foreach(_.setEnabled(false))
+  }
+
   private class TabImpl(val component: JComponent) extends Tab {
     def triggerEvent(event: TabEvent) { publish(event); }
 

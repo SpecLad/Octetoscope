@@ -48,6 +48,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   test("initialization") {
     view mustBe 'visible
     view.title mustBe "Blarf"
+    view.isCommandEnabled(MainView.Command.Close) mustBe false
   }
 
   test("quit command") {
@@ -108,6 +109,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     tab.tree mustBe presentPiece(dissectorDriver(MainPresenterSuite.FakePath))
 
     view.title mustBe "Blarf - cadabra"
+    view.isCommandEnabled(MainView.Command.Close) mustBe true
   }
 
   test("switching tabs") {
@@ -129,6 +131,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
     view.tabs must have size 0
     view.title mustBe "Blarf"
+    view.isCommandEnabled(MainView.Command.Close) mustBe false
   }
 
   test("tab closing via close button") {
@@ -139,6 +142,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.tabs.head.trigger(MainView.TabClosedEvent)
     view.tabs must have size 0
     view.title mustBe "Blarf"
+    view.isCommandEnabled(MainView.Command.Close) mustBe false
   }
 }
 

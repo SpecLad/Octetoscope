@@ -30,6 +30,7 @@ class MainPresenter(strings: PresentationStrings,
                     boxer: DialogBoxer,
                     dissectorDriver: DissectorDriver) {
   view.title = appName
+  view.disableCommand(MainView.Command.Close)
   view.show()
 
   view.subscribe(viewHandler)
@@ -39,7 +40,10 @@ class MainPresenter(strings: PresentationStrings,
   private def closeTab(tab: MainView.Tab) {
     tab.close()
     numTabs -= 1
-    if (numTabs == 0) view.title = appName
+    if (numTabs == 0) {
+      view.title = appName
+      view.disableCommand(MainView.Command.Close)
+    }
   }
 
   private object viewHandler extends MainView#Sub {
@@ -73,6 +77,7 @@ class MainPresenter(strings: PresentationStrings,
               pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(new TabHandler(path.getName))
               numTabs += 1
               view.title = appName + " - " + path.getName
+              view.enableCommand(MainView.Command.Close)
           }
 
         case CommandEvent(MainView.Command.Close) =>

@@ -16,6 +16,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import org.apache.tools.ant.filters.FixCrLfFilter
+
 apply plugin: 'base'
 
 def getVersionInfo() {
@@ -101,8 +103,14 @@ task dist(type: Zip) {
     into 'bin'
     fileMode 0755
   }
+
   from(installLibs.outputs) {
     into 'lib'
+  }
+
+  from(['README.txt', 'COPYING.txt']) {
+    // Using CRLFs as line endings, since that's the lowest common denominator.
+    filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('crlf'))
   }
 }
 

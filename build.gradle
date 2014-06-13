@@ -34,9 +34,9 @@ def getVersionInfo() {
   }
 }
 
-ext {
-  versionInfo = getVersionInfo()
+version = getVersionInfo()
 
+ext {
   def scalaMajorVersion = '2.10'
 
   deps = [
@@ -93,7 +93,6 @@ task installLibs(type: Sync) {
 task install(dependsOn: [installLauncher, installLibs])
 
 task dist(type: Zip) {
-  version versionInfo
   classifier 'bin'
   into "$baseName-$version-$classifier"
   dirMode 0755

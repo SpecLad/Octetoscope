@@ -33,10 +33,10 @@ task generateVersionResource {
   doLast {
     // Not using the Properties class here to avoid the timestamp.
     def propString = """\
-    releaseVersion = $versionInfo.releaseVersion
-    extraCommits = $versionInfo.extraCommits
-    commitHash = $versionInfo.commitHash
-    dirty = $versionInfo.dirty
+    releaseVersion = $rootProject.version.releaseVersion
+    extraCommits = $rootProject.version.extraCommits
+    commitHash = $rootProject.version.commitHash
+    dirty = $rootProject.version.dirty
     """.stripIndent()
 
     propFile.parentFile.mkdirs()

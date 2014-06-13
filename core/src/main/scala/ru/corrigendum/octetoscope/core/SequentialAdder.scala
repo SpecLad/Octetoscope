@@ -20,7 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder[Any]) {
+class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder) {
   var internalOffset = InfoSize()
 
   def apply[V](name: String, dissector: DissectorC[V]): V = {

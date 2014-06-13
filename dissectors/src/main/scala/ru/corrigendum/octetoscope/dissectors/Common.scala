@@ -26,7 +26,7 @@ private object Common {
     import Vector3.Value
 
     override def defaultValue: Value[T] = Value(None, None, None)
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Vector3.Value[T]], value: Value[T]) {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value[T]) {
       val add = new SequentialAdder(input, offset, builder)
       val xc = add.getContents("x", component)
       value.x = Some(xc.value)

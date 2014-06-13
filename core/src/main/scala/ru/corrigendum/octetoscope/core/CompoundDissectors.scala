@@ -23,7 +23,7 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 object CompoundDissectors {
   private class Array(size: Int, itemName: String, itemDissector: PlainDissector) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
 
       for (i <- 0 until size) add("%s #%d".format(itemName, i), itemDissector)
@@ -37,7 +37,7 @@ object CompoundDissectors {
     size: Int, itemName: String, itemDissector: DissectorC[V], reprFuncMaybe: Option[Seq[V] => String]
   ) extends MoleculeBuilderDissector[mutable.Buffer[V]] {
     override def defaultValue: mutable.Buffer[V] = new mutable.ArrayBuffer[V](size)
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[mutable.Buffer[V]], value: mutable.Buffer[V]) {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: mutable.Buffer[V]) {
       val add = new SequentialAdder(input, offset, builder)
 
       for (i <- 0 until size) value += add("%s #%d".format(itemName, i), itemDissector)
@@ -89,7 +89,7 @@ object CompoundDissectors {
     override def defaultValue: mutable.Set[String] = mutable.Set()
 
     override def dissectMB(input: Blob, offset: InfoSize,
-                           builder: MoleculeBuilder[mutable.Set[String]],
+                           builder: MoleculeBuilder,
                            value: mutable.Set[String]) {
       val add = new SequentialAdder(input, offset, builder)
 

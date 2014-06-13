@@ -23,7 +23,7 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 trait MoleculeBuilderDissector[Value] extends MoleculeDissectorC[Value] {
   final override def dissect(input: Blob, offset: InfoSize): MoleculeC[Value] = {
     val value = defaultValue
-    val builder = new MoleculeBuilder[Value](value)
+    val builder = new MoleculeBuilder()
     try {
       dissectMB(input, offset, builder, value)
     } catch {
@@ -31,11 +31,11 @@ trait MoleculeBuilderDissector[Value] extends MoleculeDissectorC[Value] {
         if (!builder.hasChildren) throw trunc.getCause
         builder.addNote(Quality.Broken, "truncated at \"%s\"".format(trunc.subPieceName))
     }
-    builder.build()
+    builder.build(value)
   }
 
   def defaultValue: Value
-  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Value], value: Value)
+  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value)
 }
 
 object MoleculeBuilderDissector {
@@ -44,9 +44,9 @@ object MoleculeBuilderDissector {
 
 trait MoleculeBuilderUnitDissector extends MoleculeBuilderDissector[Unit] {
   final override def defaultValue = ()
-  final override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit], value: Unit) {
+  final override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
     dissectMBU(input, offset, builder)
   }
 
-  def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit])
+  def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder)
 }

@@ -39,7 +39,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   private object Header extends MoleculeBuilderDissector[HeaderValue] {
     override def defaultValue: HeaderValue = new HeaderValue
 
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder[HeaderValue], value: HeaderValue) {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: HeaderValue) {
       val add = new SequentialAdder(input, offset, builder)
 
       val correctMagic = add("Identification", magic(MagicBytes, "IDPO")).isDefined
@@ -79,7 +79,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   }
 
   private class Skin(width: Int, height: Int) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
 
       add("Type", enum(sInt32L, Map(0 -> "ALIAS_SKIN_SINGLE", 1 -> "ALIAS_SKIN_GROUP"))) match {
@@ -99,7 +99,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
   // Quake's struct stvert_t.
   private object TexCoordPair extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
 
       /* The only bit that really makes sense to be set here is ALIAS_ONSEAM; the other bits
@@ -124,7 +124,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   private class Triangle(numVertices: Int) extends MoleculeBuilderUnitDissector {
     val lessThanNumVertices = lessThan(numVertices, "the number of vertices")
 
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
       /* Quake occasionally compares these values for equality, so we
          don't just treat any non-zero value as Front. */
@@ -141,7 +141,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
   // Quake's struct trivertx_t.
   private object Vertex extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
 
       val coordsC = add.getContents("Coordinates", vector3(uInt8))
@@ -153,7 +153,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
   // Quake's struct daliasframe_t.
   private class SingleFrame(numVertices: Int) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
 
       /* The bounding box corners are actually the same structure as
@@ -171,7 +171,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   }
 
   private class Frame(numVertices: Int) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
       val add = new SequentialAdder(input, offset, builder)
 
       add("Type", enum(sInt32L, Map(0 -> "ALIAS_SINGLE", 1 -> "ALIAS_GROUP"))) match {
@@ -195,7 +195,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     }
   }
 
-  override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder[Unit]) {
+  override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
     builder.setRepr("Quake model")
 
     val add = new SequentialAdder(input, offset, builder)

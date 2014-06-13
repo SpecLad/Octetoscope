@@ -18,21 +18,18 @@
 
 package ru.corrigendum.octetoscope.core
 
-class MoleculeBuilder[+V](value: V) { mb =>
+class MoleculeBuilder() {
   private[this] val childrenBuilder = Seq.newBuilder[SubPiece]
-  private[this] var contents: Contents[V] = new EagerContents(value)
+  private[this] var repr: Either[Option[String], () => Option[String]] = Left(None)
   private[this] var autoSize: InfoSize = InfoSize()
   private[this] var fixedSize: Option[InfoSize] = None
   private[this] val notes = Seq.newBuilder[Note]
   private[this] var hasChildren_ = false
 
-  def setRepr(repr: String) { this.contents = new EagerContents(value, Some(repr)) }
+  def setRepr(repr: String) { this.repr = Left(Some(repr)) }
 
   def setReprLazyO(reprOption: => Option[String]) {
-    this.contents = new Contents[V] {
-      override val value: V = mb.value
-      override def reprO: Option[String] = reprOption
-    }
+    this.repr = Right(() => reprOption)
   }
 
   def setReprLazy(repr: => String) {
@@ -47,7 +44,12 @@ class MoleculeBuilder[+V](value: V) { mb =>
 
   def addNote(quality: Quality.Value, text: String) { notes += Note(quality, text) }
 
-  def build(): MoleculeC[V] = {
+  def build[V](v: V): MoleculeC[V] = {
+    val contents = repr.fold(new EagerContents(v, _), r => new Contents[V] {
+      override val value: V = v
+      override def reprO: Option[String] = r()
+    })
+
     Molecule(fixedSize.getOrElse(autoSize), contents, childrenBuilder.result(), notes.result())
   }
 

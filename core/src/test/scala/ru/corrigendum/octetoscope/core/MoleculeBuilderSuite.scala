@@ -22,35 +22,35 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.MustMatchers._
 
 class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
-  var builder: MoleculeBuilder[Int] = _
+  var builder: MoleculeBuilder = _
 
   before {
-    builder = new MoleculeBuilder(5)
+    builder = new MoleculeBuilder()
   }
 
   test("default") {
     builder.hasChildren mustBe false
-    builder.build() mustBe Molecule(InfoSize(), new EagerContents(5), Seq())
+    builder.build(5) mustBe Molecule(InfoSize(), new EagerContents(5), Seq())
   }
 
   test("with repr") {
     builder.setRepr("value")
-    builder.build() mustBe Molecule(InfoSize(), new EagerContents(5, Some("value")), Seq())
+    builder.build(5) mustBe Molecule(InfoSize(), new EagerContents(5, Some("value")), Seq())
   }
 
   test("with lazy repr") {
     builder.setReprLazy("value")
-    builder.build() mustBe Molecule(InfoSize(), new EagerContents(5, Some("value")), Seq())
+    builder.build(5) mustBe Molecule(InfoSize(), new EagerContents(5, Some("value")), Seq())
   }
 
   test("with lazy reprO - None") {
     builder.setReprLazyO(None)
-    builder.build() mustBe Molecule(InfoSize(), new EagerContents(5), Seq())
+    builder.build(5) mustBe Molecule(InfoSize(), new EagerContents(5), Seq())
   }
 
   test("with lazy reprO - Some") {
     builder.setReprLazyO(Some("value"))
-    builder.build() mustBe Molecule(InfoSize(), new EagerContents(5, Some("value")), Seq())
+    builder.build(5) mustBe Molecule(InfoSize(), new EagerContents(5, Some("value")), Seq())
   }
 
   test("with children") {
@@ -64,13 +64,13 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
     builder.addChild(beta.name, beta.offset, beta.piece)
     builder.addChild(gamma.name, gamma.offset, gamma.piece)
 
-    builder.build() mustBe Molecule(Bytes(4), new EagerContents(5), Seq(alpha, beta, gamma))
+    builder.build(5) mustBe Molecule(Bytes(4), new EagerContents(5), Seq(alpha, beta, gamma))
   }
 
   test("with notes") {
     builder.addNote(Quality.Dubious, "foo")
     builder.addNote(Quality.Bad, "bar")
-    builder.build() mustBe Molecule(InfoSize(), new EagerContents(5), Seq(), notes = Seq(
+    builder.build(5) mustBe Molecule(InfoSize(), new EagerContents(5), Seq(), notes = Seq(
       Note(Quality.Dubious, "foo"),
       Note(Quality.Bad, "bar"))
     )
@@ -80,6 +80,6 @@ class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
     builder.addChild("alpha", Bytes(1), Atom(Bytes(5), EmptyContents))
     builder.fixSize(Bytes(10))
     builder.addChild("beta", Bytes(8), Atom(Bytes(5), EmptyContents))
-    builder.build().size mustBe Bytes(10)
+    builder.build(5).size mustBe Bytes(10)
   }
 }

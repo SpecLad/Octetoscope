@@ -27,18 +27,22 @@ sourceSets {
 }
 
 task generateVersionResource {
-  def propFile = new File(generatedResourcesDir, 'ru/corrigendum/octetoscope/core/version.properties')
-  outputs.file propFile
-
-  doLast {
-    // Not using the Properties class here to avoid the timestamp.
-    def propString = """\
+  // Not using the Properties class here to avoid the timestamp.
+  def propString = """\
     releaseVersion = $rootProject.version.releaseVersion
     extraCommits = $rootProject.version.extraCommits
     commitHash = $rootProject.version.commitHash
     dirty = $rootProject.version.dirty
     """.stripIndent()
 
+  def propFile = new File(generatedResourcesDir, 'ru/corrigendum/octetoscope/core/version.properties')
+  outputs.file propFile
+  outputs.upToDateWhen {
+    try { propFile.getText("US-ASCII") == propString }
+    catch (IOException ignored) { false }
+  }
+
+  doLast {
     propFile.parentFile.mkdirs()
     propFile.write(propString)
   }

@@ -20,7 +20,7 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-trait MoleculeBuilderDissector[Value] extends MoleculeDissectorC[Value] {
+trait MoleculeBuilderPostProcessingDissector[Value, WIP] extends MoleculeDissectorC[Value] {
   final override def dissect(input: Blob, offset: InfoSize): MoleculeC[Value] = {
     val value = defaultValue
     val builder = new MoleculeBuilder()
@@ -31,11 +31,16 @@ trait MoleculeBuilderDissector[Value] extends MoleculeDissectorC[Value] {
         if (!builder.hasChildren) throw trunc.getCause
         builder.addNote(Quality.Broken, "truncated at \"%s\"".format(trunc.subPieceName))
     }
-    builder.build(value)
+    builder.build(postProcess(value))
   }
 
-  def defaultValue: Value
-  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value)
+  def defaultValue: WIP
+  def postProcess(wip: WIP): Value
+  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP)
+}
+
+trait MoleculeBuilderDissector[Value] extends MoleculeBuilderPostProcessingDissector[Value, Value] {
+  final override def postProcess(wip: Value): Value = wip
 }
 
 object MoleculeBuilderDissector {

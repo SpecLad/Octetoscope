@@ -24,14 +24,15 @@ import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class DissectorSuite extends FunSuite {
-  test("MoleculeBuilderDissector.dissect") {
-    case class Value(var i: Int)
+  test("MoleculeBuilderPostProcessingDissector.dissect") {
+    case class WIP(var i: Int)
 
     val child = Atom(Bytes(1), new ToStringContents("a"))
 
-    val mbd = new MoleculeBuilderDissector[Value] {
-      override def defaultValue: Value = Value(1)
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
+    val mbd = new MoleculeBuilderPostProcessingDissector[String, WIP] {
+      override def defaultValue: WIP = WIP(1)
+      override def postProcess(wip: WIP): String = wip.i.toString
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP) {
         value.i mustBe 1
         value.i = 2
         builder.addChild("alpha", Bytes(1), child)
@@ -39,9 +40,46 @@ class DissectorSuite extends FunSuite {
     }
 
     mbd.dissect(Blob.empty) mustBe
-      Molecule(Bytes(2), new EagerContents(Value(2)), Seq(
+      Molecule(Bytes(2), new EagerContents("2"), Seq(
         SubPiece("alpha", Bytes(1), child)
       ))
+  }
+
+  test("MoleculeBuilderPostProcessingDissector - truncated - empty") {
+    val cause = new IndexOutOfBoundsException
+
+    val truncated = new MoleculeBuilderPostProcessingDissector[Unit, Unit] {
+      override def defaultValue = Unit
+      override def postProcess(wip: Unit): Unit = wip
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
+        throw new MoleculeBuilderDissector.TruncatedException(cause, "alpha")
+      }
+    }
+
+    val exc = the [IndexOutOfBoundsException] thrownBy truncated.dissect(Blob.empty)
+    exc must be theSameInstanceAs cause
+  }
+
+  test("MoleculeBuilderPostProcessingDissector - truncated - non-empty") {
+    case class WIP(var i: Int)
+
+    val child = Atom(Bytes(1), EmptyContents)
+
+    val truncated = new MoleculeBuilderPostProcessingDissector[String, WIP] {
+      override def defaultValue = WIP(0)
+      override def postProcess(wip: WIP): String = wip.i.toString
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP) {
+        value.i = 1
+        builder.addChild("alpha", InfoSize(), child)
+        throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "beta")
+      }
+    }
+
+    val molecule = truncated.dissect(Blob.empty)
+    molecule.children mustBe Seq(SubPiece("alpha", InfoSize(), child))
+    molecule.notes.loneElement.pieceQuality mustBe Quality.Broken
+    molecule.notes.loneElement.text must include ("\"beta\"")
+    molecule.contents.value mustBe "1"
   }
 
   test("MoleculeBuilderUnitDissector.dissectMB") {
@@ -60,40 +98,5 @@ class DissectorSuite extends FunSuite {
       Molecule(Bytes(2), EmptyContents, Seq(
         SubPiece("alpha", Bytes(1), child)
       ))
-  }
-
-  test("MoleculeBuilderDissector - truncated - empty") {
-    val cause = new IndexOutOfBoundsException
-
-    val truncated = new MoleculeBuilderDissector[Unit] {
-      override def defaultValue = Unit
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
-        throw new MoleculeBuilderDissector.TruncatedException(cause, "alpha")
-      }
-    }
-
-    val exc = the [IndexOutOfBoundsException] thrownBy truncated.dissect(Blob.empty)
-    exc must be theSameInstanceAs cause
-  }
-
-  test("MoleculeBuilderDissector - truncated - non-empty") {
-    case class Value(var i: Int)
-
-    val child = Atom(Bytes(1), EmptyContents)
-
-    val truncated = new MoleculeBuilderDissector[Value] {
-      override def defaultValue = Value(0)
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
-        value.i = 1
-        builder.addChild("alpha", InfoSize(), child)
-        throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "beta")
-      }
-    }
-
-    val molecule = truncated.dissect(Blob.empty)
-    molecule.children mustBe Seq(SubPiece("alpha", InfoSize(), child))
-    molecule.notes.loneElement.pieceQuality mustBe Quality.Broken
-    molecule.notes.loneElement.text must include ("\"beta\"")
-    molecule.contents.value.i mustBe 1
   }
 }

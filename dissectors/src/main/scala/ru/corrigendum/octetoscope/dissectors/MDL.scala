@@ -37,7 +37,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct mdl_t.
   private object Header extends MoleculeBuilderDissector[HeaderValue] {
-    override def defaultValue: HeaderValue = new HeaderValue
+    override def defaultWIP: HeaderValue = new HeaderValue
 
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: HeaderValue) {
       val add = new SequentialAdder(input, offset, builder)

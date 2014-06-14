@@ -20,9 +20,11 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-trait MoleculeBuilderPostProcessingDissector[Value, WIP] extends MoleculeDissectorC[Value] {
+trait MoleculeBuilderPostProcessingDissector[Value, WIP]
+    extends MoleculeDissectorC[Value] with DissectorWithDefaultValueC[Value] {
+  final override def defaultValue = postProcess(defaultWIP)
   final override def dissect(input: Blob, offset: InfoSize): MoleculeC[Value] = {
-    val value = defaultValue
+    val value = defaultWIP
     val builder = new MoleculeBuilder()
     try {
       dissectMB(input, offset, builder, value)
@@ -34,7 +36,7 @@ trait MoleculeBuilderPostProcessingDissector[Value, WIP] extends MoleculeDissect
     builder.build(postProcess(value))
   }
 
-  def defaultValue: WIP
+  def defaultWIP: WIP
   def postProcess(wip: WIP): Value
   def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP)
 }
@@ -48,7 +50,7 @@ object MoleculeBuilderDissector {
 }
 
 trait MoleculeBuilderUnitDissector extends MoleculeBuilderDissector[Unit] {
-  final override def defaultValue = ()
+  final override def defaultWIP = ()
   final override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
     dissectMBU(input, offset, builder)
   }

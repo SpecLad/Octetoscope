@@ -32,3 +32,7 @@ trait Dissector[+V, +C <: Contents[V]] {
 trait MoleculeDissector[+V, +C <: Contents[V]] extends Dissector[V, C] {
   override def dissect(input: Blob, offset: InfoSize = InfoSize()): Molecule[C]
 }
+
+trait DissectorWithDefaultValue[+V, +C <: Contents[V]] extends Dissector[V, C] {
+  def defaultValue: V
+}

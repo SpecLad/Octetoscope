@@ -27,6 +27,7 @@ package object core {
   type MoleculeC[V] = Molecule[Contents[V]]
   type DissectorC[V] = Dissector[V, Contents[V]]
   type MoleculeDissectorC[V] = MoleculeDissector[V, Contents[V]]
+  type DissectorWithDefaultValueC[V] = DissectorWithDefaultValue[V, Contents[V]]
 
   type PieceCR[V] = Piece[ContentsR[V]]
   type AtomCR[V] = Atom[ContentsR[V]]

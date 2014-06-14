@@ -25,7 +25,7 @@ private object Common {
   private class Vector3[T](component: DissectorCR[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {
     import Vector3.Value
 
-    override def defaultValue: Value[T] = Value(None, None, None)
+    override def defaultWIP: Value[T] = Value(None, None, None)
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value[T]) {
       val add = new SequentialAdder(input, offset, builder)
       val xc = add.getContents("x", component)

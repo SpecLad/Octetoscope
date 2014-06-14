@@ -36,7 +36,7 @@ object CompoundDissectors {
   private class CollectingArray[V](
     size: Int, itemName: String, itemDissector: DissectorC[V], reprFuncMaybe: Option[Seq[V] => String]
   ) extends MoleculeBuilderDissector[mutable.Buffer[V]] {
-    override def defaultValue: mutable.Buffer[V] = new mutable.ArrayBuffer[V](size)
+    override def defaultWIP: mutable.Buffer[V] = new mutable.ArrayBuffer[V](size)
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: mutable.Buffer[V]) {
       val add = new SequentialAdder(input, offset, builder)
 
@@ -86,7 +86,7 @@ object CompoundDissectors {
                          sbz: Set[String],
                          unnamedReason: String)
       extends MoleculeBuilderDissector[mutable.Set[String]] {
-    override def defaultValue: mutable.Set[String] = mutable.Set()
+    override def defaultWIP: mutable.Set[String] = mutable.Set()
 
     override def dissectMB(input: Blob, offset: InfoSize,
                            builder: MoleculeBuilder,

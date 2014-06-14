@@ -84,7 +84,7 @@ class AdderSuite extends FunSuite {
     case class Value(var i: Int)
 
     val dissector = new MoleculeBuilderDissector[Value] {
-      def defaultValue: Value = Value(0)
+      def defaultWIP: Value = Value(0)
       def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
         value.i = 1
         offset mustBe Bytes(3)
@@ -108,7 +108,7 @@ class AdderSuite extends FunSuite {
     case class Value(var i: Int)
 
     val dissector = new MoleculeBuilderDissector[Value] {
-      def defaultValue: Value = Value(0)
+      def defaultWIP: Value = Value(0)
       def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
         value.i = 1
         throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "alpha")

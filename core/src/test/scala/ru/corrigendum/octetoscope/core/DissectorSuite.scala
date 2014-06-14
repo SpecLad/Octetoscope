@@ -24,13 +24,23 @@ import org.scalatest.LoneElement._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class DissectorSuite extends FunSuite {
+  test("MoleculeBuilderPostProcessingDissector.defaultValue") {
+    val mbd = new MoleculeBuilderPostProcessingDissector[String, Int] {
+      override def defaultWIP: Int = 1
+      override def postProcess(wip: Int): String = wip.toString
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Int) { }
+    }
+
+    mbd.defaultValue mustBe "1"
+  }
+
   test("MoleculeBuilderPostProcessingDissector.dissect") {
     case class WIP(var i: Int)
 
     val child = Atom(Bytes(1), new ToStringContents("a"))
 
     val mbd = new MoleculeBuilderPostProcessingDissector[String, WIP] {
-      override def defaultValue: WIP = WIP(1)
+      override def defaultWIP: WIP = WIP(1)
       override def postProcess(wip: WIP): String = wip.i.toString
       override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP) {
         value.i mustBe 1
@@ -49,7 +59,7 @@ class DissectorSuite extends FunSuite {
     val cause = new IndexOutOfBoundsException
 
     val truncated = new MoleculeBuilderPostProcessingDissector[Unit, Unit] {
-      override def defaultValue = Unit
+      override def defaultWIP = Unit
       override def postProcess(wip: Unit): Unit = wip
       override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
         throw new MoleculeBuilderDissector.TruncatedException(cause, "alpha")
@@ -66,7 +76,7 @@ class DissectorSuite extends FunSuite {
     val child = Atom(Bytes(1), EmptyContents)
 
     val truncated = new MoleculeBuilderPostProcessingDissector[String, WIP] {
-      override def defaultValue = WIP(0)
+      override def defaultWIP = WIP(0)
       override def postProcess(wip: WIP): String = wip.i.toString
       override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP) {
         value.i = 1

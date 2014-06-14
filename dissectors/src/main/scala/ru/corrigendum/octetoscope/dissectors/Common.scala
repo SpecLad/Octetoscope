@@ -44,6 +44,6 @@ private object Common {
 
   type Vector3[T] = (Option[T], Option[T], Option[T])
 
-  def vector3[T](component: DissectorCR[T]): MoleculeDissectorC[Vector3[T]] with DissectorWithDefaultValueC[Vector3[T]] =
+  def vector3[T](component: DissectorCR[T]): MoleculeDissectorWithDefaultValueC[Vector3[T]] =
     new Vector3Dissector(component)
 }

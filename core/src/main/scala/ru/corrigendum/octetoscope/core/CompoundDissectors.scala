@@ -57,12 +57,12 @@ object CompoundDissectors {
 
   def collectingArray[V](
     size: Int, itemName: String, itemDissector: DissectorC[V]
-  ): MoleculeDissectorC[IndexedSeq[V]] with DissectorWithDefaultValueC[IndexedSeq[V]] =
+  ): MoleculeDissectorWithDefaultValueC[IndexedSeq[V]] =
     new CollectingArray[V](size, itemName, itemDissector, None)
 
   def collectingArray[V](
     size: Int, itemName: String, itemDissector: DissectorC[V], reprFunc: Seq[V] => String
-  ): MoleculeDissectorC[IndexedSeq[V]] with DissectorWithDefaultValueC[IndexedSeq[V]] =
+  ): MoleculeDissectorWithDefaultValueC[IndexedSeq[V]] =
     new CollectingArray[V](size, itemName, itemDissector, Some(reprFunc))
 
   private class Enum[V, E](underlying: DissectorCR[V], enumerators: Map[V, E]) extends DissectorCR[Option[E]] {
@@ -124,7 +124,6 @@ object CompoundDissectors {
   def bitField(totalBits: Long,
                namedBits: Map[Long, String],
                sbz: Set[String] = Set.empty,
-               unnamedReason: String = "unknown"): MoleculeDissectorC[Set[String]]
-                                                   with DissectorWithDefaultValueC[Set[String]] =
+               unnamedReason: String = "unknown"): MoleculeDissectorWithDefaultValueC[Set[String]] =
     new BitField(totalBits, namedBits, sbz, unnamedReason)
 }

@@ -81,42 +81,31 @@ class AdderSuite extends FunSuite {
   test("random adder") {
     val builder = new MoleculeBuilder
 
-    case class Value(var i: Int)
-
-    val dissector = new MoleculeBuilderDissector[Value] {
-      def defaultWIP: Value = Value(0)
-      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
-        value.i = 1
+    val dissector = new DissectorWithDefaultValueC[Int] {
+      override def defaultValue: Int = 1
+      override def dissect(input: Blob, offset: InfoSize): Piece[Contents[Int]] = {
         offset mustBe Bytes(3)
-        builder.addChild("alpha", Bytes(0), Atom(Bytes(1), EmptyContents))
+        Atom(Bytes(3), new EagerContents(2))
       }
     }
 
     val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
-    adder("omega", Bytes(2), dissector) mustBe Value(1)
+    adder("omega", Bytes(2), dissector) mustBe 2
 
-    builder.build() mustBe Molecule(Bytes(3), EmptyContents, Seq(
-      SubPiece("omega", Bytes(2), Molecule(Bytes(1), new EagerContents(Value(1)), Seq(
-        SubPiece("alpha", Bytes(0), Atom(Bytes(1), EmptyContents))
-      )))
-    ))
+    builder.build() mustBe Molecule(Bytes(5), EmptyContents, Seq(
+      SubPiece("omega", Bytes(2), Atom(Bytes(3), new EagerContents(2)))))
   }
 
   test("random adder - throw") {
     val builder = new MoleculeBuilder
 
-    case class Value(var i: Int)
-
-    val dissector = new MoleculeBuilderDissector[Value] {
-      def defaultWIP: Value = Value(0)
-      def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value) {
-        value.i = 1
-        throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "alpha")
-      }
+    val dissector = new DissectorWithDefaultValueC[Int] {
+      override def defaultValue: Int = 1
+      override def dissect(input: Blob, offset: InfoSize): Piece[Contents[Int]] = throw new IndexOutOfBoundsException
     }
 
     val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
-    adder("omega", Bytes(2), dissector) mustBe Value(0)
+    adder("omega", Bytes(2), dissector) mustBe 1
 
     inside(builder.build()) { case Molecule(size_, _, children, notes) =>
       size_ mustBe InfoSize()

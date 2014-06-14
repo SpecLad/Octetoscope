@@ -38,7 +38,7 @@ trait MoleculeBuilderPostProcessingDissector[Value, WIP]
 
   def defaultWIP: WIP
   def postProcess(wip: WIP): Value
-  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP)
+  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, wip: WIP)
 }
 
 trait MoleculeBuilderDissector[Value] extends MoleculeBuilderPostProcessingDissector[Value, Value] {
@@ -51,7 +51,7 @@ object MoleculeBuilderDissector {
 
 trait MoleculeBuilderUnitDissector extends MoleculeBuilderDissector[Unit] {
   final override def defaultWIP = ()
-  final override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
+  final override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, wip: Unit) {
     dissectMBU(input, offset, builder)
   }
 

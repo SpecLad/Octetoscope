@@ -22,11 +22,12 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core._
 
 private object Common {
-  private class Vector3[T](component: DissectorCR[T]) extends MoleculeBuilderDissector[Vector3.Value[T]] {
-    import Vector3.Value
+  private class Vector3Dissector[T](component: DissectorCR[T])
+      extends MoleculeBuilderPostProcessingDissector[Vector3[T], Vector3WIP[T]] {
+    override def defaultWIP: Vector3WIP[T] = Vector3WIP(None, None, None)
+    override def postProcess(wip: Vector3WIP[T]): Vector3[T] = (wip.x, wip.y, wip.z)
 
-    override def defaultWIP: Value[T] = Value(None, None, None)
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Value[T]) {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Vector3WIP[T]) {
       val add = new SequentialAdder(input, offset, builder)
       val xc = add.getContents("x", component)
       value.x = Some(xc.value)
@@ -39,9 +40,10 @@ private object Common {
     }
   }
 
-  object Vector3 {
-    case class Value[T](var x: Option[T], var y: Option[T], var z: Option[T])
-  }
+  private case class Vector3WIP[T](var x: Option[T], var y: Option[T], var z: Option[T])
 
-  def vector3[T](component: DissectorCR[T]): MoleculeDissectorC[Vector3.Value[T]] = new Vector3(component)
+  type Vector3[T] = (Option[T], Option[T], Option[T])
+
+  def vector3[T](component: DissectorCR[T]): MoleculeDissectorC[Vector3[T]] with DissectorWithDefaultValueC[Vector3[T]] =
+    new Vector3Dissector(component)
 }

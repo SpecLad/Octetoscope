@@ -35,25 +35,34 @@ object CompoundDissectors {
 
   private class CollectingArray[V](
     size: Int, itemName: String, itemDissector: DissectorC[V], reprFuncMaybe: Option[Seq[V] => String]
-  ) extends MoleculeBuilderDissector[mutable.Buffer[V]] {
-    override def defaultWIP: mutable.Buffer[V] = new mutable.ArrayBuffer[V](size)
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: mutable.Buffer[V]) {
+  ) extends MoleculeBuilderPostProcessingDissector[IndexedSeq[V], mutable.Buffer[V]] {
+    /* Ideally, we'd like to use Builder[V, IndexedSeq[V]] as the WIP type, but we can't,
+       since we need an IndexedSeq to pass to reprFuncMaybe, and we can't call builder.result
+       in dissectMB, since it invalidates the builder. TODO: do something about this,
+       probably splitting the repr setting into a dissector transformation.
+     */
+    override def defaultWIP: mutable.Buffer[V] = mutable.Buffer[V]()
+
+    override def postProcess(wip: mutable.Buffer[V]): IndexedSeq[V] = wip.toIndexedSeq
+
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder,
+                           wip: mutable.Buffer[V]) {
       val add = new SequentialAdder(input, offset, builder)
 
-      for (i <- 0 until size) value += add("%s #%d".format(itemName, i), itemDissector)
+      for (i <- 0 until size) wip += add("%s #%d".format(itemName, i), itemDissector)
 
-      reprFuncMaybe.foreach(f => builder.setReprLazy(f(value)))
+      reprFuncMaybe.foreach(f => builder.setReprLazy(f(wip)))
     }
   }
 
   def collectingArray[V](
     size: Int, itemName: String, itemDissector: DissectorC[V]
-  ): MoleculeBuilderDissector[mutable.Buffer[V]] =
+  ): MoleculeDissectorC[IndexedSeq[V]] with DissectorWithDefaultValueC[IndexedSeq[V]] =
     new CollectingArray[V](size, itemName, itemDissector, None)
 
   def collectingArray[V](
     size: Int, itemName: String, itemDissector: DissectorC[V], reprFunc: Seq[V] => String
-  ): MoleculeBuilderDissector[mutable.Buffer[V]] =
+  ): MoleculeDissectorC[IndexedSeq[V]] with DissectorWithDefaultValueC[IndexedSeq[V]] =
     new CollectingArray[V](size, itemName, itemDissector, Some(reprFunc))
 
   private class Enum[V, E](underlying: DissectorCR[V], enumerators: Map[V, E]) extends DissectorCR[Option[E]] {
@@ -85,12 +94,13 @@ object CompoundDissectors {
                          namedBits: Map[Long, String],
                          sbz: Set[String],
                          unnamedReason: String)
-      extends MoleculeBuilderDissector[mutable.Set[String]] {
-    override def defaultWIP: mutable.Set[String] = mutable.Set()
+      extends MoleculeBuilderPostProcessingDissector[Set[String], mutable.Builder[String, Set[String]]] {
+    override def defaultWIP: mutable.Builder[String, Set[String]] = Set.newBuilder[String]
+    override def postProcess(wip: mutable.Builder[String, Set[String]]): Set[String] = wip.result()
 
     override def dissectMB(input: Blob, offset: InfoSize,
                            builder: MoleculeBuilder,
-                           value: mutable.Set[String]) {
+                           wip: mutable.Builder[String, Set[String]]) {
       val add = new SequentialAdder(input, offset, builder)
 
       val setBitNames = IndexedSeq.newBuilder[String]
@@ -100,7 +110,7 @@ object CompoundDissectors {
           case Some(name) =>
             if (add(name, if (sbz(name)) bitSbz else PrimitiveDissectors.bit)) {
               setBitNames += name
-              value += name
+              wip += name
             }
           case None =>
             if (add("Bit #%d (%s)".format(i, unnamedReason), PrimitiveDissectors.bit))
@@ -114,6 +124,7 @@ object CompoundDissectors {
   def bitField(totalBits: Long,
                namedBits: Map[Long, String],
                sbz: Set[String] = Set.empty,
-               unnamedReason: String = "unknown"): MoleculeDissectorC[collection.Set[String]] =
+               unnamedReason: String = "unknown"): MoleculeDissectorC[Set[String]]
+                                                   with DissectorWithDefaultValueC[Set[String]] =
     new BitField(totalBits, namedBits, sbz, unnamedReason)
 }

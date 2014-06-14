@@ -19,9 +19,9 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.MustMatchers._
 import org.scalatest.Inside._
-import PrimitiveDissectors._
+import org.scalatest.MustMatchers._
+import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 
 class PrimitiveDissectorsSuite extends FunSuite {
   import PrimitiveDissectorsSuite._

@@ -18,11 +18,13 @@
 
 package ru.corrigendum.octetoscope.core
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-import java.nio.{CharBuffer, ByteBuffer}
 import java.nio.charset.{CoderResult, StandardCharsets}
-import scala.util.control.Breaks._
+import java.nio.{ByteBuffer, CharBuffer}
 import java.util.StringTokenizer
+
+import ru.corrigendum.octetoscope.abstractinfra.Blob
+
+import scala.util.control.Breaks._
 
 private object StringDissectors {
   /* The double quote is used to delimit printable characters in string reprs,

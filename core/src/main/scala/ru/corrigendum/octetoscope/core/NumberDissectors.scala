@@ -18,8 +18,9 @@
 
 package ru.corrigendum.octetoscope.core
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 import java.util.Locale
+
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 private object NumberDissectors {
   private val NumCachedSizes = 4

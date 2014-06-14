@@ -19,6 +19,7 @@
 package ru.corrigendum.octetoscope.swingui
 
 import javax.swing.tree.DefaultMutableTreeNode
+
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 
 private class PieceTreeNode(data: DisplayTreeNode) extends DefaultMutableTreeNode {

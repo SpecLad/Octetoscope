@@ -18,9 +18,10 @@
 
 package ru.corrigendum.octetoscope
 
-import ru.corrigendum.octetoscope.core._
-import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 import java.awt.Color
+
+import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
+import ru.corrigendum.octetoscope.core._
 
 package object presentation {
   private[presentation] val QualityColors = Map(

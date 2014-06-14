@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 package ru.corrigendum.octetoscope.core.mocks
 
 import java.io.File
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
+
+import ru.corrigendum.octetoscope.abstractinfra.{BinaryReader, Blob}
 
 class MockBinaryReader(result: Blob) extends BinaryReader {
   override def readWhole(path: File): Blob = result

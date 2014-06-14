@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@
 
 package ru.corrigendum.octetoscope.swingui
 
-import javax.swing._
 import java.awt._
-import javax.swing.plaf.basic.BasicButtonUI
-import resource.managed
 import java.awt.event.{ActionEvent, ActionListener}
+import javax.swing._
+import javax.swing.plaf.basic.BasicButtonUI
+
+import resource.managed
 
 private object TabComponent {
   def get(title: String, onClick: () => Unit): JComponent = {

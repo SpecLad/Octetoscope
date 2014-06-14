@@ -21,8 +21,8 @@ package ru.corrigendum.octetoscope.presentation
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
 import org.scalatest.OptionValues._
-import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
+import ru.corrigendum.octetoscope.core._
 
 class PackageSuite extends FunSuite {
   test("presentVersionInfo") {

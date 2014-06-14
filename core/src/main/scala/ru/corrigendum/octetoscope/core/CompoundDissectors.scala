@@ -18,8 +18,9 @@
 
 package ru.corrigendum.octetoscope.core
 
-import scala.collection.mutable
 import ru.corrigendum.octetoscope.abstractinfra.Blob
+
+import scala.collection.mutable
 
 object CompoundDissectors {
   private class Array(size: Int, itemName: String, itemDissector: PlainDissector) extends MoleculeBuilderUnitDissector {

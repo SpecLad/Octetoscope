@@ -19,12 +19,12 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.MustMatchers._
 import org.scalatest.Inside._
 import org.scalatest.LoneElement._
-import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
-import ru.corrigendum.octetoscope.core.CommonConstraints._
+import org.scalatest.MustMatchers._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
+import ru.corrigendum.octetoscope.core.CommonConstraints._
+import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 
 class AdderSuite extends FunSuite {
   test("sequential adder") {

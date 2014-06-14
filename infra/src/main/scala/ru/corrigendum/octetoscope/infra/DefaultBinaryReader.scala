@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,13 +18,14 @@
 
 package ru.corrigendum.octetoscope.infra
 
-import java.io.{FileInputStream, File}
-import scala.collection.mutable
+import java.io.{File, FileInputStream}
+
 import resource.managed
-import scala.util.control.Breaks._
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
+import ru.corrigendum.octetoscope.abstractinfra.{BinaryReader, Blob}
 import ru.corrigendum.octetoscope.core.ArrayBlob
+
+import scala.collection.mutable
+import scala.util.control.Breaks._
 
 object DefaultBinaryReader extends BinaryReader {
   def readWhole(path: File): Blob = {

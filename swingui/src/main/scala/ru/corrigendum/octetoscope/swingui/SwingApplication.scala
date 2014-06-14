@@ -18,8 +18,9 @@
 
 package ru.corrigendum.octetoscope.swingui
 
-import ru.corrigendum.octetoscope.abstractui.{UIStrings, MainView}
 import javax.swing.{JFileChooser, SwingUtilities, UIManager}
+
+import ru.corrigendum.octetoscope.abstractui.{MainView, UIStrings}
 
 object SwingApplication {
   def setStyle() {

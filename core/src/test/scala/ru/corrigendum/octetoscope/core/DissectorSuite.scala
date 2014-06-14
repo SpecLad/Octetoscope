@@ -19,8 +19,8 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.FunSuite
-import org.scalatest.MustMatchers._
 import org.scalatest.LoneElement._
+import org.scalatest.MustMatchers._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class DissectorSuite extends FunSuite {

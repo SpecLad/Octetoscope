@@ -19,6 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 import java.util.Properties
+
 import resource.managed
 
 case class VersionInfo(releaseVersion: String, extraCommits: Int, commitHash: String, dirty: Boolean)

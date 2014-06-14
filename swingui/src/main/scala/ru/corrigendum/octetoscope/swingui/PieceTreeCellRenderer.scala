@@ -18,9 +18,9 @@
 
 package ru.corrigendum.octetoscope.swingui
 
+import java.awt.{Color, Component, FlowLayout}
 import javax.swing.tree.{DefaultTreeCellRenderer, TreeCellRenderer}
 import javax.swing.{BorderFactory, JLabel, JPanel, JTree}
-import java.awt.{Color, FlowLayout, Component}
 
 private class PieceTreeCellRenderer extends TreeCellRenderer {
   private val wrapped = new DefaultTreeCellRenderer

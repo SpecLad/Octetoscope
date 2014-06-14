@@ -18,14 +18,15 @@
 
 package ru.corrigendum.octetoscope.presentation
 
-import ru.corrigendum.octetoscope.presentation.mocks.{MockDissectorDriver, MockDialogBoxer, MockMainView}
+import java.io.{File, IOException}
+
+import org.scalatest.LoneElement._
+import org.scalatest.MustMatchers._
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import ru.corrigendum.octetoscope.abstractui.MainView
-import org.scalatest.MustMatchers._
-import org.scalatest.LoneElement._
-import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 import ru.corrigendum.octetoscope.core._
-import java.io.{IOException, File}
+import ru.corrigendum.octetoscope.presentation.mocks.{MockDialogBoxer, MockDissectorDriver, MockMainView}
+import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _

@@ -19,11 +19,11 @@
 package ru.corrigendum.octetoscope.dissectors
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.core._
-import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
-import Common.vector3
+import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
+import ru.corrigendum.octetoscope.core._
+import ru.corrigendum.octetoscope.dissectors.Common.vector3
 
 /*
   Quake II models (*.md2).

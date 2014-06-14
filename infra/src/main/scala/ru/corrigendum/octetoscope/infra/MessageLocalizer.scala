@@ -18,10 +18,11 @@
 
 package ru.corrigendum.octetoscope.infra
 
-import java.lang.reflect.{Method, InvocationHandler, Proxy}
-import ru.corrigendum.octetoscope.abstractinfra.Translation
-import com.ibm.icu.text.MessageFormat
+import java.lang.reflect.{InvocationHandler, Method, Proxy}
 import java.util.Locale
+
+import com.ibm.icu.text.MessageFormat
+import ru.corrigendum.octetoscope.abstractinfra.Translation
 
 object MessageLocalizer {
   def localize[T](iface: Class[T], translationMap: Map[String, Class[_ <: T]]): T = {

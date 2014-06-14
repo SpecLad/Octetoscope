@@ -19,7 +19,8 @@
 package ru.corrigendum.octetoscope
 
 import java.io.File
-import ru.corrigendum.octetoscope.abstractinfra.{Blob, BinaryReader}
+
+import ru.corrigendum.octetoscope.abstractinfra.{BinaryReader, Blob}
 
 package object core {
   type PieceC[V] = Piece[Contents[V]]

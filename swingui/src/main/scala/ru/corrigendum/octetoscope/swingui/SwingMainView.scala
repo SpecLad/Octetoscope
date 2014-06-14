@@ -18,13 +18,14 @@
 
 package ru.corrigendum.octetoscope.swingui
 
-import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, UIStrings, MainView}
-import javax.swing._
-import java.awt.event.{WindowEvent, WindowListener}
-import ru.corrigendum.octetoscope.abstractui.MainView.{TabEvent, Tab}
 import java.awt.Dimension
-import javax.swing.event.{TreeExpansionEvent, TreeWillExpandListener, ChangeEvent, ChangeListener}
+import java.awt.event.{WindowEvent, WindowListener}
+import javax.swing._
+import javax.swing.event.{ChangeEvent, ChangeListener, TreeExpansionEvent, TreeWillExpandListener}
 import javax.swing.tree.DefaultTreeModel
+
+import ru.corrigendum.octetoscope.abstractui.MainView.{Tab, TabEvent}
+import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView, UIStrings}
 
 private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends SwingView(chooser) with MainView {
   private[this] val tabPane = new JTabbedPane()

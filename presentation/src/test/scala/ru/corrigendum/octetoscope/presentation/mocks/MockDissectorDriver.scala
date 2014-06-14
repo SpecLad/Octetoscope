@@ -18,8 +18,9 @@
 
 package ru.corrigendum.octetoscope.presentation.mocks
 
-import ru.corrigendum.octetoscope.core.{PlainPiece, DissectorDriver}
 import java.io.File
+
+import ru.corrigendum.octetoscope.core.{DissectorDriver, PlainPiece}
 
 class MockDissectorDriver extends DissectorDriver {
   override def apply(path: File): PlainPiece = {

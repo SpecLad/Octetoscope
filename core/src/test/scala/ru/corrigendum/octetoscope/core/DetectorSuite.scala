@@ -21,7 +21,6 @@ package ru.corrigendum.octetoscope.core
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
 import org.scalatest.OptionValues._
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.mocks.MockDissector
 
 class DetectorSuite extends FunSuite {

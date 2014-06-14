@@ -18,11 +18,10 @@
 
 package ru.corrigendum.octetoscope
 
-import ru.corrigendum.octetoscope.abstractui._
+import java.awt.event.{ActionEvent, ActionListener, KeyEvent}
 import javax.swing._
-import java.awt.event.{KeyEvent, ActionEvent, ActionListener}
-import ru.corrigendum.octetoscope.abstractui.CommandItemDescription
-import ru.corrigendum.octetoscope.abstractui.SubMenuDescription
+
+import ru.corrigendum.octetoscope.abstractui.{CommandItemDescription, SubMenuDescription, _}
 
 package object swingui {
   private val MnemonicStringPattern = """^((?:[^&]|&&)*)&(\p{javaLetterOrDigit})((?:[^&]|&&)*)$""".r

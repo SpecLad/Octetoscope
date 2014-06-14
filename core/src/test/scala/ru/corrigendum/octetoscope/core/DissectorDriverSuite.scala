@@ -18,12 +18,13 @@
 
 package ru.corrigendum.octetoscope.core
 
-import org.scalatest.MustMatchers._
-import org.scalatest.FunSuite
-import ru.corrigendum.octetoscope.core.mocks.{MockDissector, MockBinaryReader}
-import java.nio.charset.StandardCharsets
 import java.io.File
+import java.nio.charset.StandardCharsets
+
+import org.scalatest.FunSuite
+import org.scalatest.MustMatchers._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
+import ru.corrigendum.octetoscope.core.mocks.{MockBinaryReader, MockDissector}
 
 class DissectorDriverSuite extends FunSuite {
   test("success") {

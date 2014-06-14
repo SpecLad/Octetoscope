@@ -18,9 +18,10 @@
 
 package ru.corrigendum.octetoscope.abstractui
 
-import collection.mutable
-import javax.swing.KeyStroke
 import java.awt.event.InputEvent
+import javax.swing.KeyStroke
+
+import scala.collection.mutable
 
 trait MainView extends View with mutable.Publisher[MainView.Event] {
   override type Pub = MainView

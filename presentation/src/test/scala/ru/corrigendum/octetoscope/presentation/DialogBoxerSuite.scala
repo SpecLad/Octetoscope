@@ -19,9 +19,8 @@
 package ru.corrigendum.octetoscope.presentation
 
 import org.scalatest.MustMatchers._
-
-import mocks.MockView
 import org.scalatest.{BeforeAndAfter, FunSuite}
+import ru.corrigendum.octetoscope.presentation.mocks.MockView
 
 class DialogBoxerSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockView = _

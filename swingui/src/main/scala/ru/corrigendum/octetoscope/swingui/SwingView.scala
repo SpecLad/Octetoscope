@@ -18,8 +18,9 @@
 
 package ru.corrigendum.octetoscope.swingui
 
-import javax.swing.{JFileChooser, JOptionPane, JFrame}
 import java.io.File
+import javax.swing.{JFileChooser, JFrame, JOptionPane}
+
 import ru.corrigendum.octetoscope.abstractui.View
 
 private class SwingView(chooser: JFileChooser) extends View {

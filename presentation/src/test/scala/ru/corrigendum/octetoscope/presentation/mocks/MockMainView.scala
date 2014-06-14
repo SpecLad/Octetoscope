@@ -18,9 +18,10 @@
 
 package ru.corrigendum.octetoscope.presentation.mocks
 
-import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView}
-import scala.collection.mutable
 import ru.corrigendum.octetoscope.abstractui.MainView.Tab
+import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView}
+
+import scala.collection.mutable
 
 class MockMainView extends MockView with MainView {
   private[this] var _disposed: Boolean = false

@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.core.mocks
 
-import ru.corrigendum.octetoscope.core.{Quality, Constraint}
+import ru.corrigendum.octetoscope.core.{Constraint, Quality}
 
 object MockConstraint extends Constraint[String] {
   override def check(value: String): Boolean = value.length > 1

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.presentation.tools
 
-import java.lang.reflect.{Method, InvocationHandler, Proxy}
+import java.lang.reflect.{InvocationHandler, Method, Proxy}
 import java.util
 
 object FakeMessageLocalizer {

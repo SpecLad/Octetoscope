@@ -18,8 +18,8 @@
 
 package ru.corrigendum.octetoscope.core
 
-import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.MustMatchers._
+import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
   var builder: MoleculeBuilder = _

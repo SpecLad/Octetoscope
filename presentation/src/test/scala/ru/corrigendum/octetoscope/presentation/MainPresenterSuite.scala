@@ -49,6 +49,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   test("initialization") {
     view mustBe 'visible
     view.title mustBe "Blarf"
+    view.numericViewWidth mustBe 23
     view.isCommandEnabled(MainView.Command.Close) mustBe false
   }
 

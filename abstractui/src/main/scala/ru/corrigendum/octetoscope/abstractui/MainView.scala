@@ -31,6 +31,9 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
   def title: String
   def title_=(title: String)
 
+  def numericViewWidth: Int
+  def numericViewWidth_=(numCharacters: Int)
+
   def show()
 
   // the new tab must be activated

@@ -30,6 +30,7 @@ class MainPresenter(strings: PresentationStrings,
                     boxer: DialogBoxer,
                     dissectorDriver: DissectorDriver) {
   view.title = appName
+  view.numericViewWidth = MainPresenter.DefaultBytesPerRow * 3 - 1
   view.disableCommand(MainView.Command.Close)
   view.show()
 
@@ -99,4 +100,8 @@ class MainPresenter(strings: PresentationStrings,
       }
     }
   }
+}
+
+object MainPresenter {
+  private val DefaultBytesPerRow = 8
 }

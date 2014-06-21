@@ -30,7 +30,7 @@ import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView, UIStrin
 private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends SwingView(chooser) with MainView {
   private[this] val tabPane = new JTabbedPane()
 
-  private[this] val numericView = new JTextArea(0, 23)
+  private[this] val numericView = new JTextArea()
   numericView.setBorder(BorderFactory.createCompoundBorder(
     BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK),
     BorderFactory.createEmptyBorder(0, 2, 0, 2)))
@@ -84,6 +84,12 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
   override def title_=(title: String) {
     frame.setTitle(title)
+  }
+
+  override def numericViewWidth: Int = numericView.getColumns
+
+  override def numericViewWidth_=(numCharacters: Int) {
+    numericView.setColumns(numCharacters)
   }
 
   override def show() {

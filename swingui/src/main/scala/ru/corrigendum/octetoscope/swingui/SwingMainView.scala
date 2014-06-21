@@ -18,8 +18,8 @@
 
 package ru.corrigendum.octetoscope.swingui
 
-import java.awt.Dimension
 import java.awt.event.{WindowEvent, WindowListener}
+import java.awt.{Font, BorderLayout, Color, Dimension}
 import javax.swing._
 import javax.swing.event.{ChangeEvent, ChangeListener, TreeExpansionEvent, TreeWillExpandListener}
 import javax.swing.tree.DefaultTreeModel
@@ -29,6 +29,14 @@ import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView, UIStrin
 
 private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends SwingView(chooser) with MainView {
   private[this] val tabPane = new JTabbedPane()
+
+  private[this] val numericView = new JTextArea(0, 23)
+  numericView.setBorder(BorderFactory.createCompoundBorder(
+    BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK),
+    BorderFactory.createEmptyBorder(0, 2, 0, 2)))
+  numericView.setFont(new Font("Monospaced", Font.PLAIN, 14))
+  numericView.setText("lo re mi ps um do lo rs\nit am et")
+  numericView.setEditable(false)
 
   {
     frame.addWindowListener(new WindowListener {
@@ -48,7 +56,9 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
   frame.setJMenuBar(createMenuBarFromDescription(MainView.menuDescription, strings,
     (c: MainView.Command.Value) => publish(MainView.CommandEvent(c))))
-  frame.setContentPane(tabPane)
+  frame.getContentPane.add(tabPane)
+  frame.getContentPane.add(numericView, BorderLayout.EAST)
+
   frame.setPreferredSize(new Dimension(800, 600))
   frame.pack()
   frame.setLocationRelativeTo(null)

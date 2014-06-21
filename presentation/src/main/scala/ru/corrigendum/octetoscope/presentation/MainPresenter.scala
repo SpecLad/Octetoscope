@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.presentation
 import java.io.IOException
 
 import ru.corrigendum.octetoscope.abstractui.MainView
-import ru.corrigendum.octetoscope.abstractui.MainView.{CommandEvent, _}
+import ru.corrigendum.octetoscope.abstractui.MainView._
 import ru.corrigendum.octetoscope.core.{DetectionFailedException, DissectorDriver, TooSmallToDissectException, VersionInfo}
 
 class MainPresenter(strings: PresentationStrings,

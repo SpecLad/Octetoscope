@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.swingui
 
 import java.awt.event.{WindowEvent, WindowListener}
-import java.awt.{Font, BorderLayout, Color, Dimension}
+import java.awt.{BorderLayout, Color, Dimension, Font}
 import javax.swing._
 import javax.swing.event.{ChangeEvent, ChangeListener, TreeExpansionEvent, TreeWillExpandListener}
 import javax.swing.tree.DefaultTreeModel

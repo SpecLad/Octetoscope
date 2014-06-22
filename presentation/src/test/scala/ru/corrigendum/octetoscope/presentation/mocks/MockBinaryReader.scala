@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,15 +18,16 @@
 
 package ru.corrigendum.octetoscope.presentation.mocks
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.core.{DissectorDriver, PlainPiece}
+import java.io.File
 
-class MockDissectorDriver extends DissectorDriver {
-  override def apply(path: Blob): PlainPiece = {
+import ru.corrigendum.octetoscope.abstractinfra.{Blob, BinaryReader}
+
+class MockBinaryReader extends BinaryReader {
+  override def readWhole(path: File): Blob = {
     exception.foreach(throw _)
     result
   }
 
-  var result: PlainPiece = _
+  var result: Blob = Blob.empty
   var exception: Option[Exception] = None
 }

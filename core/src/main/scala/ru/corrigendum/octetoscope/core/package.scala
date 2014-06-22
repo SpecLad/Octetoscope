@@ -18,9 +18,7 @@
 
 package ru.corrigendum.octetoscope
 
-import java.io.File
-
-import ru.corrigendum.octetoscope.abstractinfra.{BinaryReader, Blob}
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 package object core {
   type PieceC[V] = Piece[Contents[V]]
@@ -45,15 +43,14 @@ package object core {
 
   type Detector = Blob => Option[PlainDissector]
 
-  type DissectorDriver = File => PlainPiece
+  type DissectorDriver = Blob => PlainPiece
 
   class TooSmallToDissectException(cause: Throwable) extends Exception(cause)
   class DetectionFailedException extends Exception
 
-  def getDissectorDriver(reader: BinaryReader, detector: Detector): DissectorDriver =
-    (path: File) =>
+  def getDissectorDriver(detector: Detector): DissectorDriver =
+    (blob: Blob) =>
       try {
-        val blob = reader.readWhole(path)
         val dissector = detector(blob).getOrElse(throw new DetectionFailedException)
         dissector.dissect(blob)
       } catch {

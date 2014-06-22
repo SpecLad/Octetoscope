@@ -42,6 +42,7 @@ object Octetoscope extends App {
     view => new MainPresenter(
       presentationStrings, APPLICATION_NAME, view,
       new DialogBoxerImpl(view, APPLICATION_NAME),
-      getDissectorDriver(DefaultBinaryReader, getDetector(magicMap))
+      DefaultBinaryReader,
+      getDissectorDriver(getDetector(magicMap))
     ))
 }

@@ -23,22 +23,25 @@ import java.io.{File, IOException}
 import org.scalatest.LoneElement._
 import org.scalatest.MustMatchers._
 import org.scalatest.{BeforeAndAfter, FunSuite}
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.core._
-import ru.corrigendum.octetoscope.presentation.mocks.{MockDialogBoxer, MockDissectorDriver, MockMainView}
+import ru.corrigendum.octetoscope.presentation.mocks.{MockBinaryReader, MockDialogBoxer, MockDissectorDriver, MockMainView}
 import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
   private[this] var boxer: MockDialogBoxer = _
   private[this] val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
+  private[this] var binaryReader: MockBinaryReader = _
   private[this] var dissectorDriver: MockDissectorDriver = _
 
   before {
     view = new MockMainView()
     boxer = new MockDialogBoxer()
+    binaryReader = new MockBinaryReader()
     dissectorDriver = new MockDissectorDriver()
-    new MainPresenter(strings, "Blarf", view, boxer, dissectorDriver)
+    new MainPresenter(strings, "Blarf", view, boxer, binaryReader, dissectorDriver)
   }
 
   test("closing the window") {
@@ -72,7 +75,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   test("open command - IOException") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
     val exception = new IOException("whatever")
-    dissectorDriver.exception = Some(exception)
+    binaryReader.exception = Some(exception)
 
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
@@ -108,7 +111,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     val tab = view.tabs.loneElement
     tab.title mustBe "cadabra"
     tab.toolTip mustBe MainPresenterSuite.FakePath.toString
-    tab.tree mustBe presentPiece(dissectorDriver(MainPresenterSuite.FakePath))
+    tab.tree mustBe presentPiece(dissectorDriver(Blob.empty))
 
     view.title mustBe "Blarf - cadabra"
     view.isCommandEnabled(MainView.Command.Close) mustBe true

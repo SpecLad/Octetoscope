@@ -20,6 +20,7 @@ package ru.corrigendum.octetoscope.presentation
 
 import java.io.IOException
 
+import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.abstractui.MainView._
 import ru.corrigendum.octetoscope.core.{DetectionFailedException, DissectorDriver, TooSmallToDissectException, VersionInfo}
@@ -28,6 +29,7 @@ class MainPresenter(strings: PresentationStrings,
                     appName: String,
                     view: MainView,
                     boxer: DialogBoxer,
+                    binaryReader: BinaryReader,
                     dissectorDriver: DissectorDriver) {
   view.title = appName
   view.numericViewWidth = MainPresenter.DefaultBytesPerRow * 3 - 1
@@ -62,7 +64,8 @@ class MainPresenter(strings: PresentationStrings,
             case None =>
             case Some(path) =>
               val piece = try {
-                dissectorDriver(path)
+                val blob = binaryReader.readWhole(path)
+                dissectorDriver(blob)
               } catch {
                 case ioe: IOException =>
                   boxer.showMessageBox(strings.errorReadingFile(ioe.getMessage))

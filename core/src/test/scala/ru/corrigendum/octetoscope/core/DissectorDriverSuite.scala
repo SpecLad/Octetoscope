@@ -18,38 +18,34 @@
 
 package ru.corrigendum.octetoscope.core
 
-import java.io.File
 import java.nio.charset.StandardCharsets
 
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.core.mocks.{MockBinaryReader, MockDissector}
+import ru.corrigendum.octetoscope.core.mocks.MockDissector
 
 class DissectorDriverSuite extends FunSuite {
   test("success") {
-    val reader = new MockBinaryReader(new ArrayBlob("magic".getBytes(StandardCharsets.US_ASCII)))
-    val driver = getDissectorDriver(reader, Function.const(Some(MockDissector)))
-    driver(DissectorDriverSuite.FakePath) mustBe Atom(Bytes(5), new ToStringContents("magic"))
+    val driver = getDissectorDriver(Function.const(Some(MockDissector)))
+    driver(DissectorDriverSuite.FakeBlob) mustBe Atom(Bytes(5), new ToStringContents("magic"))
   }
 
   test("failure - file too small") {
-    val reader = new MockBinaryReader(Blob.empty)
-    val driver = getDissectorDriver(reader, Function.const(Some(new PlainDissector {
+    val driver = getDissectorDriver(Function.const(Some(new PlainDissector {
       override def dissect(input: Blob, offset: InfoSize): PlainPiece = throw new IndexOutOfBoundsException
     })))
 
-    a [TooSmallToDissectException] must be thrownBy driver(DissectorDriverSuite.FakePath)
+    a [TooSmallToDissectException] must be thrownBy driver(DissectorDriverSuite.FakeBlob)
   }
 
   test("failure - detection failed") {
-    val reader = new MockBinaryReader(Blob.empty)
-    val driver = getDissectorDriver(reader, Function.const(None))
+    val driver = getDissectorDriver(Function.const(None))
 
-    a [DetectionFailedException] must be thrownBy driver(DissectorDriverSuite.FakePath)
+    a [DetectionFailedException] must be thrownBy driver(DissectorDriverSuite.FakeBlob)
   }
 }
 
 object DissectorDriverSuite {
-  val FakePath = new File("/abra/cadabra")
+  val FakeBlob = new ArrayBlob("magic".getBytes(StandardCharsets.US_ASCII))
 }

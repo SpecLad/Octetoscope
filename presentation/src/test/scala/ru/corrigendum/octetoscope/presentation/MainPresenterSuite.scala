@@ -121,7 +121,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     dissectorDriver.result = MainPresenterSuite.FakePiece
     view.selectedFile = Some(MainPresenterSuite.FakePath)
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
-    view.selectedFile = Some(new File(MainPresenterSuite.FakePath, "alalazam"))
+    view.selectedFile = Some(new File(MainPresenterSuite.FakePath, "alakazam"))
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
     view.activateTab(0)
 

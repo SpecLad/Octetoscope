@@ -20,6 +20,7 @@ package ru.corrigendum.octetoscope
 
 import java.awt.Color
 
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 import ru.corrigendum.octetoscope.core._
 
@@ -59,5 +60,12 @@ package object presentation {
     }
 
     helper(SubPiece("WHOLE", InfoSize(), piece))
+  }
+
+  private val bytesAsHex = Array.tabulate(256)(_.formatted("%02x"))
+
+  private[presentation] def presentBlobAsHexadecimal(blob: Blob, numColumns: Int): String = {
+    require(numColumns > 0)
+    blob.toArray.grouped(numColumns).map(_.map((b: Byte) => bytesAsHex(b & 0xff)).mkString(" ")).mkString("\n")
   }
 }

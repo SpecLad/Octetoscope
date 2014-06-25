@@ -21,6 +21,7 @@ package ru.corrigendum.octetoscope.presentation
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
 import org.scalatest.OptionValues._
+import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 import ru.corrigendum.octetoscope.core._
 
@@ -68,5 +69,19 @@ class PackageSuite extends FunSuite {
     val expected = DisplayTreeNode("WHOLE",
       Seq((QualityColors(Quality.Good), "note 1"), (QualityColors(Quality.Bad), "note 2")), None)
     actual mustBe expected
+  }
+
+  test("presentBlobAsHexadecimal - empty") {
+    presentBlobAsHexadecimal(Blob.empty, 10) mustBe ""
+  }
+
+  test("presentBlobAsHexadecimal - multiple") {
+    val blob = new ArrayBlob(Array[Byte](0x12, 0x23, 0x34, 0x4a, 0x5b, 0x6c))
+    presentBlobAsHexadecimal(blob, 2) mustBe "12 23\n34 4a\n5b 6c"
+  }
+
+  test("presentBlobAsHexadecimal - non-multiple") {
+    val blob = new ArrayBlob(Array[Byte](0x12, 0x23, 0x34, 0x4a, 0x5b, 0x6c, 0))
+    presentBlobAsHexadecimal(blob, 3) mustBe "12 23 34\n4a 5b 6c\n00"
   }
 }

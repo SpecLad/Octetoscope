@@ -105,6 +105,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
   test("open command - successful") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
+    binaryReader.result = MainPresenterSuite.FakeBlob
     dissectorDriver.result = MainPresenterSuite.FakePiece
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
@@ -115,38 +116,48 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
     view.title mustBe "Blarf - cadabra"
     view.isCommandEnabled(MainView.Command.Close) mustBe true
+    view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
   }
 
   test("switching tabs") {
     dissectorDriver.result = MainPresenterSuite.FakePiece
     view.selectedFile = Some(MainPresenterSuite.FakePath)
+    binaryReader.result = MainPresenterSuite.FakeBlob
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
+
     view.selectedFile = Some(new File(MainPresenterSuite.FakePath, "alakazam"))
+    binaryReader.result = Blob.empty
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
+
     view.activateTab(0)
 
     view.title mustBe "Blarf - cadabra"
+    view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
   }
 
   test("tab closing via menu") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
+    binaryReader.result = MainPresenterSuite.FakeBlob
     dissectorDriver.result = MainPresenterSuite.FakePiece
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
     view.trigger(MainView.CommandEvent(MainView.Command.Close))
 
     view.tabs must have size 0
     view.title mustBe "Blarf"
+    view.numericViewText mustBe ""
     view.isCommandEnabled(MainView.Command.Close) mustBe false
   }
 
   test("tab closing via close button") {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
+    binaryReader.result = MainPresenterSuite.FakeBlob
     dissectorDriver.result = MainPresenterSuite.FakePiece
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
     view.tabs.head.trigger(MainView.TabClosedEvent)
     view.tabs must have size 0
     view.title mustBe "Blarf"
+    view.numericViewText mustBe ""
     view.isCommandEnabled(MainView.Command.Close) mustBe false
   }
 }
@@ -154,4 +165,5 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 object MainPresenterSuite {
   private val FakePath = new File("/abra/cadabra")
   private val FakePiece = Atom(Bytes(5), new EagerContentsR((), "dummy"))
+  private val FakeBlob = new ArrayBlob(Array.tabulate[Byte](19)(_.toByte))
 }

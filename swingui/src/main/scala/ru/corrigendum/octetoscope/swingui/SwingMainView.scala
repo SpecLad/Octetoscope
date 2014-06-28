@@ -35,7 +35,6 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK),
     BorderFactory.createEmptyBorder(0, 2, 0, 2)))
   numericView.setFont(new Font("Monospaced", Font.PLAIN, 14))
-  numericView.setText("lo re mi ps um do lo rs\nit am et")
   numericView.setEditable(false)
 
   {
@@ -91,6 +90,10 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   override def numericViewWidth_=(numCharacters: Int) {
     numericView.setColumns(numCharacters)
   }
+
+  override def numericViewText: String = numericView.getText
+
+  override def numericViewText_=(text: String) { numericView.setText(text) }
 
   override def show() {
     frame.setVisible(true)

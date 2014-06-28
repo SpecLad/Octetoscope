@@ -45,6 +45,7 @@ class MainPresenter(strings: PresentationStrings,
     numTabs -= 1
     if (numTabs == 0) {
       view.title = appName
+      view.numericViewText = ""
       view.disableCommand(MainView.Command.Close)
     }
   }
@@ -63,9 +64,9 @@ class MainPresenter(strings: PresentationStrings,
           pub.showFileOpenBox() match {
             case None =>
             case Some(path) =>
-              val piece = try {
+              val (blob, piece) = try {
                 val blob = binaryReader.readWhole(path)
-                dissectorDriver(blob)
+                (blob, dissectorDriver(blob))
               } catch {
                 case ioe: IOException =>
                   boxer.showMessageBox(strings.errorReadingFile(ioe.getMessage))
@@ -78,9 +79,12 @@ class MainPresenter(strings: PresentationStrings,
                   return
               }
 
-              pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(new TabHandler(path.getName))
+              val numericViewText = presentBlobAsHexadecimal(blob, MainPresenter.DefaultBytesPerRow)
+              pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(
+                new TabHandler(path.getName, numericViewText))
               numTabs += 1
               view.title = appName + " - " + path.getName
+              view.numericViewText = numericViewText
               view.enableCommand(MainView.Command.Close)
           }
 
@@ -92,7 +96,7 @@ class MainPresenter(strings: PresentationStrings,
     }
   }
 
-  private class TabHandler(title: String) extends MainView.Tab#Sub {
+  private class TabHandler(title: String, numericViewText: String) extends MainView.Tab#Sub {
     override def notify(pub: Tab#Pub, event: TabEvent) {
       event match {
         case TabClosedEvent =>
@@ -100,6 +104,7 @@ class MainPresenter(strings: PresentationStrings,
 
         case TabActivatedEvent =>
           view.title = appName + " - " + title
+          view.numericViewText = numericViewText
       }
     }
   }

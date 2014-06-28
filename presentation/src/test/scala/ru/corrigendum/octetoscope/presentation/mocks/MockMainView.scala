@@ -44,6 +44,7 @@ class MockMainView extends MockView with MainView {
 
   override var title: String = ""
   override var numericViewWidth: Int = 0
+  override var numericViewText: String = ""
 
   override def show() {
     _visible = true

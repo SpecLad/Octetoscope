@@ -31,9 +31,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   private[this] val tabPane = new JTabbedPane()
 
   private[this] val numericView = new JTextArea()
-  numericView.setBorder(BorderFactory.createCompoundBorder(
-    BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK),
-    BorderFactory.createEmptyBorder(0, 2, 0, 2)))
+  numericView.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2))
   numericView.setFont(new Font("Monospaced", Font.PLAIN, 14))
   numericView.setEditable(false)
 
@@ -56,7 +54,15 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   frame.setJMenuBar(createMenuBarFromDescription(MainView.menuDescription, strings,
     (c: MainView.Command.Value) => publish(MainView.CommandEvent(c))))
   frame.getContentPane.add(tabPane)
-  frame.getContentPane.add(numericView, BorderLayout.EAST)
+
+  {
+    val rawViewScroller = new JScrollPane(numericView)
+    rawViewScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
+    // always show the vertical scrollbar, so that the view doesn't change size when tabs are switched
+    rawViewScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
+    rawViewScroller.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK))
+    frame.getContentPane.add(rawViewScroller, BorderLayout.EAST)
+  }
 
   frame.setPreferredSize(new Dimension(800, 600))
   frame.pack()

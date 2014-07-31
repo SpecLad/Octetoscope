@@ -22,6 +22,7 @@ import java.awt.event.{WindowEvent, WindowListener}
 import java.awt.{BorderLayout, Color, Dimension, Font}
 import javax.swing._
 import javax.swing.event.{ChangeEvent, ChangeListener, TreeExpansionEvent, TreeWillExpandListener}
+import javax.swing.text.DefaultCaret
 import javax.swing.tree.DefaultTreeModel
 
 import ru.corrigendum.octetoscope.abstractui.MainView.{Tab, TabEvent}
@@ -34,6 +35,12 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   numericView.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2))
   numericView.setFont(new Font("Monospaced", Font.PLAIN, 14))
   numericView.setEditable(false)
+
+  {
+    val caret = new DefaultCaret
+    caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
+    numericView.setCaret(caret)
+  }
 
   {
     frame.addWindowListener(new WindowListener {

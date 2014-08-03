@@ -46,6 +46,8 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
 
   def enableCommand(command: MainView.Command.Value)
   def disableCommand(command: MainView.Command.Value)
+
+  def scrollRawView(topPixel: Int)
 }
 
 object MainView {

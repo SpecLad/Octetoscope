@@ -29,10 +29,12 @@ class MockMainView extends MockView with MainView {
   private[this] val _tabs = mutable.Buffer[MockTab]()
   private[this] var _activeTabIndex: Int = _
   private[this] var _disabledCommands = MainView.Command.ValueSet()
+  private[this] var _rawViewTopPixel: Int = -1
 
   def disposed = _disposed
   def visible = _visible
   def tabs = _tabs.readOnly
+  def rawViewTopPixel = _rawViewTopPixel
 
   def dispose() {
     _disposed = true
@@ -69,6 +71,8 @@ class MockMainView extends MockView with MainView {
 
   def isCommandEnabled(command: MainView.Command.Value) = !_disabledCommands.contains(command)
 
+  override def scrollRawView(topPixel: Int) { _rawViewTopPixel = topPixel }
+
   class MockTab(val title: String, val toolTip: String, val tree: DisplayTreeNode) extends Tab {
     override def close() {
       _tabs -= this
@@ -79,5 +83,4 @@ class MockMainView extends MockView with MainView {
       publish(event)
     }
   }
-
 }

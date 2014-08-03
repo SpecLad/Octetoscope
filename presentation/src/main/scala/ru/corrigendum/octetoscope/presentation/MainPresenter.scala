@@ -86,6 +86,7 @@ class MainPresenter(strings: PresentationStrings,
               view.title = appName + " - " + path.getName
               view.numericViewText = numericViewText
               view.enableCommand(MainView.Command.Close)
+              view.scrollRawView(0)
           }
 
         case CommandEvent(MainView.Command.Close) =>

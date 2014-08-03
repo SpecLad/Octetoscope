@@ -18,8 +18,8 @@
 
 package ru.corrigendum.octetoscope.swingui
 
+import java.awt._
 import java.awt.event.{WindowEvent, WindowListener}
-import java.awt.{BorderLayout, Color, Dimension, Font}
 import javax.swing._
 import javax.swing.event.{ChangeEvent, ChangeListener, TreeExpansionEvent, TreeWillExpandListener}
 import javax.swing.text.DefaultCaret
@@ -35,6 +35,12 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   numericView.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2))
   numericView.setFont(new Font("Monospaced", Font.PLAIN, 14))
   numericView.setEditable(false)
+
+  val rawViewScroller = new JScrollPane(numericView)
+  rawViewScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
+  // always show the vertical scrollbar, so that the view doesn't change size when tabs are switched
+  rawViewScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
+  rawViewScroller.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK))
 
   {
     val caret = new DefaultCaret
@@ -61,15 +67,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   frame.setJMenuBar(createMenuBarFromDescription(MainView.menuDescription, strings,
     (c: MainView.Command.Value) => publish(MainView.CommandEvent(c))))
   frame.getContentPane.add(tabPane)
-
-  {
-    val rawViewScroller = new JScrollPane(numericView)
-    rawViewScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
-    // always show the vertical scrollbar, so that the view doesn't change size when tabs are switched
-    rawViewScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
-    rawViewScroller.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK))
-    frame.getContentPane.add(rawViewScroller, BorderLayout.EAST)
-  }
+  frame.getContentPane.add(rawViewScroller, BorderLayout.EAST)
 
   frame.setPreferredSize(new Dimension(800, 600))
   frame.pack()
@@ -157,6 +155,10 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
   override def disableCommand(command: MainView.Command.Value) {
     findMenuItemsForCommand(frame.getJMenuBar, command).foreach(_.setEnabled(false))
+  }
+
+  override def scrollRawView(topPixel: Int) {
+    rawViewScroller.getViewport.setViewPosition(new Point(0, topPixel))
   }
 
   private class TabImpl(val component: JComponent) extends Tab {

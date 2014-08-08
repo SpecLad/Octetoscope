@@ -36,7 +36,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   numericView.setFont(new Font("Monospaced", Font.PLAIN, 14))
   numericView.setEditable(false)
 
-  val rawViewScroller = new JScrollPane(numericView)
+  private[this] val rawViewScroller = new JScrollPane(numericView)
   rawViewScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
   // always show the vertical scrollbar, so that the view doesn't change size when tabs are switched
   rawViewScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)

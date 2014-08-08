@@ -38,7 +38,7 @@ class MainPresenter(strings: PresentationStrings,
 
   view.subscribe(viewHandler)
 
-  var numTabs = 0
+  private[this] var numTabs = 0
 
   private def closeTab(tab: MainView.Tab) {
     tab.close()

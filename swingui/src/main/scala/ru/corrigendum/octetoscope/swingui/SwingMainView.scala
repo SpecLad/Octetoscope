@@ -48,21 +48,19 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     numericView.setCaret(caret)
   }
 
-  {
-    frame.addWindowListener(new WindowListener {
-      override def windowDeiconified(e: WindowEvent) {}
+  frame.addWindowListener(new WindowListener {
+    override def windowDeiconified(e: WindowEvent) {}
 
-      override def windowClosing(e: WindowEvent) {
-        publish(MainView.ClosedEvent)
-      }
+    override def windowClosing(e: WindowEvent) {
+      publish(MainView.ClosedEvent)
+    }
 
-      override def windowClosed(e: WindowEvent) {}
-      override def windowActivated(e: WindowEvent) {}
-      override def windowOpened(e: WindowEvent) {}
-      override def windowDeactivated(e: WindowEvent) {}
-      override def windowIconified(e: WindowEvent) {}
-    })
-  }
+    override def windowClosed(e: WindowEvent) {}
+    override def windowActivated(e: WindowEvent) {}
+    override def windowOpened(e: WindowEvent) {}
+    override def windowDeactivated(e: WindowEvent) {}
+    override def windowIconified(e: WindowEvent) {}
+  })
 
   frame.setJMenuBar(createMenuBarFromDescription(MainView.menuDescription, strings,
     (c: MainView.Command.Value) => publish(MainView.CommandEvent(c))))

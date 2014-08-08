@@ -27,7 +27,7 @@ class MockMainView extends MockView with MainView {
   private[this] var _disposed: Boolean = false
   private[this] var _visible: Boolean = false
   private[this] val _tabs = mutable.Buffer[MockTab]()
-  private[this] var _activeTabIndex: Int = _
+  private[this] var _activeTabIndex: Int = -1
   private[this] var _disabledCommands = MainView.Command.ValueSet()
   private[this] var _rawViewTopPixel: Int = -1
 
@@ -54,15 +54,15 @@ class MockMainView extends MockView with MainView {
 
   override def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab = {
     _tabs += new MockTab(title, toolTip, root)
-    _activeTabIndex = _tabs.length - 1
     _tabs.last
   }
 
-  override def activeTab: Option[Tab] = if (_activeTabIndex < _tabs.length) Some(_tabs(_activeTabIndex)) else None
+  override def activeTab: Option[Tab] = if (_activeTabIndex >= 0) Some(_tabs(_activeTabIndex)) else None
 
   def activateTab(newActiveIndex: Int) {
     _activeTabIndex = newActiveIndex
-    _tabs(_activeTabIndex).trigger(MainView.TabActivatedEvent)
+    if (_activeTabIndex >=0)
+      _tabs(_activeTabIndex).trigger(MainView.TabActivatedEvent)
   }
 
   override def enableCommand(command: MainView.Command.Value) { _disabledCommands -= command }
@@ -74,9 +74,17 @@ class MockMainView extends MockView with MainView {
   override def scrollRawView(topPixel: Int) { _rawViewTopPixel = topPixel }
 
   class MockTab(val title: String, val toolTip: String, val tree: DisplayTreeNode) extends Tab {
+    override def activate(): Unit = {
+      activateTab(_tabs.indexOf(this))
+    }
+
     override def close() {
       _tabs -= this
-      _activeTabIndex = 0
+      if (_tabs.isEmpty) {
+        activateTab(-1)
+      } else {
+        activateTab(0)
+      }
     }
 
     def trigger(event: MainView.TabEvent) {

@@ -114,6 +114,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     tab.toolTip mustBe MainPresenterSuite.FakePath.toString
     tab.tree mustBe presentPiece(dissectorDriver(Blob.empty))
 
+    view.activeTab mustBe Some(tab)
     view.title mustBe "Blarf - cadabra"
     view.isCommandEnabled(MainView.Command.Close) mustBe true
     view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)

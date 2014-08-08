@@ -39,7 +39,6 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
 
   def show()
 
-  // the new tab must be activated
   def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab
 
   def activeTab: Option[MainView.Tab]
@@ -80,6 +79,8 @@ object MainView {
 
   trait Tab extends mutable.Publisher[MainView.TabEvent] {
     override type Pub = Tab
+
+    def activate()
     def close()
   }
 }

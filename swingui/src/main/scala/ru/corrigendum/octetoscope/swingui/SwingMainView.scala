@@ -25,7 +25,7 @@ import javax.swing.event.{ChangeEvent, ChangeListener, TreeExpansionEvent, TreeW
 import javax.swing.text.DefaultCaret
 import javax.swing.tree.DefaultTreeModel
 
-import ru.corrigendum.octetoscope.abstractui.MainView.{Tab, TabEvent}
+import ru.corrigendum.octetoscope.abstractui.MainView.{TabActivatedEvent, Tab, TabEvent}
 import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView, UIStrings}
 
 private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends SwingView(chooser) with MainView {
@@ -133,7 +133,6 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
     tabPane.addTab(null, null, new JScrollPane(tree), toolTip)
     tabPane.setTabComponentAt(tabPane.getTabCount - 1, tab.component)
-    tabPane.setSelectedIndex(tabPane.getTabCount - 1)
 
     tab
   }
@@ -161,6 +160,18 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
   private class TabImpl(val component: JComponent) extends Tab {
     def triggerEvent(event: TabEvent) { publish(event); }
+
+    override def activate(): Unit = {
+      val newSelectedIndex = tabPane.indexOfTabComponent(component)
+
+      // setSelectedIndex doesn't do anything if the selected index doesn't
+      // change. However, the presenter depends on the event always being fired
+      // upon calling activate(), so call it manually.
+      if (newSelectedIndex == tabPane.getSelectedIndex)
+        publish(TabActivatedEvent)
+      else
+        tabPane.setSelectedIndex(newSelectedIndex)
+    }
 
     override def close() {
       tabPane.remove(tabPane.indexOfTabComponent(component))

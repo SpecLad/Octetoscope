@@ -80,11 +80,10 @@ class MainPresenter(strings: PresentationStrings,
               }
 
               val numericViewText = presentBlobAsHexadecimal(blob, MainPresenter.DefaultBytesPerRow)
-              pub.addTab(path.getName, path.toString, presentPiece(piece)).subscribe(
-                new TabHandler(path.getName, numericViewText))
+              val newTab = pub.addTab(path.getName, path.toString, presentPiece(piece))
               numTabs += 1
-              view.title = appName + " - " + path.getName
-              view.numericViewText = numericViewText
+              newTab.subscribe(new TabHandler(path.getName, numericViewText))
+              newTab.activate()
               view.enableCommand(MainView.Command.Close)
               view.scrollRawView(0)
           }

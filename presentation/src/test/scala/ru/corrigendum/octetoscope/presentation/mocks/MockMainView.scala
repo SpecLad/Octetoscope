@@ -57,7 +57,7 @@ class MockMainView extends MockView with MainView {
     _tabs.last
   }
 
-  override def activeTab: Option[Tab] = if (_activeTabIndex >= 0) Some(_tabs(_activeTabIndex)) else None
+  def activeTab: Option[MockTab] = if (_activeTabIndex >= 0) Some(_tabs(_activeTabIndex)) else None
 
   def activateTab(newActiveIndex: Int) {
     _activeTabIndex = newActiveIndex

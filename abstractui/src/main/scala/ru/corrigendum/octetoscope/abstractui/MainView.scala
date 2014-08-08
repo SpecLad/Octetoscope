@@ -41,8 +41,6 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
 
   def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab
 
-  def activeTab: Option[MainView.Tab]
-
   def enableCommand(command: MainView.Command.Value)
   def disableCommand(command: MainView.Command.Value)
 

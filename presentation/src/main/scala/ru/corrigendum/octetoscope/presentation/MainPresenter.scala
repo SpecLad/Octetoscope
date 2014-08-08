@@ -39,6 +39,7 @@ class MainPresenter(strings: PresentationStrings,
   view.subscribe(viewHandler)
 
   private[this] var numTabs = 0
+  private[this] var currentTabHandler: Option[TabHandler] = None
 
   private def closeTab(tab: MainView.Tab) {
     tab.close()
@@ -47,6 +48,7 @@ class MainPresenter(strings: PresentationStrings,
       view.title = appName
       view.numericViewText = ""
       view.disableCommand(MainView.Command.Close)
+      currentTabHandler = None
     }
   }
 
@@ -82,21 +84,21 @@ class MainPresenter(strings: PresentationStrings,
               val numericViewText = presentBlobAsHexadecimal(blob, MainPresenter.DefaultBytesPerRow)
               val newTab = pub.addTab(path.getName, path.toString, presentPiece(piece))
               numTabs += 1
-              newTab.subscribe(new TabHandler(path.getName, numericViewText))
+              newTab.subscribe(new TabHandler(newTab, path.getName, numericViewText))
               newTab.activate()
               view.enableCommand(MainView.Command.Close)
               view.scrollRawView(0)
           }
 
         case CommandEvent(MainView.Command.Close) =>
-          closeTab(pub.activeTab.get)
+          closeTab(currentTabHandler.get.tab)
 
         case CommandEvent(_) => // workaround for bug SI-7206
       }
     }
   }
 
-  private class TabHandler(title: String, numericViewText: String) extends MainView.Tab#Sub {
+  private class TabHandler(val tab: Tab, title: String, numericViewText: String) extends MainView.Tab#Sub {
     override def notify(pub: Tab#Pub, event: TabEvent) {
       event match {
         case TabClosedEvent =>
@@ -105,6 +107,7 @@ class MainPresenter(strings: PresentationStrings,
         case TabActivatedEvent =>
           view.title = appName + " - " + title
           view.numericViewText = numericViewText
+          currentTabHandler = Some(this)
       }
     }
   }

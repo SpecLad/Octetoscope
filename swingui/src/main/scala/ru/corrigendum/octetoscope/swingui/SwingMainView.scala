@@ -137,15 +137,6 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     tab
   }
 
-  override def activeTab: Option[Tab] = {
-    val tabIndex = tabPane.getSelectedIndex
-    if (tabIndex == -1)
-      None
-    else
-      Some(tabPane.getTabComponentAt(tabIndex).asInstanceOf[JComponent]
-        .getClientProperty(SwingMainView.PropertyKeyTab).asInstanceOf[TabImpl])
-  }
-
   override def enableCommand(command: MainView.Command.Value) {
     findMenuItemsForCommand(frame.getJMenuBar, command).foreach(_.setEnabled(true))
   }

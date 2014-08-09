@@ -87,7 +87,6 @@ class MainPresenter(strings: PresentationStrings,
               newTab.subscribe(new TabHandler(newTab, path.getName, numericViewText))
               newTab.activate()
               view.enableCommand(MainView.Command.Close)
-              view.scrollRawView(0)
           }
 
         case CommandEvent(MainView.Command.Close) =>
@@ -99,14 +98,22 @@ class MainPresenter(strings: PresentationStrings,
   }
 
   private class TabHandler(val tab: Tab, title: String, numericViewText: String) extends MainView.Tab#Sub {
+    private[this] var rawViewTopPixel: Int = 0
+
+    private def saveRawViewTopPixel() {
+      rawViewTopPixel = view.rawViewTopPixel
+    }
+
     override def notify(pub: Tab#Pub, event: TabEvent) {
       event match {
         case TabClosedEvent =>
           closeTab(pub)
 
         case TabActivatedEvent =>
+          currentTabHandler.foreach(_.saveRawViewTopPixel())
           view.title = appName + " - " + title
           view.numericViewText = numericViewText
+          view.scrollRawView(rawViewTopPixel)
           currentTabHandler = Some(this)
       }
     }

@@ -102,7 +102,17 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
   override def numericViewText: String = numericView.getText
 
-  override def numericViewText_=(text: String) { numericView.setText(text) }
+  override def numericViewText_=(text: String) {
+    numericView.setText(text)
+    /* Changing the text will change the text area's preferred size, but
+       it will not change its actual size until after the event is handled.
+       However, we need the actual size to change now, since the presenter will
+       most likely try to scroll the text afterwards, and the size needs to be
+       correct for the scrolling to work. Thus, we ask the viewport to validate
+       now, which sets the text area's size.
+     */
+    rawViewScroller.getViewport.validate()
+  }
 
   override def show() {
     frame.setVisible(true)
@@ -144,6 +154,8 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   override def disableCommand(command: MainView.Command.Value) {
     findMenuItemsForCommand(frame.getJMenuBar, command).foreach(_.setEnabled(false))
   }
+
+  override def rawViewTopPixel: Int = rawViewScroller.getViewport.getViewPosition.getY.toInt
 
   override def scrollRawView(topPixel: Int) {
     rawViewScroller.getViewport.setViewPosition(new Point(0, topPixel))

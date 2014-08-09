@@ -126,6 +126,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.selectedFile = Some(MainPresenterSuite.FakePath)
     binaryReader.result = MainPresenterSuite.FakeBlob
     view.trigger(MainView.CommandEvent(MainView.Command.Open))
+    view.rawViewTopPixel = 65
 
     view.selectedFile = Some(new File(MainPresenterSuite.FakePath, "alakazam"))
     binaryReader.result = Blob.empty
@@ -135,6 +136,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
     view.title mustBe "Blarf - cadabra"
     view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
+    view.rawViewTopPixel mustBe 65
   }
 
   test("tab closing via menu") {

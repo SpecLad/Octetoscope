@@ -78,7 +78,7 @@ object MainView {
   trait Tab extends mutable.Publisher[MainView.TabEvent] {
     override type Pub = Tab
 
-    def activate()
+    def activate() // must publish a TabActivatedEvent even if the tab is already active
     def close()
   }
 }

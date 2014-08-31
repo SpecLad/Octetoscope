@@ -32,15 +32,21 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   private[this] val tabPane = new JTabbedPane()
 
   private[this] val numericView = new JTextArea()
-  numericView.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2))
   numericView.setFont(new Font("Monospaced", Font.PLAIN, 14))
   numericView.setEditable(false)
+
+  private[this] val offsetView = new JTextArea()
+  offsetView.setFont(numericView.getFont)
+  offsetView.setEnabled(false)
+  offsetView.setText("00000000\n" * 100)
 
   private[this] val rawViewScroller = new JScrollPane(numericView)
   rawViewScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
   // always show the vertical scrollbar, so that the view doesn't change size when tabs are switched
   rawViewScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
   rawViewScroller.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK))
+  rawViewScroller.setRowHeaderView(offsetView)
+  rawViewScroller.setViewportBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new Color(225, 225, 225)))
 
   {
     val caret = new DefaultCaret

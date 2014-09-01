@@ -82,9 +82,10 @@ class MainPresenter(strings: PresentationStrings,
               }
 
               val numericViewText = presentBlobAsHexadecimal(blob, MainPresenter.DefaultBytesPerRow)
+              val offsetViewText = generateBlobOffsets(blob.size, MainPresenter.DefaultBytesPerRow)
               val newTab = pub.addTab(path.getName, path.toString, presentPiece(piece))
               numTabs += 1
-              newTab.subscribe(new TabHandler(newTab, path.getName, numericViewText))
+              newTab.subscribe(new TabHandler(newTab, path.getName, numericViewText, offsetViewText))
               newTab.activate()
               view.enableCommand(MainView.Command.Close)
           }
@@ -97,7 +98,8 @@ class MainPresenter(strings: PresentationStrings,
     }
   }
 
-  private class TabHandler(val tab: Tab, title: String, numericViewText: String) extends MainView.Tab#Sub {
+  private class TabHandler(val tab: Tab, title: String,
+                           numericViewText: String, offsetViewText: String) extends MainView.Tab#Sub {
     private[this] var rawViewTopPixel: Int = 0
 
     private def saveRawViewTopPixel() {
@@ -113,6 +115,7 @@ class MainPresenter(strings: PresentationStrings,
           currentTabHandler.foreach(_.saveRawViewTopPixel())
           view.title = appName + " - " + title
           view.numericViewText = numericViewText
+          view.offsetViewText = offsetViewText
           view.scrollRawView(rawViewTopPixel)
           currentTabHandler = Some(this)
       }

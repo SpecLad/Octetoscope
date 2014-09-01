@@ -68,4 +68,12 @@ package object presentation {
     require(numColumns > 0)
     blob.toArray.grouped(numColumns).map(_.map((b: Byte) => bytesAsHex(b & 0xff)).mkString(" ")).mkString("\n")
   }
+
+  private[presentation] def generateBlobOffsets(blobSize: Long, numColumns: Int): String = {
+    val format = if (blobSize <= 0xffL) "%02x"
+                 else if (blobSize <= 0xffffL) "%04x"
+                 else if (blobSize <= 0xffffffffL) "%08x"
+                 else "%016x"
+    (for (off <- 0L until blobSize by numColumns) yield format.format(off)).mkString("\n")
+  }
 }

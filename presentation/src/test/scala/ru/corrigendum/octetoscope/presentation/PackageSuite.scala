@@ -84,4 +84,17 @@ class PackageSuite extends FunSuite {
     val blob = new ArrayBlob(Array[Byte](0x12, 0x23, 0x34, 0x4a, 0x5b, 0x6c, 0))
     presentBlobAsHexadecimal(blob, 3) mustBe "12 23 34\n4a 5b 6c\n00"
   }
+
+  test("generateBlobOffsets") {
+    generateBlobOffsets(0, 4) mustBe ""
+    generateBlobOffsets(1, 4) mustBe "00"
+    generateBlobOffsets(4, 4) mustBe "00"
+    generateBlobOffsets(7, 4) mustBe "00\n04"
+    generateBlobOffsets(9, 4) mustBe "00\n04\n08"
+    generateBlobOffsets(0x101, 0x40) mustBe "0000\n0040\n0080\n00c0\n0100"
+    generateBlobOffsets(0x15007, 0x3001) mustBe
+      "00000000\n00003001\n00006002\n00009003\n0000c004\n0000f005\n00012006"
+    generateBlobOffsets(0x200000000L, 0x7fffffff) mustBe
+      "0000000000000000\n000000007fffffff\n00000000fffffffe\n000000017ffffffd\n00000001fffffffc"
+  }
 }

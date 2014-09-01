@@ -38,7 +38,6 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   private[this] val offsetView = new JTextArea()
   offsetView.setFont(numericView.getFont)
   offsetView.setEnabled(false)
-  offsetView.setText("00000000\n" * 100)
 
   private[this] val rawViewScroller = new JScrollPane(numericView)
   rawViewScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
@@ -118,6 +117,12 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
        now, which sets the text area's size.
      */
     rawViewScroller.getViewport.validate()
+  }
+
+  override def offsetViewText: String = offsetView.getText
+
+  override def offsetViewText_=(text: String) {
+    offsetView.setText(text)
   }
 
   override def show() {

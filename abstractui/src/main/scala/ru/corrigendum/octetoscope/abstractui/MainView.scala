@@ -37,6 +37,9 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
   def numericViewText: String
   def numericViewText_=(text: String)
 
+  def offsetViewText: String
+  def offsetViewText_=(text: String)
+
   def show()
 
   def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab

@@ -118,6 +118,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.title mustBe "Blarf - cadabra"
     view.isCommandEnabled(MainView.Command.Close) mustBe true
     view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
+    view.offsetViewText mustBe generateBlobOffsets(MainPresenterSuite.FakeBlob.size, 8)
     view.rawViewTopPixel mustBe 0
   }
 
@@ -136,6 +137,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
 
     view.title mustBe "Blarf - cadabra"
     view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
+    view.offsetViewText mustBe generateBlobOffsets(MainPresenterSuite.FakeBlob.size, 8)
     view.rawViewTopPixel mustBe 65
   }
 

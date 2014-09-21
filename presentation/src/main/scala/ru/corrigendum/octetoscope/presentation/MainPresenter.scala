@@ -47,6 +47,7 @@ class MainPresenter(strings: PresentationStrings,
     if (numTabs == 0) {
       view.title = appName
       view.numericViewText = ""
+      view.offsetViewText = ""
       view.disableCommand(MainView.Command.Close)
       currentTabHandler = None
     }

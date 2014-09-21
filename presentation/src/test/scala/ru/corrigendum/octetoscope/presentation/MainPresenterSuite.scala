@@ -151,6 +151,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.tabs must have size 0
     view.title mustBe "Blarf"
     view.numericViewText mustBe ""
+    view.offsetViewText mustBe ""
     view.isCommandEnabled(MainView.Command.Close) mustBe false
   }
 
@@ -164,6 +165,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.tabs must have size 0
     view.title mustBe "Blarf"
     view.numericViewText mustBe ""
+    view.offsetViewText mustBe ""
     view.isCommandEnabled(MainView.Command.Close) mustBe false
   }
 }

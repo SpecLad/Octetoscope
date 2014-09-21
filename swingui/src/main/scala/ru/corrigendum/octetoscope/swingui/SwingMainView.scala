@@ -109,10 +109,6 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     numericView.setColumns(numCharacters)
   }
 
-  override def numericViewText: String = numericView.getText
-
-  override def offsetViewText: String = offsetView.getText
-
   override def setRawViewTexts(offsetViewText: String, numericViewText: String) {
     offsetView.setText(offsetViewText)
     numericView.setText(numericViewText)

@@ -36,6 +36,8 @@ class MockMainView extends MockView with MainView {
   def disposed = _disposed
   def visible = _visible
   def tabs = _tabs.readOnly
+  def numericViewText: String = _numericViewText
+  def offsetViewText: String = _offsetViewText
 
   def dispose() {
     _disposed = true
@@ -47,8 +49,6 @@ class MockMainView extends MockView with MainView {
 
   override var title: String = ""
   override var numericViewWidth: Int = 0
-  override def numericViewText: String = _numericViewText
-  override def offsetViewText: String = _offsetViewText
   override def rawViewTopPixel = _rawViewTopPixel
   def rawViewTopPixel_=(value: Int) { _rawViewTopPixel = value }
 

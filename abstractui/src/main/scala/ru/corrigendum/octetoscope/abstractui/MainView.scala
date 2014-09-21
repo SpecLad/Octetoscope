@@ -35,10 +35,10 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
   def numericViewWidth_=(numCharacters: Int)
 
   def numericViewText: String
-  def numericViewText_=(text: String)
 
   def offsetViewText: String
-  def offsetViewText_=(text: String)
+
+  def setRawViewTexts(offsetViewText: String, numericViewText: String)
 
   def show()
 

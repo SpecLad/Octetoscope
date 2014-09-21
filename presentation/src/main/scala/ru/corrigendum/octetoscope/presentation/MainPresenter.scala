@@ -46,8 +46,7 @@ class MainPresenter(strings: PresentationStrings,
     numTabs -= 1
     if (numTabs == 0) {
       view.title = appName
-      view.numericViewText = ""
-      view.offsetViewText = ""
+      view.setRawViewTexts("", "")
       view.disableCommand(MainView.Command.Close)
       currentTabHandler = None
     }
@@ -115,8 +114,7 @@ class MainPresenter(strings: PresentationStrings,
         case TabActivatedEvent =>
           currentTabHandler.foreach(_.saveRawViewTopPixel())
           view.title = appName + " - " + title
-          view.numericViewText = numericViewText
-          view.offsetViewText = offsetViewText
+          view.setRawViewTexts(offsetViewText, numericViewText)
           view.scrollRawView(rawViewTopPixel)
           currentTabHandler = Some(this)
       }

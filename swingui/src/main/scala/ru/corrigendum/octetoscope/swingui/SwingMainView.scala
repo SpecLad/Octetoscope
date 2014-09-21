@@ -111,8 +111,11 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
   override def numericViewText: String = numericView.getText
 
-  override def numericViewText_=(text: String) {
-    numericView.setText(text)
+  override def offsetViewText: String = offsetView.getText
+
+  override def setRawViewTexts(offsetViewText: String, numericViewText: String) {
+    offsetView.setText(offsetViewText)
+    numericView.setText(numericViewText)
     /* Changing the text will change the text area's preferred size, but
        it will not change its actual size until after the event is handled.
        However, we need the actual size to change now, since the presenter will
@@ -121,12 +124,6 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
        now, which sets the text area's size.
      */
     rawViewScroller.getViewport.validate()
-  }
-
-  override def offsetViewText: String = offsetView.getText
-
-  override def offsetViewText_=(text: String) {
-    offsetView.setText(text)
   }
 
   override def show() {

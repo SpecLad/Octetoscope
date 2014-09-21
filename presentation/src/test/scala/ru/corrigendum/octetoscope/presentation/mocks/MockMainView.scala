@@ -30,6 +30,8 @@ class MockMainView extends MockView with MainView {
   private[this] var _activeTabIndex: Int = -1
   private[this] var _disabledCommands = MainView.Command.ValueSet()
   private[this] var _rawViewTopPixel: Int = -1
+  private[this] var _numericViewText: String = ""
+  private[this] var _offsetViewText: String = ""
 
   def disposed = _disposed
   def visible = _visible
@@ -45,10 +47,15 @@ class MockMainView extends MockView with MainView {
 
   override var title: String = ""
   override var numericViewWidth: Int = 0
-  override var numericViewText: String = ""
-  override var offsetViewText: String = ""
+  override def numericViewText: String = _numericViewText
+  override def offsetViewText: String = _offsetViewText
   override def rawViewTopPixel = _rawViewTopPixel
   def rawViewTopPixel_=(value: Int) { _rawViewTopPixel = value }
+
+  override def setRawViewTexts(offsetViewText: String, numericViewText: String) {
+    this._offsetViewText = offsetViewText
+    this._numericViewText = numericViewText
+  }
 
   override def show() {
     _visible = true

@@ -48,9 +48,13 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   rawViewScroller.setViewportBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new Color(225, 225, 225)))
 
   {
-    val caret = new DefaultCaret
-    caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
-    numericView.setCaret(caret)
+    def nonUpdatingCaret = {
+      val caret = new DefaultCaret
+      caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
+      caret
+    }
+    numericView.setCaret(nonUpdatingCaret)
+    offsetView.setCaret(nonUpdatingCaret)
   }
 
   frame.addWindowListener(new WindowListener {

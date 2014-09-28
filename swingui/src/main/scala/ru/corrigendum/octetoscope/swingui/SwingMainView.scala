@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.swingui
 
 import java.awt._
-import java.awt.event.{WindowEvent, WindowListener}
+import java.awt.event.{WindowAdapter, WindowEvent}
 import javax.swing._
 import javax.swing.event.{ChangeEvent, ChangeListener, TreeExpansionEvent, TreeWillExpandListener}
 import javax.swing.text.DefaultCaret
@@ -57,18 +57,10 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     offsetView.setCaret(nonUpdatingCaret)
   }
 
-  frame.addWindowListener(new WindowListener {
-    override def windowDeiconified(e: WindowEvent) {}
-
+  frame.addWindowListener(new WindowAdapter {
     override def windowClosing(e: WindowEvent) {
       publish(MainView.ClosedEvent)
     }
-
-    override def windowClosed(e: WindowEvent) {}
-    override def windowActivated(e: WindowEvent) {}
-    override def windowOpened(e: WindowEvent) {}
-    override def windowDeactivated(e: WindowEvent) {}
-    override def windowIconified(e: WindowEvent) {}
   })
 
   frame.setJMenuBar(createMenuBarFromDescription(MainView.menuDescription, strings,

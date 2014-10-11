@@ -19,13 +19,13 @@
 package ru.corrigendum.octetoscope.swingui
 
 import java.awt._
-import java.awt.event.{WindowAdapter, WindowEvent}
+import java.awt.event.{MouseEvent, MouseAdapter, WindowAdapter, WindowEvent}
 import javax.swing._
 import javax.swing.event.{ChangeEvent, ChangeListener, TreeExpansionEvent, TreeWillExpandListener}
 import javax.swing.text.DefaultCaret
 import javax.swing.tree.DefaultTreeModel
 
-import ru.corrigendum.octetoscope.abstractui.MainView.{TabActivatedEvent, Tab, TabEvent}
+import ru.corrigendum.octetoscope.abstractui.MainView.{Tab, TabActivatedEvent, TabEvent}
 import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, MainView, UIStrings}
 
 private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends SwingView(chooser) with MainView {
@@ -137,6 +137,15 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
       override def treeWillExpand(event: TreeExpansionEvent) {
         val node = event.getPath.getLastPathComponent.asInstanceOf[PieceTreeNode]
         if (node.loadChildren()) model.nodeStructureChanged(node)
+      }
+    })
+    tree.addMouseListener(new MouseAdapter {
+      override def mouseClicked(e: MouseEvent) {
+        if (e.getClickCount != 2) return
+        val path = tree.getPathForLocation(e.getX, e.getY)
+        if (path == null) return
+        val node = path.getLastPathComponent.asInstanceOf[PieceTreeNode]
+        node.eventListener.doubleClicked()
       }
     })
     tree.expandRow(0)

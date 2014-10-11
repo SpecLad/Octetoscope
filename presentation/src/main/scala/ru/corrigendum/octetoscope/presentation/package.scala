@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope
 import java.awt.Color
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
+import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNodeEventListener, DisplayTreeNode}
 import ru.corrigendum.octetoscope.core._
 
 package object presentation {
@@ -55,6 +55,9 @@ package object presentation {
         np.piece match {
           case _: PlainAtom => None
           case m: PlainMolecule => Some(() => m.children.map(helper))
+        },
+        new DisplayTreeNodeEventListener {
+          override def doubleClicked() { /* TODO */ }
         }
       )
     }

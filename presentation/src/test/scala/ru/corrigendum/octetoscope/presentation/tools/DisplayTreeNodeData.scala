@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,17 +16,18 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.abstractui
+package ru.corrigendum.octetoscope.presentation.tools
 
 import java.awt.Color
 
-trait DisplayTreeNodeEventListener {
-  def doubleClicked()
-}
+import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 
-sealed case class DisplayTreeNode(
-  text: String,
-  notes: Seq[(Color, String)],
-  getChildren: Option[() => Seq[DisplayTreeNode]],
-  eventListener: DisplayTreeNodeEventListener
-)
+sealed case class DisplayTreeNodeData(text: String,
+                                      notes: Seq[(Color, String)],
+                                      children: Option[Seq[DisplayTreeNodeData]] = None)
+
+object DisplayTreeNodeData {
+  def from(node: DisplayTreeNode): DisplayTreeNodeData = {
+    DisplayTreeNodeData(node.text, node.notes, node.getChildren.map(_().map(from)))
+  }
+}

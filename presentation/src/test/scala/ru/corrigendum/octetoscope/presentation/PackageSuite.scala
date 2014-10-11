@@ -20,10 +20,9 @@ package ru.corrigendum.octetoscope.presentation
 
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
-import org.scalatest.OptionValues._
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 import ru.corrigendum.octetoscope.core._
+import ru.corrigendum.octetoscope.presentation.tools.DisplayTreeNodeData
 
 class PackageSuite extends FunSuite {
   test("presentVersionInfo") {
@@ -35,11 +34,13 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - atom - with value") {
-    presentPiece(Atom(Bytes(5), new EagerContentsR((), "alpha"))) mustBe DisplayTreeNode("WHOLE: alpha", Nil, None)
+    DisplayTreeNodeData.from(presentPiece(Atom(Bytes(5), new EagerContentsR((), "alpha")))) mustBe
+      DisplayTreeNodeData("WHOLE: alpha", Nil)
   }
 
   test("presentPiece - atom - without value") {
-    presentPiece(Atom(Bytes(2), EmptyContents)) mustBe DisplayTreeNode("WHOLE", Nil, None)
+    DisplayTreeNodeData.from(presentPiece(Atom(Bytes(2), EmptyContents))) mustBe
+      DisplayTreeNodeData("WHOLE", Nil)
   }
 
   test("presentPiece - molecule") {
@@ -48,26 +49,25 @@ class PackageSuite extends FunSuite {
         SubPiece("one", Bytes(0), Atom(Bytes(10), new EagerContentsR((), "gamma"))),
         SubPiece("two", Bytes(50), Atom(Bytes(10), EmptyContents))))
 
-    val displayed = presentPiece(molecule)
-    displayed.text mustBe "WHOLE: beta"
-    displayed.notes mustBe Nil
-    displayed.getChildren.value() mustBe Seq(
-      DisplayTreeNode("one: gamma", Nil, None),
-      DisplayTreeNode("two", Nil, None)
+    DisplayTreeNodeData.from(presentPiece(molecule)) mustBe
+      DisplayTreeNodeData("WHOLE: beta", Nil, Some(Seq(
+        DisplayTreeNodeData("one: gamma", Nil),
+        DisplayTreeNodeData("two", Nil)
+      ))
     )
   }
 
   test("presentPiece - with note") {
     for (quality <- Quality.values)
-      presentPiece(Atom(Bytes(2), EmptyContents, notes = Seq(Note(quality, "note")))) mustBe
-        DisplayTreeNode("WHOLE", Seq((QualityColors(quality), "note")), None)
+      DisplayTreeNodeData.from(presentPiece(Atom(Bytes(2), EmptyContents, notes = Seq(Note(quality, "note"))))) mustBe
+        DisplayTreeNodeData("WHOLE", Seq((QualityColors(quality), "note")))
   }
 
   test("presentPiece - multiple notes") {
-    val actual = presentPiece(Atom(Bytes(2), EmptyContents, notes =
-      Seq(Note(Quality.Good, "note 1"), Note(Quality.Bad, "note 2"))))
-    val expected = DisplayTreeNode("WHOLE",
-      Seq((QualityColors(Quality.Good), "note 1"), (QualityColors(Quality.Bad), "note 2")), None)
+    val actual = DisplayTreeNodeData.from(presentPiece(Atom(Bytes(2), EmptyContents, notes =
+      Seq(Note(Quality.Good, "note 1"), Note(Quality.Bad, "note 2")))))
+    val expected = DisplayTreeNodeData("WHOLE",
+      Seq((QualityColors(Quality.Good), "note 1"), (QualityColors(Quality.Bad), "note 2")))
     actual mustBe expected
   }
 

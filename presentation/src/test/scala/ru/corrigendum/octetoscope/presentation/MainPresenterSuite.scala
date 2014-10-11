@@ -27,7 +27,7 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.presentation.mocks.{MockBinaryReader, MockDialogBoxer, MockDissectorDriver, MockMainView}
-import ru.corrigendum.octetoscope.presentation.tools.FakeMessageLocalizer
+import ru.corrigendum.octetoscope.presentation.tools.{DisplayTreeNodeData, FakeMessageLocalizer}
 
 class MainPresenterSuite extends FunSuite with BeforeAndAfter {
   private[this] var view: MockMainView = _
@@ -112,7 +112,7 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     val tab = view.tabs.loneElement
     tab.title mustBe "cadabra"
     tab.toolTip mustBe MainPresenterSuite.FakePath.toString
-    tab.tree mustBe presentPiece(dissectorDriver(Blob.empty))
+    DisplayTreeNodeData.from(tab.tree) mustBe DisplayTreeNodeData.from(presentPiece(dissectorDriver(Blob.empty)))
 
     view.activeTab mustBe Some(tab)
     view.title mustBe "Blarf - cadabra"

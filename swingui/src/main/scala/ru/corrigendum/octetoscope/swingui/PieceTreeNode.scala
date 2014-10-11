@@ -25,6 +25,7 @@ import ru.corrigendum.octetoscope.abstractui.DisplayTreeNode
 private class PieceTreeNode(data: DisplayTreeNode) extends DefaultMutableTreeNode {
   val text = data.text
   val notes = data.notes
+  val eventListener = data.eventListener
 
   private[this] var _childrenThunk: Option[() => Seq[DisplayTreeNode]] = data.getChildren
 

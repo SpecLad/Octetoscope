@@ -60,6 +60,7 @@ subprojects {
     testCompile deps.scalaTest
   }
 
+  sourceCompatibility = '1.7'
   targetCompatibility = '1.7'
 
   test << {

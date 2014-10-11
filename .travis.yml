@@ -3,7 +3,7 @@ env:
 language: scala
 jdk:
   - openjdk7
-  - oraclejdk7
+  - oraclejdk8
 before_install: git fetch --unshallow
 install: ./gradlew --stacktrace assemble
 script: ./gradlew --stacktrace check

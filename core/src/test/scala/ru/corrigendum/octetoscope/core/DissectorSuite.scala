@@ -59,7 +59,7 @@ class DissectorSuite extends FunSuite {
     val cause = new IndexOutOfBoundsException
 
     val truncated = new MoleculeBuilderPostProcessingDissector[Unit, Unit] {
-      override def defaultWIP = Unit
+      override def defaultWIP = ()
       override def postProcess(wip: Unit): Unit = wip
       override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
         throw new MoleculeBuilderDissector.TruncatedException(cause, "alpha")

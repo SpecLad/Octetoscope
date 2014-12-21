@@ -36,7 +36,7 @@ class MainPresenter(strings: PresentationStrings,
   view.disableCommand(MainView.Command.Close)
   view.show()
 
-  view.subscribe(viewHandler)
+  view.subscribe(ViewHandler)
 
   private[this] var numTabs = 0
   private[this] var currentTabHandler: Option[TabHandler] = None
@@ -52,7 +52,7 @@ class MainPresenter(strings: PresentationStrings,
     }
   }
 
-  private object viewHandler extends MainView#Sub {
+  private object ViewHandler extends MainView#Sub {
     override def notify(pub: MainView#Pub, event: Event) {
       event match {
         case ClosedEvent => pub.dispose()

@@ -25,6 +25,8 @@ import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.presentation.tools.DisplayTreeNodeData
 
 class PackageSuite extends FunSuite {
+  import PackageSuite._
+
   test("presentVersionInfo") {
     val hash = "1234" * 10
     presentVersionInfo(VersionInfo("1.2", 0, hash, dirty = false)) mustBe "1.2-g1234123"
@@ -34,12 +36,12 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - atom - with value") {
-    DisplayTreeNodeData.from(presentPiece(Atom(Bytes(5), new EagerContentsR((), "alpha")))) mustBe
+    DisplayTreeNodeData.from(presentPieceIgnoringEvents(Atom(Bytes(5), new EagerContentsR((), "alpha")))) mustBe
       DisplayTreeNodeData("WHOLE: alpha", Nil)
   }
 
   test("presentPiece - atom - without value") {
-    DisplayTreeNodeData.from(presentPiece(Atom(Bytes(2), EmptyContents))) mustBe
+    DisplayTreeNodeData.from(presentPieceIgnoringEvents(Atom(Bytes(2), EmptyContents))) mustBe
       DisplayTreeNodeData("WHOLE", Nil)
   }
 
@@ -49,7 +51,7 @@ class PackageSuite extends FunSuite {
         SubPiece("one", Bytes(0), Atom(Bytes(10), new EagerContentsR((), "gamma"))),
         SubPiece("two", Bytes(50), Atom(Bytes(10), EmptyContents))))
 
-    DisplayTreeNodeData.from(presentPiece(molecule)) mustBe
+    DisplayTreeNodeData.from(presentPieceIgnoringEvents(molecule)) mustBe
       DisplayTreeNodeData("WHOLE: beta", Nil, Some(Seq(
         DisplayTreeNodeData("one: gamma", Nil),
         DisplayTreeNodeData("two", Nil)
@@ -58,17 +60,41 @@ class PackageSuite extends FunSuite {
   }
 
   test("presentPiece - with note") {
-    for (quality <- Quality.values)
-      DisplayTreeNodeData.from(presentPiece(Atom(Bytes(2), EmptyContents, notes = Seq(Note(quality, "note"))))) mustBe
+    for (quality <- Quality.values) {
+      val piece = Atom(Bytes(2), EmptyContents, notes = Seq(Note(quality, "note")))
+      DisplayTreeNodeData.from(presentPieceIgnoringEvents(piece)) mustBe
         DisplayTreeNodeData("WHOLE", Seq((QualityColors(quality), "note")))
+    }
   }
 
   test("presentPiece - multiple notes") {
-    val actual = DisplayTreeNodeData.from(presentPiece(Atom(Bytes(2), EmptyContents, notes =
+    val actual = DisplayTreeNodeData.from(presentPieceIgnoringEvents(Atom(Bytes(2), EmptyContents, notes =
       Seq(Note(Quality.Good, "note 1"), Note(Quality.Bad, "note 2")))))
     val expected = DisplayTreeNodeData("WHOLE",
       Seq((QualityColors(Quality.Good), "note 1"), (QualityColors(Quality.Bad), "note 2")))
     actual mustBe expected
+  }
+
+  test("presentPiece - double click handler") {
+    val piece = Molecule(Bytes(100), EmptyContents, Seq(
+      SubPiece("alpha", Bytes(50), Molecule(Bytes(25), EmptyContents, Seq(
+        SubPiece("beta", Bytes(5), Atom(Bytes(10), EmptyContents))
+      )))
+    ))
+
+    var receivedOffset: InfoSize = null
+    var receivedSize: InfoSize = null
+
+    def handleDoubleClick(offset: InfoSize, size: InfoSize): Unit = {
+      receivedOffset = offset
+      receivedSize = size
+    }
+
+    val displayTreeNode = presentPiece(piece, handleDoubleClick)
+    displayTreeNode.getChildren.get()(0).getChildren.get()(0).eventListener.doubleClicked()
+
+    receivedOffset mustBe Bytes(55)
+    receivedSize mustBe Bytes(10)
   }
 
   test("presentBlobAsHexadecimal - empty") {
@@ -97,4 +123,8 @@ class PackageSuite extends FunSuite {
     generateBlobOffsets(0x200000000L, 0x7fffffff) mustBe
       "0000000000000000\n000000007fffffff\n00000000fffffffe\n000000017ffffffd\n00000001fffffffc"
   }
+}
+
+object PackageSuite {
+  def presentPieceIgnoringEvents(piece: PlainPiece) = presentPiece(piece, (offset: InfoSize, size: InfoSize) => ())
 }

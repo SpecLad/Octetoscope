@@ -41,28 +41,32 @@ package object presentation {
     )
   }
 
-  private[presentation] def presentPiece(piece: PlainPiece): DisplayTreeNode = {
-    def helper(np: SubPiece): DisplayTreeNode = {
+  private[presentation] def presentPiece(piece: PlainPiece,
+                                         doubleClickHandler: (InfoSize, InfoSize) => Unit): DisplayTreeNode = {
+    def helper(np: SubPiece, offset: InfoSize): DisplayTreeNode = {
       val displayText = StringBuilder.newBuilder
       displayText ++= np.name
 
       for (repr <- np.piece.contents.reprO)
         displayText ++= ": " ++= repr
 
+      // We want the listener to only capture one value, not the whole np object.
+      val size = np.piece.size
+
       DisplayTreeNode(
         displayText.result(),
         np.piece.notes.map(n => (QualityColors(n.pieceQuality), n.text)),
         np.piece match {
           case _: PlainAtom => None
-          case m: PlainMolecule => Some(() => m.children.map(helper))
+          case m: PlainMolecule => Some(() => m.children.map(c => helper(c, offset + c.offset)))
         },
         new DisplayTreeNodeEventListener {
-          override def doubleClicked() { /* TODO */ }
+          override def doubleClicked() { doubleClickHandler(offset, size) }
         }
       )
     }
 
-    helper(SubPiece("WHOLE", InfoSize(), piece))
+    helper(SubPiece("WHOLE", InfoSize(), piece), InfoSize())
   }
 
   private val bytesAsHex = Array.tabulate(256)(_.formatted("%02x"))

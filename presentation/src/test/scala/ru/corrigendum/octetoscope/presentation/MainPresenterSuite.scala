@@ -112,7 +112,8 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     val tab = view.tabs.loneElement
     tab.title mustBe "cadabra"
     tab.toolTip mustBe MainPresenterSuite.FakePath.toString
-    DisplayTreeNodeData.from(tab.tree) mustBe DisplayTreeNodeData.from(presentPiece(dissectorDriver(Blob.empty)))
+    DisplayTreeNodeData.from(tab.tree) mustBe DisplayTreeNodeData.from(
+      presentPiece(dissectorDriver(Blob.empty), (offset: InfoSize, size: InfoSize) => ()))
 
     view.activeTab mustBe Some(tab)
     view.title mustBe "Blarf - cadabra"

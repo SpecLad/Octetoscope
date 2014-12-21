@@ -23,7 +23,7 @@ import java.io.IOException
 import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.abstractui.MainView._
-import ru.corrigendum.octetoscope.core.{DetectionFailedException, DissectorDriver, TooSmallToDissectException, VersionInfo}
+import ru.corrigendum.octetoscope.core._
 
 class MainPresenter(strings: PresentationStrings,
                     appName: String,
@@ -50,6 +50,10 @@ class MainPresenter(strings: PresentationStrings,
       view.disableCommand(MainView.Command.Close)
       currentTabHandler = None
     }
+  }
+
+  private def handlePieceDoubleClick(offset: InfoSize, size: InfoSize) {
+    /* TODO */
   }
 
   private object ViewHandler extends MainView#Sub {
@@ -83,7 +87,7 @@ class MainPresenter(strings: PresentationStrings,
 
               val numericViewText = presentBlobAsHexadecimal(blob, MainPresenter.DefaultBytesPerRow)
               val offsetViewText = generateBlobOffsets(blob.size, MainPresenter.DefaultBytesPerRow)
-              val newTab = pub.addTab(path.getName, path.toString, presentPiece(piece))
+              val newTab = pub.addTab(path.getName, path.toString, presentPiece(piece, handlePieceDoubleClick))
               numTabs += 1
               newTab.subscribe(new TabHandler(newTab, path.getName, numericViewText, offsetViewText))
               newTab.activate()

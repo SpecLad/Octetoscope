@@ -126,6 +126,9 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
 
     val model = new DefaultTreeModel(new PieceTreeNode(root), true)
     val tree = new JTree(model)
+    // double-click to toggle interferes with our own double-click handling;
+    // instead, we'll allow triple-click to toggle as a hidden feature
+    tree.setToggleClickCount(3)
     // we collapse the root and then expand it again, so that
     // the expand handler can fire for it, and its children are properly loaded
     tree.collapseRow(0)

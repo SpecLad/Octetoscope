@@ -86,13 +86,13 @@ class MockMainView extends MockView with MainView {
 
   override def scrollRawView(topPixel: Int) { _rawViewTopPixel = topPixel }
 
-  override def setNumericViewSelection(selectionStart: Int, selectionEnd: Int): Unit = {
+  override def setNumericViewSelection(selectionStart: Int, selectionEnd: Int) {
     _numericViewSelectionStart = selectionStart
     _numericViewSelectionEnd = selectionEnd
   }
 
   class MockTab(val title: String, val toolTip: String, val tree: DisplayTreeNode) extends Tab {
-    override def activate(): Unit = {
+    override def activate() {
       activateTab(_tabs.indexOf(this))
     }
 

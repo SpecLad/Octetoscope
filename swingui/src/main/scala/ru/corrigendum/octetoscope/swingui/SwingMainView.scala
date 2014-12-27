@@ -73,7 +73,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   frame.setLocationRelativeTo(null)
 
   tabPane.addChangeListener(new ChangeListener {
-    override def stateChanged(e: ChangeEvent): Unit = {
+    override def stateChanged(e: ChangeEvent) {
       val tabIndex = tabPane.getSelectedIndex
       if (tabIndex == -1) return
 
@@ -187,7 +187,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   private class TabImpl(val component: JComponent) extends Tab {
     def triggerEvent(event: TabEvent) { publish(event); }
 
-    override def activate(): Unit = {
+    override def activate() {
       val newSelectedIndex = tabPane.indexOfTabComponent(component)
 
       // setSelectedIndex doesn't do anything if the selected index doesn't

@@ -85,7 +85,7 @@ class PackageSuite extends FunSuite {
     var receivedOffset: InfoSize = null
     var receivedSize: InfoSize = null
 
-    def handleDoubleClick(offset: InfoSize, size: InfoSize): Unit = {
+    def handleDoubleClick(offset: InfoSize, size: InfoSize) {
       receivedOffset = offset
       receivedSize = size
     }

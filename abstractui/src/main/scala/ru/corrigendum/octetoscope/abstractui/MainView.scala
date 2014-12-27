@@ -45,6 +45,8 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
 
   def rawViewTopPixel: Int
   def scrollRawView(topPixel: Int)
+
+  def setNumericViewSelection(selectionStart: Int, selectionEnd: Int)
 }
 
 object MainView {

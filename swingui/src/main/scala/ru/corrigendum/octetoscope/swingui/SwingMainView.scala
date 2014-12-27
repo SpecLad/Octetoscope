@@ -173,6 +173,17 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     rawViewScroller.getViewport.setViewPosition(new Point(0, topPixel))
   }
 
+  override def setNumericViewSelection(selectionStart: Int, selectionEnd: Int) {
+    numericView.setCaretPosition(selectionStart)
+    numericView.moveCaretPosition(selectionEnd)
+    /* This is a workaround for text area hiding its selection when it isn't
+       active. TODO: find a better solution. (Maybe implement a custom caret?) */
+    if (selectionStart == selectionEnd)
+      numericView.getCaret.setVisible(true)
+    else
+      numericView.getCaret.setSelectionVisible(true)
+  }
+
   private class TabImpl(val component: JComponent) extends Tab {
     def triggerEvent(event: TabEvent) { publish(event); }
 

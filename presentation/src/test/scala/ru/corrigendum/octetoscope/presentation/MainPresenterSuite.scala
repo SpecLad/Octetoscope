@@ -169,6 +169,33 @@ class MainPresenterSuite extends FunSuite with BeforeAndAfter {
     view.offsetViewText mustBe ""
     view.isCommandEnabled(MainView.Command.Close) mustBe false
   }
+
+  test("double clicking pieces") {
+    view.selectedFile = Some(MainPresenterSuite.FakePath)
+    binaryReader.result = MainPresenterSuite.FakeBlob
+    dissectorDriver.result = Molecule(Bytes(16), EmptyContents, Seq(
+      SubPiece("alpha", Bytes(2), Atom(Bytes(10), EmptyContents)), // whole number of bytes
+      SubPiece("beta", Bits(2), Atom(Bits(12), EmptyContents)), // covering more than half a byte (on each end)
+      SubPiece("gamma", Bits(4), Atom(Bits(8), EmptyContents)), // covering exactly half a byte
+      SubPiece("delta", Bits(6), Atom(Bits(4), EmptyContents)), // covering less than half a byte
+      SubPiece("epsilon", Bytes(3), Atom(InfoSize(), EmptyContents)), // zero-length between bytes
+      SubPiece("zeta", InfoSize(3, 2), Atom(InfoSize(), EmptyContents)), // zero-length in the middle of a left nibble
+      SubPiece("eta", InfoSize(3, 4), Atom(InfoSize(), EmptyContents)), // zero-length between nibbles
+      SubPiece("theta", InfoSize(3, 6), Atom(InfoSize(), EmptyContents)) // zero-length in the middle of a right nibble
+    ))
+    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+
+    val tab = view.tabs.loneElement
+
+    val expectedSelections = Seq(
+      (6, 35), (0, 5), (1, 4), (1, 4),
+      (9, 9), (9, 9), (10, 10), (10, 10))
+
+    for ((child, expectedSelection) <- tab.tree.getChildren.get() zip expectedSelections) {
+      child.eventListener.doubleClicked()
+      (view.numericViewSelectionStart, view.numericViewSelectionEnd) mustBe expectedSelection
+    }
+  }
 }
 
 object MainPresenterSuite {

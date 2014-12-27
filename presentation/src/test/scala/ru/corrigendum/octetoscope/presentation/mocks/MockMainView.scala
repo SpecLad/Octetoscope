@@ -32,12 +32,16 @@ class MockMainView extends MockView with MainView {
   private[this] var _rawViewTopPixel: Int = -1
   private[this] var _numericViewText: String = ""
   private[this] var _offsetViewText: String = ""
+  private[this] var _numericViewSelectionStart: Int = _
+  private[this] var _numericViewSelectionEnd: Int = _
 
   def disposed = _disposed
   def visible = _visible
   def tabs = _tabs.readOnly
   def numericViewText: String = _numericViewText
   def offsetViewText: String = _offsetViewText
+  def numericViewSelectionStart: Int = _numericViewSelectionStart
+  def numericViewSelectionEnd: Int = _numericViewSelectionEnd
 
   def dispose() {
     _disposed = true
@@ -81,6 +85,11 @@ class MockMainView extends MockView with MainView {
   def isCommandEnabled(command: MainView.Command.Value) = !_disabledCommands.contains(command)
 
   override def scrollRawView(topPixel: Int) { _rawViewTopPixel = topPixel }
+
+  override def setNumericViewSelection(selectionStart: Int, selectionEnd: Int): Unit = {
+    _numericViewSelectionStart = selectionStart
+    _numericViewSelectionEnd = selectionEnd
+  }
 
   class MockTab(val title: String, val toolTip: String, val tree: DisplayTreeNode) extends Tab {
     override def activate(): Unit = {

@@ -53,7 +53,16 @@ class MainPresenter(strings: PresentationStrings,
   }
 
   private def handlePieceDoubleClick(offset: InfoSize, size: InfoSize) {
-    /* TODO */
+    val selectionStart = if (offset.bits < 4) offset.bytes * 3 else offset.bytes * 3 + 1
+    val selectionEnd = if (size == InfoSize()) {
+      selectionStart
+    } else {
+      val offsetEnd = offset + size
+      if (offsetEnd.bits == 0) offsetEnd.bytes * 3 - 1
+      else if (offsetEnd.bits > 4) offsetEnd.bytes * 3 + 2
+      else offsetEnd.bytes * 3 + 1
+    }
+    view.setNumericViewSelection(selectionStart.toInt, selectionEnd.toInt)
   }
 
   private object ViewHandler extends MainView#Sub {

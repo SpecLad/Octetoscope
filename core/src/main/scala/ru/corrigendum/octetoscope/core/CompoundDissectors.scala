@@ -44,6 +44,7 @@ object CompoundDissectors {
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder,
                            wip: mutable.ArrayBuffer[V]) {
       val add = new SequentialAdder(input, offset, builder)
+      wip.sizeHint(size)
 
       for (i <- 0 until size) wip += add("%s #%d".format(itemName, i), itemDissector)
 

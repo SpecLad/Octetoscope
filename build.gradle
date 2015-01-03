@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -41,8 +41,8 @@ ext {
 
   deps = [
     scalaLibrary: "org.scala-lang:scala-library:$scalaMajorVersion.4",
-    scalaTest: "org.scalatest:scalatest_$scalaMajorVersion:2.1.6",
-    icu: 'com.ibm.icu:icu4j:53.1',
+    scalaTest: "org.scalatest:scalatest_$scalaMajorVersion:2.2.1",
+    icu: 'com.ibm.icu:icu4j:54.1.1',
     arm: "com.jsuereth:scala-arm_$scalaMajorVersion:1.4",
   ]
 }

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -36,18 +36,13 @@ object CompoundDissectors {
 
   private class CollectingArray[V](
     size: Int, itemName: String, itemDissector: DissectorC[V], reprFuncMaybe: Option[Seq[V] => String]
-  ) extends MoleculeBuilderPostProcessingDissector[IndexedSeq[V], mutable.Buffer[V]] {
-    /* Ideally, we'd like to use Builder[V, IndexedSeq[V]] as the WIP type, but we can't,
-       since we need an IndexedSeq to pass to reprFuncMaybe, and we can't call builder.result
-       in dissectMB, since it invalidates the builder. TODO: do something about this,
-       probably splitting the repr setting into a dissector transformation.
-     */
-    override def defaultWIP: mutable.Buffer[V] = mutable.Buffer[V]()
+  ) extends MoleculeBuilderPostProcessingDissector[IndexedSeq[V], mutable.ArrayBuffer[V]] {
+    override def defaultWIP: mutable.ArrayBuffer[V] = mutable.ArrayBuffer[V]()
 
-    override def postProcess(wip: mutable.Buffer[V]): IndexedSeq[V] = wip.toIndexedSeq
+    override def postProcess(wip: mutable.ArrayBuffer[V]): IndexedSeq[V] = wip
 
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder,
-                           wip: mutable.Buffer[V]) {
+                           wip: mutable.ArrayBuffer[V]) {
       val add = new SequentialAdder(input, offset, builder)
 
       for (i <- 0 until size) wip += add("%s #%d".format(itemName, i), itemDissector)

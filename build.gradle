@@ -108,7 +108,7 @@ task dist(type: Zip) {
     into 'lib'
   }
 
-  from(['README.txt', 'COPYING.txt']) {
+  from(['AUTHORS.txt', 'COPYING.txt', 'README.txt']) {
     // Using CRLFs as line endings, since that's the lowest common denominator.
     filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('crlf'))
   }

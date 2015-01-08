@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
         "DLE DC1 DC2 DC3 DC4 NAK SYN ETB " +
         "CAN EM SUB ESC FS GS RS US " +
         "DEL QUOTE",
-      Some(new String(('\0' to '\037').toArray :+ '\177' :+ '"')),
+      Some(new String(('\u0000' to '\u001f').toArray :+ '\u007f' :+ '"')),
       ((0 to 0x1F) :+ 0x7F :+ '"'.toInt).map(_.toByte): _*)
     verifyWithQualities(asciiString(2), "0xf1f2", None, Seq(Quality.Broken), 0xf1.toByte, 0xf2.toByte)
     verifyWithQualities(asciiString(5), "\"a\" 0xf1f2 \"bc\"", None, Seq(Quality.Broken),

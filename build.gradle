@@ -37,7 +37,7 @@ def getVersionInfo() {
 version = getVersionInfo()
 
 ext {
-  def scalaMajorVersion = '2.10'
+  def scalaMajorVersion = '2.11'
 
   deps = [
     scalaLibrary: "org.scala-lang:scala-library:$scalaMajorVersion.4",

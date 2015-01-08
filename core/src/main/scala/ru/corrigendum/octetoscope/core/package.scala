@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ package object core {
         case iobe: IndexOutOfBoundsException => throw new TooSmallToDissectException(iobe)
       }
 
-  def getDetector(magicMap: Seq[Pair[Array[Byte], PlainDissector]]): Detector =
+  def getDetector(magicMap: Seq[(Array[Byte], PlainDissector)]): Detector =
     (blob: Blob) => {
       magicMap.find {
         case (magic, _) =>

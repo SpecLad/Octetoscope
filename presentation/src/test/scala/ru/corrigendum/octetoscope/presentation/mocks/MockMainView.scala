@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class MockMainView extends MockView with MainView {
 
   def disposed = _disposed
   def visible = _visible
-  def tabs = _tabs.readOnly
+  def tabs: Seq[MockTab] = _tabs
   def numericViewText: String = _numericViewText
   def offsetViewText: String = _offsetViewText
   def numericViewSelectionStart: Int = _numericViewSelectionStart

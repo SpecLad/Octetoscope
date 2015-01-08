@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope
 import ru.corrigendum.octetoscope.core.PlainDissector
 
 package object dissectors {
-  val magicMap: Seq[Pair[Array[Byte], PlainDissector]] = Seq(
+  val magicMap: Seq[(Array[Byte], PlainDissector)] = Seq(
     MDL.MagicBytes -> MDL,
     MD2.MagicBytes -> MD2
   )

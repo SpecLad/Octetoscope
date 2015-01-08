@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,17 +30,11 @@ private object StringDissectors {
   /* The double quote is used to delimit printable characters in string reprs,
      so to avoid ambiguity we treat it as a special character. The rest are
      simply non-printable. */
-  val AsciiSpecialChars = Map(
-    '\0' -> "NUL", '\1' -> "SOH", '\2' -> "STX", '\3' -> "ETX",
-    '\4' -> "EOT", '\5' -> "ENQ", '\6' -> "ACK", '\7' -> "BEL",
-    '\10' -> "BS", '\11' -> "HT", '\12' -> "LF", '\13' -> "VT",
-    '\14' -> "FF", '\15' -> "CR", '\16' -> "SO", '\17' -> "SI",
-    '\20' -> "DLE", '\21' -> "DC1", '\22' -> "DC2", '\23' -> "DC3",
-    '\24' -> "DC4", '\25' -> "NAK", '\26' -> "SYN", '\27' -> "ETB",
-    '\30' -> "CAN", '\31' -> "EM", '\32' -> "SUB", '\33' -> "ESC",
-    '\34' -> "FS", '\35' -> "GS", '\36' -> "RS", '\37' -> "US",
-    '\177' -> "DEL", '"' -> "QUOTE"
-  )
+  val AsciiSpecialChars = Map('\u007f' -> "DEL", '"' -> "QUOTE") ++
+    Seq("NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
+      "BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
+      "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
+      "CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US").zipWithIndex.map(pair => (pair._2.toChar, pair._1))
 
   abstract class AsciiStringGeneric(length: Int) extends DissectorCR[Option[String]] {
     protected def findActualLength(input: Blob, byteOffset: Long): Int

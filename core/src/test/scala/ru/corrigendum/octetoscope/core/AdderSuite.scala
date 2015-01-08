@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class AdderSuite extends FunSuite {
     adder("alpha", sInt32L) mustBe 1
     adder.getContents("beta", sInt32L) mustBe new ToStringContents(2)
 
-    builder.build() mustBe Molecule(Bytes(8), EmptyContents, Seq(
+    builder.build(()) mustBe Molecule(Bytes(8), EmptyContents, Seq(
       SubPiece("alpha", Bytes(0), Atom(Bytes(4), new ToStringContents[Int](1))),
       SubPiece("beta", Bytes(4), Atom(Bytes(4), new ToStringContents[Int](2)))
     ))
@@ -70,7 +70,7 @@ class AdderSuite extends FunSuite {
     adder.filtered("beta", sInt8)(c1, c2) mustBe None
     adder.filtered("gamma", sInt8)(c1, c2) mustBe None
 
-    val molecule = builder.build()
+    val molecule = builder.build(())
 
     molecule.children(0).piece.notes mustBe Nil
     molecule.children(1).piece.notes mustBe Seq(Note(Quality.Bad, c1.note(Quality.Bad)))
@@ -92,7 +92,7 @@ class AdderSuite extends FunSuite {
     val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
     adder("omega", Bytes(2), dissector) mustBe 2
 
-    builder.build() mustBe Molecule(Bytes(5), EmptyContents, Seq(
+    builder.build(()) mustBe Molecule(Bytes(5), EmptyContents, Seq(
       SubPiece("omega", Bytes(2), Atom(Bytes(3), new EagerContents(2)))))
   }
 
@@ -107,7 +107,7 @@ class AdderSuite extends FunSuite {
     val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
     adder("omega", Bytes(2), dissector) mustBe 1
 
-    inside(builder.build()) { case Molecule(size_, _, children, notes) =>
+    inside(builder.build(())) { case Molecule(size_, _, children, notes) =>
       size_ mustBe InfoSize()
       children mustBe empty
       notes.loneElement.pieceQuality mustBe Quality.Broken

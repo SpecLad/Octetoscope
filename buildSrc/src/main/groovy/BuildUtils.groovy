@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -58,13 +58,13 @@ public final class BuildUtils {
     def repo = new RepositoryBuilder().setWorkTree(project.rootDir).build()
 
     try {
+      def tagMap = repo.tags.findAll { it.key.startsWith(tagPrefix) }.collectEntries {
+        [repo.peel(it.value).peeledObjectId, it.key]
+      }
+
       def walk = new RevWalk(repo)
 
       try {
-        def tagMap = repo.tags.findAll { it.key.startsWith(tagPrefix) }.collectEntries {
-          [walk.peel(walk.parseTag(it.value.objectId)).copy(), it.key]
-        }
-
         def headId = repo.resolve(Constants.HEAD)
 
         def curCommit = walk.lookupCommit(headId)

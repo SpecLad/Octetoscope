@@ -16,7 +16,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import org.eclipse.jgit.dircache.DirCacheIterator
 import org.eclipse.jgit.lib.Constants
+import org.eclipse.jgit.lib.FileMode
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.eclipse.jgit.revwalk.RevTree
@@ -85,6 +87,40 @@ public final class BuildUtils {
       } finally {
         walk.dispose()
       }
+    } finally {
+      repo.close()
+    }
+  }
+
+  public static List<ExportedFileInfo> getExportedFiles(Project project) {
+    def repo = new RepositoryBuilder().setWorkTree(project.rootDir).build()
+
+    try {
+      def treeWalk = new TreeWalk(repo)
+
+      treeWalk.addTree(new FileTreeIterator(repo))
+      treeWalk.addTree(new DirCacheIterator(repo.readDirCache()))
+
+      treeWalk.recursive = true
+      treeWalk.filter = new NotIgnoredFilter(0)
+
+      def results = []
+
+      while (treeWalk.next()) {
+        def wtItem = treeWalk.getTree(0, FileTreeIterator.class)
+        def dcItem = treeWalk.getTree(1, DirCacheIterator.class)
+
+        if (wtItem == null) continue
+
+        def mode = wtItem.getIndexFileMode(dcItem)
+
+        if (mode != FileMode.REGULAR_FILE && mode != FileMode.EXECUTABLE_FILE)
+          throw new RuntimeException("Can't export an entry with mode $mode.")
+
+        results.add(new ExportedFileInfo(path: wtItem.entryPathString, executable: mode == FileMode.EXECUTABLE_FILE))
+      }
+
+      return results
     } finally {
       repo.close()
     }

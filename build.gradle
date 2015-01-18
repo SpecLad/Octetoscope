@@ -93,6 +93,9 @@ task installLibs(type: Sync) {
 
 task install(dependsOn: [installLauncher, installLibs])
 
+// Using CRLFs as line endings in distributions, since that's the lowest common denominator.
+def exportEOL = FixCrLfFilter.CrLf.newInstance('crlf')
+
 task distBinary(type: Zip) {
   classifier 'bin'
   into "$baseName-$version-$classifier"
@@ -109,8 +112,7 @@ task distBinary(type: Zip) {
   }
 
   from(['AUTHORS.txt', 'COPYING.txt', 'README.txt']) {
-    // Using CRLFs as line endings, since that's the lowest common denominator.
-    filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('crlf'))
+    filter(FixCrLfFilter, eol: exportEOL)
   }
 }
 
@@ -125,6 +127,25 @@ task generateVersionGradle(type: GenerateFileTask) {
   outputPath = new File(buildDir, 'generated/version.gradle')
 }
 
-task dist(dependsOn: distBinary)
+task distSource(type: Zip) {
+  classifier 'src'
+  into "$baseName-$version-$classifier"
+  dirMode 0755
+  fileMode 0644
+
+  BuildUtils.getExportedFiles(rootProject).each { f ->
+    from(f.path) {
+      into RelativePath.parse(true, f.path).parent.pathString
+      if (f.executable) fileMode 0755
+      // TODO: apply the CrLf filter where appropriate
+    }
+  }
+
+  from(generateVersionGradle.outputs) {
+    filter(FixCrLfFilter, eol: exportEOL)
+  }
+}
+
+task dist(dependsOn: [distBinary, distSource])
 
 defaultTasks 'build', 'install'

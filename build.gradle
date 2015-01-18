@@ -114,6 +114,17 @@ task distBinary(type: Zip) {
   }
 }
 
+task generateVersionGradle(type: GenerateFileTask) {
+  text = """\
+    releaseVersion = '$version.releaseVersion'
+    extraCommits = $version.extraCommits
+    commitHash = '$version.commitHash'
+    dirty = $version.dirty
+    """.stripIndent()
+
+  outputPath = new File(buildDir, 'generated/version.gradle')
+}
+
 task dist(dependsOn: distBinary)
 
 defaultTasks 'build', 'install'

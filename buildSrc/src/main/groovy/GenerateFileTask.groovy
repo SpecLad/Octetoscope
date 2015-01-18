@@ -21,10 +21,10 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 class GenerateFileTask extends DefaultTask {
-  public String text = ""
+  String text = ""
 
   @OutputFile
-  public File outputPath
+  File outputPath
 
   GenerateFileTask() {
     outputs.upToDateWhen {

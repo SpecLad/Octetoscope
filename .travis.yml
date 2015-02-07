@@ -7,4 +7,4 @@ jdk:
   - oraclejdk8
 before_install: git fetch --unshallow
 install: ./gradlew --stacktrace assemble
-script: ./gradlew --stacktrace check
+script: ./gradlew --stacktrace check dist

@@ -16,6 +16,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import org.apache.tools.ant.DirectoryScanner
 import org.apache.tools.ant.filters.FixCrLfFilter
 
 apply plugin: 'base'
@@ -95,6 +96,17 @@ task install(dependsOn: [installLauncher, installLibs])
 
 // Using CRLFs as line endings in distributions, since that's the lowest common denominator.
 def exportEOL = FixCrLfFilter.CrLf.newInstance('crlf')
+
+// Gradle uses Ant's default excludes list when finding files to copy, which includes things
+// like .gitattributes and .gitignore, which we don't want to exclude when building the source
+// distribution. And we don't know for sure what else it might exclude, so it's best to empty it
+// entirely. It shouldn't matter at all for our other copy-like tasks, since we never copy from
+// directories that might have something ignorable in them.
+// See also <https://issues.gradle.org/browse/GRADLE-1883>.
+DirectoryScanner.defaultExcludes.each { DirectoryScanner.removeDefaultExclude(it) }
+// Because of a bug in Gradle, having no excludes excludes everything. This pattern shouldn't
+// match anything. See <https://github.com/gradle/gradle/pull/396>.
+DirectoryScanner.addDefaultExclude("\0")
 
 task distBinary(type: Zip) {
   classifier 'bin'

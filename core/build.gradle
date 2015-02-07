@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,26 +26,16 @@ sourceSets {
   }
 }
 
-task generateVersionResource {
+task generateVersionResource(type: GenerateFileTask) {
   // Not using the Properties class here to avoid the timestamp.
-  def propString = """\
+  text = """\
     releaseVersion = $rootProject.version.releaseVersion
     extraCommits = $rootProject.version.extraCommits
     commitHash = $rootProject.version.commitHash
     dirty = $rootProject.version.dirty
     """.stripIndent()
 
-  def propFile = new File(generatedResourcesDir, 'ru/corrigendum/octetoscope/core/version.properties')
-  outputs.file propFile
-  outputs.upToDateWhen {
-    try { propFile.getText("US-ASCII") == propString }
-    catch (IOException ignored) { false }
-  }
-
-  doLast {
-    propFile.parentFile.mkdirs()
-    propFile.write(propString)
-  }
+  outputPath = new File(generatedResourcesDir, 'ru/corrigendum/octetoscope/core/version.properties')
 }
 
 processResources {

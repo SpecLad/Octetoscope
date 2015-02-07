@@ -146,6 +146,11 @@ task distSource(type: Zip) {
   fileMode 0644
 
   BuildUtils.getExportedFiles(rootProject).each { f ->
+    // If we're building _from_ a source distribution, there's a version.gradle
+    // in our work directory. We don't want to include that, or we'll end up with
+    // two version.gradle files in the archive.
+    if (f.path == 'version.gradle') return
+
     from(f.path) {
       into RelativePath.parse(true, f.path).parent.pathString
       if (f.executable) fileMode 0755

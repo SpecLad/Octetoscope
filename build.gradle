@@ -139,24 +139,28 @@ task generateVersionGradle(type: GenerateFileTask) {
   outputPath = new File(buildDir, 'generated/version.gradle')
 }
 
-task distSource(type: Zip) {
-  classifier 'src'
-  into "$baseName-$version-$classifier"
-  dirMode 0755
-  fileMode 0644
-
+task configureDistSource << {
+  // This is in a separate task in order to defer the exported file enumeration until execution
+  // time. This means we won't have to perform it when we run tasks unrelated to distSource.
   BuildUtils.getExportedFiles(rootProject).each { f ->
     // If we're building _from_ a source distribution, there's a version.gradle
     // in our work directory. We don't want to include that, or we'll end up with
     // two version.gradle files in the archive.
     if (f.path == 'version.gradle') return
 
-    from(f.path) {
+    distSource.from(f.path) {
       into RelativePath.parse(true, f.path).parent.pathString
       if (f.executable) fileMode 0755
       // TODO: apply the CrLf filter where appropriate
     }
   }
+}
+
+task distSource(type: Zip, dependsOn: configureDistSource) {
+  classifier 'src'
+  into "$baseName-$version-$classifier"
+  dirMode 0755
+  fileMode 0644
 
   from(generateVersionGradle.outputs) {
     filter(FixCrLfFilter, eol: exportEOL)

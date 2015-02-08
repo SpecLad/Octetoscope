@@ -7,45 +7,68 @@
 use strict;
 use warnings;
 
+use Cwd qw/abs_path/;
 use File::Basename;
+use File::Spec;
+use List::Util qw/first/;
 
 my $re_year = qr/[1-9]\d{3,}/;
 my $re_year_range = qr/$re_year|$re_year-$re_year/;
 my $re_years = qr/$re_year_range(?:, $re_year_range)*/;
 
-my $generic_header = <<'EOF';
-This file is part of Octetoscope.
-Copyright (C) YEARS Octetoscope contributors (see /AUTHORS.txt)
+sub has_suffix {
+  my @suffixes = @_;
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+  return sub {
+    my ($path) = @_;
+    for (@suffixes) {
+      return 1 if $path =~ /\Q$_\E$/;
+    }
+    return 0;
+  }
+}
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+my @rules;
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-EOF
+sub fallback {
+  my ($value, $fallback) = @_;
+  return defined($value) ? $value : $fallback;
+}
 
-my @file_suffixes = (".gradle", ".groovy", ".java", ".scala");
+sub rule {
+  my ($predicate, $header, %options) = @_;
+  push @rules, {PREDICATE => $predicate, HEADER => $header,
+                BEFORE => fallback($options{BEFORE}, ''),
+                AFTER => fallback($options{AFTER}, ''),
+                PREFIX => fallback($options{PREFIX}, '')};
+}
+
+my $script_dir = [fileparse(abs_path($0))]->[1];
+my $conf_file = File::Spec->catfile($script_dir, 'check-headers.conf');
+
+unless (defined do $conf_file) {
+  die "couldn't parse \"$conf_file\": $@" if $@;
+  die "couldn't read \"$conf_file\": $!";
+}
 
 my $exit_status = 0;
 
 sub get_copyright_years {
   my ($fname) = @_;
-  return undef if (fileparse($fname, @file_suffixes))[2] eq '';
 
-  # This transformation is not part of $generic_header in case
-  # we later need to support languages with different comment syntax.
-  my $header = $generic_header;
-  $header =~ s/^(.)/  $1/mg;
+  my $rule = first { $_->{PREDICATE}->($fname) } @rules;
+
+  return undef unless defined $rule;
+
+  my $empty_line_prefix = $rule->{PREFIX};
+  $empty_line_prefix =~ s/\s+$//;
+
+  my $header = $rule->{HEADER};
+  $header =~ s/^(?=.)/$rule->{PREFIX}/mg;
+  $header =~ s/^$/$empty_line_prefix/mg;
   $header = quotemeta($header);
   $header =~ s/YEARS/($re_years)/;
-  $header = qr"^/\*\n$header\*/\n";
+  $header = qr/^\Q$rule->{BEFORE}\E$header\Q$rule->{AFTER}\E/;
 
   open my $file, '-|', 'git', 'show', ':' . $fname;
 

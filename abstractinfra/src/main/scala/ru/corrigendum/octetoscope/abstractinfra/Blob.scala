@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013, 2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,8 +21,7 @@ package ru.corrigendum.octetoscope.abstractinfra
 trait Blob {
   def apply(index: Long): Byte
   def size: Long
-  def slice(start: Long, end: Long = size): Blob
-  def toArray: Array[Byte]
+  def getRangeAsArray(start: Long = 0, end: Long = size): Array[Byte]
 }
 
 object Blob {
@@ -33,10 +32,9 @@ object Blob {
 
     override def size: Long = 0
 
-    override def slice(start: Long, end: Long): Blob =
-      if (start == 0 && end == 0) empty
-      else throw new IndexOutOfBoundsException
-
-    override def toArray: Array[Byte] = emptyArray
+    override def getRangeAsArray(start: Long, end: Long): Array[Byte] = {
+      if (start == 0 && end == 0) return emptyArray
+      throw new IndexOutOfBoundsException
+    }
   }
 }

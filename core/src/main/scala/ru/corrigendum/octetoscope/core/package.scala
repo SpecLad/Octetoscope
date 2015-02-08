@@ -63,7 +63,7 @@ package object core {
     (blob: Blob) => {
       magicMap.find {
         case (magic, _) =>
-          magic.length <= blob.size && blob.slice(0, magic.length).toArray.sameElements(magic)
+          magic.length <= blob.size && blob.getRangeAsArray(0, magic.length).sameElements(magic)
       }.map(_._2)
     }
 }

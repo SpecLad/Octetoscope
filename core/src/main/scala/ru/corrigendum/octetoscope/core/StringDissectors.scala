@@ -44,7 +44,7 @@ private object StringDissectors {
       val Bytes(bo) = offset
 
       val actualLength = findActualLength(input, bo)
-      val inBuffer = ByteBuffer.wrap(input.slice(bo, bo + actualLength).toArray)
+      val inBuffer = ByteBuffer.wrap(input.getRangeAsArray(bo, bo + actualLength))
       val outBuffer = CharBuffer.allocate(256)
       val decoder = StandardCharsets.US_ASCII.newDecoder()
 

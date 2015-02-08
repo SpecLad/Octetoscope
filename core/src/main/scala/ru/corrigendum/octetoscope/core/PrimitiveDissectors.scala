@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ object PrimitiveDissectors {
     override def dissect(input: Blob, offset: InfoSize): AtomC[Option[Unit]] = {
       val Bytes(bo) = offset
 
-      if (input.slice(bo, bo + expected.length).toArray.sameElements(expected)) {
+      if (input.getRangeAsArray(bo, bo + expected.length).sameElements(expected)) {
         Atom(Bytes(expected.length), new EagerContents(Some(()), Some(interpretation)))
       } else {
         val note = "expected \"%s\" (0x%s)".format(interpretation, expected.map("%02x".format(_)).mkString)

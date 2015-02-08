@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013, 2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,20 +20,18 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-class ArrayBlob private (array: Array[Byte], offset: Int, length: Int) extends Blob {
-  def this(array: Array[Byte]) = this(array, 0, array.length)
-
+class ArrayBlob(array: Array[Byte]) extends Blob {
   override def apply(index: Long): Byte = {
-    if (index < 0 || index >= length) throw new IndexOutOfBoundsException
-    array(offset + index.toInt)
+    // We do our own check instead of relying on the array's, to make sure
+    // the index doesn't overflow when we convert it to int.
+    if (index < 0 || index >= array.length) throw new IndexOutOfBoundsException
+    array(index.toInt)
   }
 
-  override def size: Long = length
+  override def size: Long = array.length
 
-  override def slice(start: Long, end: Long): Blob = {
-    if (start < 0 || end > length || start > end) throw new IndexOutOfBoundsException
-    new ArrayBlob(array, offset + start.toInt, end.toInt - start.toInt)
+  override def getRangeAsArray(start: Long, end: Long): Array[Byte] = {
+    if (start < 0 || end > array.length || start > end) throw new IndexOutOfBoundsException
+    array.slice(start.toInt, end.toInt)
   }
-
-  override def toArray: Array[Byte] = array.slice(offset, offset + length)
 }

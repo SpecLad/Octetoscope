@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -73,7 +73,8 @@ package object presentation {
 
   private[presentation] def presentBlobAsHexadecimal(blob: Blob, numColumns: Int): String = {
     require(numColumns > 0)
-    blob.toArray.grouped(numColumns).map(_.map((b: Byte) => bytesAsHex(b & 0xff)).mkString(" ")).mkString("\n")
+    blob.getRangeAsArray().grouped(numColumns)
+      .map(_.map((b: Byte) => bytesAsHex(b & 0xff)).mkString(" ")).mkString("\n")
   }
 
   private[presentation] def generateBlobOffsets(blobSize: Long, numColumns: Int): String = {

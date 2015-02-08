@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
   var blob: Blob = _
 
   before {
-    blob = new ArrayBlob(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8, 9)).slice(2, 7)
+    blob = new ArrayBlob(Array[Byte](3, 4, 5, 6, 7))
   }
 
   test("apply - normal") {
@@ -38,27 +38,23 @@ class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
     an [IndexOutOfBoundsException] must be thrownBy { blob(-1) }
   }
 
-  test("toArray") {
-    blob.toArray mustBe Array[Byte](3, 4, 5, 6, 7)
-  }
-
   test("size") {
     blob.size mustBe 5
   }
 
-  test("slice - normal") {
-    blob.slice(2, 4).toArray mustBe Array[Byte](5, 6)
-    blob.slice(0, 4).toArray mustBe Array[Byte](3, 4, 5, 6)
-    blob.slice(2, 5).toArray mustBe Array[Byte](5, 6, 7)
-    blob.slice(0, 5).toArray mustBe Array[Byte](3, 4, 5, 6, 7)
-    blob.slice(2, 2).toArray mustBe Array[Byte]()
+  test("getRangeAsArray - normal") {
+    blob.getRangeAsArray(2, 4) mustBe Array[Byte](5, 6)
+    blob.getRangeAsArray(0, 4) mustBe Array[Byte](3, 4, 5, 6)
+    blob.getRangeAsArray(2, 5) mustBe Array[Byte](5, 6, 7)
+    blob.getRangeAsArray(0, 5) mustBe Array[Byte](3, 4, 5, 6, 7)
+    blob.getRangeAsArray(2, 2) mustBe Array[Byte]()
   }
 
-  test("slice - out of range") {
-    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(-1, 4) }
-    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(5, 6) }
-    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(2, 6) }
-    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(-2, -1) }
-    an [IndexOutOfBoundsException] must be thrownBy { blob.slice(4, 2) }
+  test("getRangeAsArray - out of range") {
+    an [IndexOutOfBoundsException] must be thrownBy { blob.getRangeAsArray(-1, 4) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob.getRangeAsArray(5, 6) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob.getRangeAsArray(2, 6) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob.getRangeAsArray(-2, -1) }
+    an [IndexOutOfBoundsException] must be thrownBy { blob.getRangeAsArray(4, 2) }
   }
 }

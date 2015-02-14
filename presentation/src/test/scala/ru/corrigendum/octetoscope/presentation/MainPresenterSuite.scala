@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,184 +22,186 @@ import java.io.{File, IOException}
 
 import org.scalatest.LoneElement._
 import org.scalatest.MustMatchers._
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.path
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.presentation.mocks.{MockBinaryReader, MockDialogBoxer, MockDissectorDriver, MockMainView}
 import ru.corrigendum.octetoscope.presentation.tools.{DisplayTreeNodeData, FakeMessageLocalizer}
 
-class MainPresenterSuite extends FunSuite with BeforeAndAfter {
-  private[this] var view: MockMainView = _
-  private[this] var boxer: MockDialogBoxer = _
-  private[this] val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
-  private[this] var binaryReader: MockBinaryReader = _
-  private[this] var dissectorDriver: MockDissectorDriver = _
+class MainPresenterSuite extends path.FunSpec {
+  describe("A MainPresenter") {
+    val view = new MockMainView()
+    val boxer = new MockDialogBoxer()
+    val binaryReader = new MockBinaryReader()
+    val dissectorDriver = new MockDissectorDriver()
+    val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
 
-  before {
-    view = new MockMainView()
-    boxer = new MockDialogBoxer()
-    binaryReader = new MockBinaryReader()
-    dissectorDriver = new MockDissectorDriver()
     new MainPresenter(strings, "Blarf", view, boxer, binaryReader, dissectorDriver)
-  }
 
-  test("closing the window") {
-    view.trigger(MainView.ClosedEvent)
-    view mustBe 'disposed
-  }
+    it("must put the window into the initial state") {
+      view mustBe 'visible
+      view.title mustBe "Blarf"
+      view.numericViewWidth mustBe 23
+      view.isCommandEnabled(MainView.Command.Close) mustBe false
+    }
 
-  test("initialization") {
-    view mustBe 'visible
-    view.title mustBe "Blarf"
-    view.numericViewWidth mustBe 23
-    view.isCommandEnabled(MainView.Command.Close) mustBe false
-  }
+    describe("when the window is closed") {
+      view.trigger(MainView.ClosedEvent)
+      it must behave like userQuits
+    }
 
-  test("quit command") {
-    view.trigger(MainView.CommandEvent(MainView.Command.Quit))
-    view mustBe 'disposed
-  }
+    describe("when the Quit command is given") {
+      view.trigger(MainView.CommandEvent(MainView.Command.Quit))
+      it must behave like userQuits
+    }
 
-  test("about command") {
-    view.trigger(MainView.CommandEvent(MainView.Command.About))
-    boxer.messages mustBe List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours)))
-  }
+    def userQuits() {
+      it("must dispose the window") {
+        view mustBe 'disposed
+      }
+    }
 
-  test("open command - cancelled") {
-    view.selectedFile = None
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
-    view.tabs must have size 0
-  }
+    describe("when the About command is given") {
+      view.trigger(MainView.CommandEvent(MainView.Command.About))
+      it("must show the About message box") {
+        boxer.messages mustBe List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours)))
+      }
+    }
 
-  test("open command - IOException") {
-    view.selectedFile = Some(MainPresenterSuite.FakePath)
-    val exception = new IOException("whatever")
-    binaryReader.exception = Some(exception)
+    describe("when the Open command is given") {
+      describe("and the Open dialog is cancelled") {
+        view.selectedFile = None
+        view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+        it("must not open any tabs") {
+          view.tabs must have size 0
+        }
+      }
 
-    view.tabs must have size 0
-    boxer.messages mustBe List(strings.errorReadingFile(exception.getMessage))
-  }
+      describe("and a file is selected") {
+        view.selectedFile = Some(MainPresenterSuite.FakePath)
 
-  test("open command - TooSmallToDissectException") {
-    view.selectedFile = Some(MainPresenterSuite.FakePath)
-    dissectorDriver.exception = Some(new TooSmallToDissectException(null))
+        describe("and an I/O exception occurs when reading the file") {
+          val exception = new IOException("whatever")
+          binaryReader.exception = Some(exception)
+          view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+          it("must complain and not open any tabs") {
+            view.tabs must have size 0
+            boxer.messages mustBe List(strings.errorReadingFile(exception.getMessage))
+          }
+        }
 
-    view.tabs must have size 0
-    boxer.messages mustBe List(strings.fileTooSmallToDissect())
-  }
+        describe("and the file is too small to dissect") {
+          dissectorDriver.exception = Some(new TooSmallToDissectException(null))
+          view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-  test("open command - DetectionFailedException") {
-    view.selectedFile = Some(MainPresenterSuite.FakePath)
-    dissectorDriver.exception = Some(new DetectionFailedException)
+          it("must complain and not open any tabs") {
+            view.tabs must have size 0
+            boxer.messages mustBe List(strings.fileTooSmallToDissect())
+          }
+        }
 
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+        describe("and the file's format can't be detected") {
+          dissectorDriver.exception = Some(new DetectionFailedException)
+          view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.tabs must have size 0
-    boxer.messages mustBe List(strings.cantDetectFileFormat())
-  }
+          it("must complain and not open any tabs") {
+            view.tabs must have size 0
+            boxer.messages mustBe List(strings.cantDetectFileFormat())
+          }
+        }
 
-  test("open command - successful") {
-    view.selectedFile = Some(MainPresenterSuite.FakePath)
-    binaryReader.result = MainPresenterSuite.FakeBlob
-    dissectorDriver.result = MainPresenterSuite.FakePiece
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+        describe("and the file is successfully dissected") {
+          binaryReader.result = MainPresenterSuite.FakeBlob
+          dissectorDriver.result = MainPresenterSuite.FakePiece
+          view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    val tab = view.tabs.loneElement
-    tab.title mustBe "cadabra"
-    tab.toolTip mustBe MainPresenterSuite.FakePath.toString
-    DisplayTreeNodeData.from(tab.tree) mustBe DisplayTreeNodeData.from(
-      presentPiece(dissectorDriver(Blob.empty), (offset: InfoSize, size: InfoSize) => ()))
+          it("must open a tab for the file") {
+            val tab = view.tabs.loneElement
 
-    view.activeTab mustBe Some(tab)
-    view.title mustBe "Blarf - cadabra"
-    view.isCommandEnabled(MainView.Command.Close) mustBe true
-    view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
-    view.offsetViewText mustBe generateBlobOffsets(MainPresenterSuite.FakeBlob.size, 8)
-    view.rawViewTopPixel mustBe 0
-  }
+            tab.title mustBe "cadabra"
+            tab.toolTip mustBe MainPresenterSuite.FakePath.toString
+            DisplayTreeNodeData.from(tab.tree) mustBe DisplayTreeNodeData.from(
+              presentPiece(dissectorDriver(Blob.empty), (offset: InfoSize, size: InfoSize) => ()))
 
-  test("switching tabs") {
-    dissectorDriver.result = MainPresenterSuite.FakePiece
-    view.selectedFile = Some(MainPresenterSuite.FakePath)
-    binaryReader.result = MainPresenterSuite.FakeBlob
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
-    view.rawViewTopPixel = 65
+            view.activeTab mustBe Some(tab)
+            view.title mustBe "Blarf - cadabra"
+            view.isCommandEnabled(MainView.Command.Close) mustBe true
+            view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
+            view.offsetViewText mustBe generateBlobOffsets(MainPresenterSuite.FakeBlob.size, 8)
+            view.rawViewTopPixel mustBe 0
+          }
 
-    view.selectedFile = Some(new File(MainPresenterSuite.FakePath, "alakazam"))
-    binaryReader.result = Blob.empty
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+          describe("when opening another tab and switching back") {
+            view.rawViewTopPixel = 65
 
-    view.activateTab(0)
+            view.selectedFile = Some(new File(MainPresenterSuite.FakePath, "alakazam"))
+            binaryReader.result = Blob.empty
+            view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
-    view.title mustBe "Blarf - cadabra"
-    view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
-    view.offsetViewText mustBe generateBlobOffsets(MainPresenterSuite.FakeBlob.size, 8)
-    view.rawViewTopPixel mustBe 65
-  }
+            view.activateTab(0)
 
-  test("tab closing via menu") {
-    view.selectedFile = Some(MainPresenterSuite.FakePath)
-    binaryReader.result = MainPresenterSuite.FakeBlob
-    dissectorDriver.result = MainPresenterSuite.FakePiece
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
-    view.trigger(MainView.CommandEvent(MainView.Command.Close))
+            it("must show the first file's contents again") {
+              view.title mustBe "Blarf - cadabra"
+              view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
+              view.offsetViewText mustBe generateBlobOffsets(MainPresenterSuite.FakeBlob.size, 8)
+              view.rawViewTopPixel mustBe 65
+            }
+          }
 
-    view.tabs must have size 0
-    view.title mustBe "Blarf"
-    view.numericViewText mustBe ""
-    view.offsetViewText mustBe ""
-    view.isCommandEnabled(MainView.Command.Close) mustBe false
-  }
+          describe("when the Close command is given") {
+            view.trigger(MainView.CommandEvent(MainView.Command.Close))
+            it must behave like tabIsClosed
+          }
 
-  test("tab closing via close button") {
-    view.selectedFile = Some(MainPresenterSuite.FakePath)
-    binaryReader.result = MainPresenterSuite.FakeBlob
-    dissectorDriver.result = MainPresenterSuite.FakePiece
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+          describe("when the tab's close button is clicked") {
+            view.tabs.head.trigger(MainView.TabClosedEvent)
+            it must behave like tabIsClosed
+          }
 
-    view.tabs.head.trigger(MainView.TabClosedEvent)
-    view.tabs must have size 0
-    view.title mustBe "Blarf"
-    view.numericViewText mustBe ""
-    view.offsetViewText mustBe ""
-    view.isCommandEnabled(MainView.Command.Close) mustBe false
-  }
+          def tabIsClosed() {
+            it("must close the tab") {
+              view.tabs must have size 0
+              view.title mustBe "Blarf"
+              view.numericViewText mustBe ""
+              view.offsetViewText mustBe ""
+              view.isCommandEnabled(MainView.Command.Close) mustBe false
+            }
+          }
 
-  test("double clicking pieces") {
-    view.selectedFile = Some(MainPresenterSuite.FakePath)
-    binaryReader.result = MainPresenterSuite.FakeBlob
-    dissectorDriver.result = Molecule(Bytes(16), EmptyContents, Seq(
-      SubPiece("alpha", Bytes(2), Atom(Bytes(10), EmptyContents)), // whole number of bytes
-      SubPiece("beta", Bits(2), Atom(Bits(12), EmptyContents)), // covering more than half a byte (on each end)
-      SubPiece("gamma", Bits(4), Atom(Bits(8), EmptyContents)), // covering exactly half a byte
-      SubPiece("delta", Bits(6), Atom(Bits(4), EmptyContents)), // covering less than half a byte
-      SubPiece("epsilon", Bytes(3), Atom(InfoSize(), EmptyContents)), // zero-length between bytes
-      SubPiece("zeta", InfoSize(3, 2), Atom(InfoSize(), EmptyContents)), // zero-length in the middle of a left nibble
-      SubPiece("eta", InfoSize(3, 4), Atom(InfoSize(), EmptyContents)), // zero-length between nibbles
-      SubPiece("theta", InfoSize(3, 6), Atom(InfoSize(), EmptyContents)) // zero-length in the middle of a right nibble
-    ))
-    view.trigger(MainView.CommandEvent(MainView.Command.Open))
+          describe("when pieces are double-clicked") {
+            it("must highlight the matching fragment in the raw view") {
+              val tab = view.tabs.loneElement
 
-    val tab = view.tabs.loneElement
+              val expectedSelections = Seq(
+                (6, 35), (0, 5), (1, 4), (1, 4),
+                (9, 9), (9, 9), (10, 10), (10, 10))
 
-    val expectedSelections = Seq(
-      (6, 35), (0, 5), (1, 4), (1, 4),
-      (9, 9), (9, 9), (10, 10), (10, 10))
-
-    for ((child, expectedSelection) <- tab.tree.getChildren.get() zip expectedSelections) {
-      child.eventListener.doubleClicked()
-      (view.numericViewSelectionStart, view.numericViewSelectionEnd) mustBe expectedSelection
+              for ((child, expectedSelection) <- tab.tree.getChildren.get() zip expectedSelections) {
+                child.eventListener.doubleClicked()
+                (view.numericViewSelectionStart, view.numericViewSelectionEnd) mustBe expectedSelection
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
 
 object MainPresenterSuite {
   private val FakePath = new File("/abra/cadabra")
-  private val FakePiece = Atom(Bytes(5), new EagerContentsR((), "dummy"))
   private val FakeBlob = new ArrayBlob(Array.tabulate[Byte](19)(_.toByte))
+  private val FakePiece = Molecule(Bytes(16), EmptyContents, Seq(
+    SubPiece("alpha", Bytes(2), Atom(Bytes(10), EmptyContents)), // whole number of bytes
+    SubPiece("beta", Bits(2), Atom(Bits(12), EmptyContents)), // covering more than half a byte (on each end)
+    SubPiece("gamma", Bits(4), Atom(Bits(8), EmptyContents)), // covering exactly half a byte
+    SubPiece("delta", Bits(6), Atom(Bits(4), EmptyContents)), // covering less than half a byte
+    SubPiece("epsilon", Bytes(3), Atom(InfoSize(), EmptyContents)), // zero-length between bytes
+    SubPiece("zeta", InfoSize(3, 2), Atom(InfoSize(), EmptyContents)), // zero-length in the middle of a left nibble
+    SubPiece("eta", InfoSize(3, 4), Atom(InfoSize(), EmptyContents)), // zero-length between nibbles
+    SubPiece("theta", InfoSize(3, 6), Atom(InfoSize(), EmptyContents)) // zero-length in the middle of a right nibble
+  ))
 }

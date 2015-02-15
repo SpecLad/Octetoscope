@@ -36,7 +36,7 @@ private object StringDissectors {
       "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
       "CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US").zipWithIndex.map(pair => (pair._2.toChar, pair._1))
 
-  abstract class AsciiStringGeneric(length: Int) extends DissectorCR[Option[String]] {
+  abstract class AsciiStringGeneric(length: Int, allowDecodingErrors: Boolean) extends DissectorCR[Option[String]] {
     protected def findActualLength(input: Blob, byteOffset: Long): Int
     protected def assess(actualLength: Int): Seq[Note] = Nil
 
@@ -111,16 +111,18 @@ private object StringDissectors {
         new EagerContentsR(value,
           if (groupedChunks.isEmpty) "\"\""
           else groupedChunks.map(stringifyChunk).mkString(" ")),
-        if (value.isEmpty) Note(Quality.Broken, "invalid encoding") +: assess(actualLength)
+        if (value.isEmpty && !allowDecodingErrors) Note(Quality.Broken, "invalid encoding") +: assess(actualLength)
         else assess(actualLength))
     }
   }
 
-  class AsciiString(length: Int) extends AsciiStringGeneric(length) {
+  class AsciiString(length: Int, allowDecodingErrors: Boolean)
+      extends AsciiStringGeneric(length, allowDecodingErrors) {
     override protected def findActualLength(input: Blob, byteOffset: Long): Int = length
   }
 
-  class AsciiZString(length: Int) extends AsciiStringGeneric(length) {
+  class AsciiZString(length: Int, allowDecodingErrors: Boolean)
+      extends AsciiStringGeneric(length, allowDecodingErrors) {
     override protected def findActualLength(input: Blob, byteOffset: Long): Int = {
       var actualLen = 0
 

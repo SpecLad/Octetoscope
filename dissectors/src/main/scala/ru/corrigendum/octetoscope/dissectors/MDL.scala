@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -163,7 +163,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       add("Bounding box maximum", vector3(uInt8))
       add("Unused", uInt8)
 
-      val nameC = add.getContents("Name", asciiZString(16))
+      val nameC = add.getContents("Name", asciiishZString(16))
       builder.setReprLazy(nameC.repr)
 
       add("Vertices", array(numVertices, "Vertex", Vertex))

@@ -86,33 +86,38 @@ class PrimitiveDissectorsSuite extends FunSuite {
       Seq.empty, 0x01, 0x00, 0xC0.toByte, 0x7F.toByte)
   }
 
-  test("asciiString") {
-    verify(asciiString(0), "\"\"", Some(""))
-    verify(asciiString(4), "\"abcd\"", Some("abcd"), 'a', 'b', 'c', 'd')
-    verify(asciiString(999), "\"" + "abc" * 333 + "\"", Some("abc" * 333),
-      Seq.fill(333)(Seq('a'.toByte, 'b'.toByte, 'c'.toByte)).flatten: _*)
-    verify(asciiString(34),
-      "NUL SOH STX ETX EOT ENQ ACK BEL " +
-        "BS HT LF VT FF CR SO SI " +
-        "DLE DC1 DC2 DC3 DC4 NAK SYN ETB " +
-        "CAN EM SUB ESC FS GS RS US " +
-        "DEL QUOTE",
-      Some(new String(('\u0000' to '\u001f').toArray :+ '\u007f' :+ '"')),
-      ((0 to 0x1F) :+ 0x7F :+ '"'.toInt).map(_.toByte): _*)
-    verifyWithQualities(asciiString(2), "0xf1f2", None, Seq(Quality.Broken), 0xf1.toByte, 0xf2.toByte)
-    verifyWithQualities(asciiString(5), "\"a\" 0xf1f2 \"bc\"", None, Seq(Quality.Broken),
-      'a', 0xf1.toByte, 0xf2.toByte, 'b', 'c')
-    verifyWithQualities(asciiString(5), "\"1\" CR LF \"2\" 0xff", None, Seq(Quality.Broken),
-      '1', '\r', '\n', '2', 0xff.toByte)
+  test("ascii(ish)String") {
+    for ((dissector, qualities) <- Seq((asciiString _, Seq(Quality.Broken)), (asciiishString _, Seq()))) {
+      verify(dissector(0), "\"\"", Some(""))
+      verify(dissector(4), "\"abcd\"", Some("abcd"), 'a', 'b', 'c', 'd')
+      verify(dissector(999), "\"" + "abc" * 333 + "\"", Some("abc" * 333),
+        Seq.fill(333)(Seq('a'.toByte, 'b'.toByte, 'c'.toByte)).flatten: _*)
+      verify(dissector(34),
+        "NUL SOH STX ETX EOT ENQ ACK BEL " +
+          "BS HT LF VT FF CR SO SI " +
+          "DLE DC1 DC2 DC3 DC4 NAK SYN ETB " +
+          "CAN EM SUB ESC FS GS RS US " +
+          "DEL QUOTE",
+        Some(new String(('\u0000' to '\u001f').toArray :+ '\u007f' :+ '"')),
+        ((0 to 0x1F) :+ 0x7F :+ '"'.toInt).map(_.toByte): _*)
+
+      verifyWithQualities(dissector(2), "0xf1f2", None, qualities, 0xf1.toByte, 0xf2.toByte)
+      verifyWithQualities(dissector(5), "\"a\" 0xf1f2 \"bc\"", None, qualities,
+        'a', 0xf1.toByte, 0xf2.toByte, 'b', 'c')
+      verifyWithQualities(dissector(5), "\"1\" CR LF \"2\" 0xff", None, qualities,
+        '1', '\r', '\n', '2', 0xff.toByte)
+    }
   }
 
-  test("asciiZString") {
-    verify(asciiZString(4), "\"abc\"", Some("abc"), 'a', 'b', 'c', 0)
-    verify(asciiZString(4), "\"ab\"", Some("ab"), 'a', 'b', 0, 'd')
-    verifyWithQualities(asciiZString(0), "\"\"", Some(""), Seq(Quality.Bad))
-    verifyWithQualities(asciiZString(4), "\"abcd\"", Some("abcd"), Seq(Quality.Bad), 'a', 'b', 'c', 'd')
-    verifyWithQualities(asciiZString(3), "\"a\" 0xf0 \"b\"", None, Seq(Quality.Bad, Quality.Broken),
-      'a', 0xf0.toByte, 'b')
+  test("ascii(ish)ZString") {
+    for ((dissector, qualitiesOnDecodingErrors) <- Seq(
+        (asciiZString _, Seq(Quality.Bad, Quality.Broken)), (asciiishZString _, Seq(Quality.Bad)))) {
+      verify(dissector(4), "\"abc\"", Some("abc"), 'a', 'b', 'c', 0)
+      verify(dissector(4), "\"ab\"", Some("ab"), 'a', 'b', 0, 'd')
+      verifyWithQualities(dissector(0), "\"\"", Some(""), Seq(Quality.Bad))
+      verifyWithQualities(dissector(4), "\"abcd\"", Some("abcd"), Seq(Quality.Bad), 'a', 'b', 'c', 'd')
+      verifyWithQualities(dissector(3), "\"a\" 0xf0 \"b\"", None, qualitiesOnDecodingErrors, 'a', 0xf0.toByte, 'b')
+    }
   }
 
   test("magic") {

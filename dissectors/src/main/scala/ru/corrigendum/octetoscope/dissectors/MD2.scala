@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -139,7 +139,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(input, offset, builder)
       add("Scale", vector3(float32L))
       add("Translation", vector3(float32L))
-      val nameC = add.getContents("Name", asciiZString(16))
+      val nameC = add.getContents("Name", asciiishZString(16))
       builder.setReprLazy(nameC.repr)
 
       for (numVertices <- numVertices)
@@ -245,7 +245,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
     val header = add("Header", Bytes(0), Header)
 
     for (offSkins <- header.offSkins; numSkins <- header.numSkins)
-      add("Skins", Bytes(offSkins), array(numSkins, "Skin", asciiZString(64)))
+      add("Skins", Bytes(offSkins), array(numSkins, "Skin", asciiishZString(64)))
 
     for (offTexCoords <- header.offTexCoords; numTexCoords <- header.numTexCoords)
       add("Texture coordinates", Bytes(offTexCoords), array(numTexCoords, "Texture coordinate pair", TexCoordPair))

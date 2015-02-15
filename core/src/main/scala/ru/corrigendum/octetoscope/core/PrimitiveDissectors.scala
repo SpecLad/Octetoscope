@@ -27,8 +27,13 @@ object PrimitiveDissectors {
   def sInt32L: DissectorCR[Int] = NumberDissectors.SInt32L
   def float32L: DissectorCR[Float] = NumberDissectors.Float32L
 
-  def asciiString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiString(length)
-  def asciiZString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiZString(length)
+  def asciiString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiString(length, false)
+  def asciiZString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiZString(length, false)
+
+  // ASCIIish strings are the same as ASCII, except undecodable characters are not considered an error.
+  // Essentially, they're strings in an unknown encoding that's compatible with ASCII.
+  def asciiishString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiString(length, true)
+  def asciiishZString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiZString(length, true)
 
   private class Magic(expected: Array[Byte], interpretation: String) extends DissectorC[Option[Unit]] {
     override def dissect(input: Blob, offset: InfoSize): AtomC[Option[Unit]] = {

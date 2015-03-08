@@ -37,7 +37,7 @@ class MainPresenterSuite extends path.FunSpec {
     val dissectorDriver = new MockDissectorDriver()
     val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
 
-    new MainPresenter(strings, "Blarf", view, boxer, binaryReader, dissectorDriver)
+    MainPresenter.attach(strings, "Blarf", view, boxer, binaryReader, dissectorDriver)
 
     it("must put the window into the initial state") {
       view mustBe 'visible

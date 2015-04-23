@@ -17,25 +17,25 @@
 */
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 class GenerateFileTask extends DefaultTask {
+  @Input
   String text = ""
 
   @OutputFile
   File outputPath
 
-  GenerateFileTask() {
-    outputs.upToDateWhen {
-      try { outputPath.getText("US-ASCII") == text }
-      catch (IOException ignored) { false }
-    }
+  @OutputDirectory
+  def getOutputDirectory() {
+    return outputPath.parentFile
   }
 
   @TaskAction
   def generate() {
-    outputPath.parentFile.mkdirs()
     outputPath.write(text)
   }
 }

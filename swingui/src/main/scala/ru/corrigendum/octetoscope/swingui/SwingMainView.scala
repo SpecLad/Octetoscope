@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   }
 
   frame.addWindowListener(new WindowAdapter {
-    override def windowClosing(e: WindowEvent) {
+    override def windowClosing(e: WindowEvent): Unit = {
       publish(MainView.ClosedEvent)
     }
   })
@@ -73,7 +73,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   frame.setLocationRelativeTo(null)
 
   tabPane.addChangeListener(new ChangeListener {
-    override def stateChanged(e: ChangeEvent) {
+    override def stateChanged(e: ChangeEvent): Unit = {
       val tabIndex = tabPane.getSelectedIndex
       if (tabIndex == -1) return
 
@@ -85,23 +85,23 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     }
   })
 
-  override def dispose() {
+  override def dispose(): Unit = {
     frame.dispose()
   }
 
   override def title: String = frame.getTitle
 
-  override def title_=(title: String) {
+  override def title_=(title: String): Unit = {
     frame.setTitle(title)
   }
 
   override def numericViewWidth: Int = numericView.getColumns
 
-  override def numericViewWidth_=(numCharacters: Int) {
+  override def numericViewWidth_=(numCharacters: Int): Unit = {
     numericView.setColumns(numCharacters)
   }
 
-  override def setRawViewTexts(offsetViewText: String, numericViewText: String) {
+  override def setRawViewTexts(offsetViewText: String, numericViewText: String): Unit = {
     offsetView.setText(offsetViewText)
     numericView.setText(numericViewText)
     /* Changing the text will change the text area's preferred size, but
@@ -114,7 +114,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     rawViewScroller.getViewport.validate()
   }
 
-  override def show() {
+  override def show(): Unit = {
     frame.setVisible(true)
   }
 
@@ -136,14 +136,14 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     tree.setShowsRootHandles(true)
     tree.setCellRenderer(new PieceTreeCellRenderer)
     tree.addTreeWillExpandListener(new TreeWillExpandListener {
-      override def treeWillCollapse(event: TreeExpansionEvent) {}
-      override def treeWillExpand(event: TreeExpansionEvent) {
+      override def treeWillCollapse(event: TreeExpansionEvent): Unit = {}
+      override def treeWillExpand(event: TreeExpansionEvent): Unit = {
         val node = event.getPath.getLastPathComponent.asInstanceOf[PieceTreeNode]
         if (node.loadChildren()) model.nodeStructureChanged(node)
       }
     })
     tree.addMouseListener(new MouseAdapter {
-      override def mouseClicked(e: MouseEvent) {
+      override def mouseClicked(e: MouseEvent): Unit = {
         if (e.getClickCount != 2) return
         val path = tree.getPathForLocation(e.getX, e.getY)
         if (path == null) return
@@ -159,21 +159,21 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     tab
   }
 
-  override def enableCommand(command: MainView.Command.Value) {
+  override def enableCommand(command: MainView.Command.Value): Unit = {
     findMenuItemsForCommand(frame.getJMenuBar, command).foreach(_.setEnabled(true))
   }
 
-  override def disableCommand(command: MainView.Command.Value) {
+  override def disableCommand(command: MainView.Command.Value): Unit = {
     findMenuItemsForCommand(frame.getJMenuBar, command).foreach(_.setEnabled(false))
   }
 
   override def rawViewTopPixel: Int = rawViewScroller.getViewport.getViewPosition.getY.toInt
 
-  override def scrollRawView(topPixel: Int) {
+  override def scrollRawView(topPixel: Int): Unit = {
     rawViewScroller.getViewport.setViewPosition(new Point(0, topPixel))
   }
 
-  override def setNumericViewSelection(selectionStart: Int, selectionEnd: Int) {
+  override def setNumericViewSelection(selectionStart: Int, selectionEnd: Int): Unit = {
     numericView.setCaretPosition(selectionStart)
     numericView.moveCaretPosition(selectionEnd)
     /* This is a workaround for text area hiding its selection when it isn't
@@ -185,9 +185,9 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   }
 
   private class TabImpl(val component: JComponent) extends Tab {
-    def triggerEvent(event: TabEvent) { publish(event); }
+    def triggerEvent(event: TabEvent): Unit = { publish(event); }
 
-    override def activate() {
+    override def activate(): Unit = {
       val newSelectedIndex = tabPane.indexOfTabComponent(component)
 
       // setSelectedIndex doesn't do anything if the selected index doesn't
@@ -199,7 +199,7 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
         tabPane.setSelectedIndex(newSelectedIndex)
     }
 
-    override def close() {
+    override def close(): Unit = {
       tabPane.remove(tabPane.indexOfTabComponent(component))
     }
   }

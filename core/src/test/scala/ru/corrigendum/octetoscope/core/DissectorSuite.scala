@@ -28,7 +28,7 @@ class DissectorSuite extends FunSuite {
     val mbd = new MoleculeBuilderPostProcessingDissector[String, Int] {
       override def defaultWIP: Int = 1
       override def postProcess(wip: Int): String = wip.toString
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Int) { }
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Int): Unit = { }
     }
 
     mbd.defaultValue mustBe "1"
@@ -42,7 +42,7 @@ class DissectorSuite extends FunSuite {
     val mbd = new MoleculeBuilderPostProcessingDissector[String, WIP] {
       override def defaultWIP: WIP = WIP(1)
       override def postProcess(wip: WIP): String = wip.i.toString
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP) {
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP): Unit = {
         value.i mustBe 1
         value.i = 2
         builder.addChild("alpha", Bytes(1), child)
@@ -61,7 +61,7 @@ class DissectorSuite extends FunSuite {
     val truncated = new MoleculeBuilderPostProcessingDissector[Unit, Unit] {
       override def defaultWIP = ()
       override def postProcess(wip: Unit): Unit = wip
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit) {
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit): Unit = {
         throw new MoleculeBuilderDissector.TruncatedException(cause, "alpha")
       }
     }
@@ -78,7 +78,7 @@ class DissectorSuite extends FunSuite {
     val truncated = new MoleculeBuilderPostProcessingDissector[String, WIP] {
       override def defaultWIP = WIP(0)
       override def postProcess(wip: WIP): String = wip.i.toString
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP) {
+      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP): Unit = {
         value.i = 1
         builder.addChild("alpha", InfoSize(), child)
         throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "beta")
@@ -96,7 +96,7 @@ class DissectorSuite extends FunSuite {
     val child = Atom(Bytes(1), new ToStringContents("a"))
 
     val mbud = new MoleculeBuilderUnitDissector {
-      override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+      override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
         builder.addChild("alpha", Bytes(1), child)
       }
     }

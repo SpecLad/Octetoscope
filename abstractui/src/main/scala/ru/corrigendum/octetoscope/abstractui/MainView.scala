@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,27 +26,27 @@ import scala.collection.mutable
 trait MainView extends View with mutable.Publisher[MainView.Event] {
   override type Pub = MainView
 
-  def dispose()
+  def dispose(): Unit
 
   def title: String
-  def title_=(title: String)
+  def title_=(title: String): Unit
 
   def numericViewWidth: Int
-  def numericViewWidth_=(numCharacters: Int)
+  def numericViewWidth_=(numCharacters: Int): Unit
 
-  def setRawViewTexts(offsetViewText: String, numericViewText: String)
+  def setRawViewTexts(offsetViewText: String, numericViewText: String): Unit
 
-  def show()
+  def show(): Unit
 
   def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab
 
-  def enableCommand(command: MainView.Command.Value)
-  def disableCommand(command: MainView.Command.Value)
+  def enableCommand(command: MainView.Command.Value): Unit
+  def disableCommand(command: MainView.Command.Value): Unit
 
   def rawViewTopPixel: Int
-  def scrollRawView(topPixel: Int)
+  def scrollRawView(topPixel: Int): Unit
 
-  def setNumericViewSelection(selectionStart: Int, selectionEnd: Int)
+  def setNumericViewSelection(selectionStart: Int, selectionEnd: Int): Unit
 }
 
 object MainView {
@@ -80,7 +80,7 @@ object MainView {
   trait Tab extends mutable.Publisher[MainView.TabEvent] {
     override type Pub = Tab
 
-    def activate() // must publish a TabActivatedEvent even if the tab is already active
-    def close()
+    def activate(): Unit // must publish a TabActivatedEvent even if the tab is already active
+    def close(): Unit
   }
 }

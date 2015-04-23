@@ -39,7 +39,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   private object Header extends MoleculeBuilderDissector[HeaderValue] {
     override def defaultWIP = new HeaderValue
 
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: HeaderValue) {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: HeaderValue): Unit = {
       val add = new SequentialAdder(input, offset, builder)
 
       val correctMagic = add("Identification", magic(MagicBytes, "IDP2")).isDefined
@@ -89,7 +89,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct dstvert_t.
   private object TexCoordPair extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(input, offset, builder)
       val sc = add.getContents("s", sInt16L)
       val tc = add.getContents("t", sInt16L)
@@ -106,7 +106,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       .map(num => if (num > Short.MaxValue) any else lessThan(num.toShort, "the number of texture coordinate pairs"))
       .getOrElse(any)
 
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(input, offset, builder)
       def formatSeq(elements: Seq[Any]) = elements.mkString("(", ", ", ")")
 
@@ -122,7 +122,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct dtrivertx_t
   private object Vertex extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(input, offset, builder)
 
       val coordsC = add.getContents("Coordinates", vector3(uInt8))
@@ -134,7 +134,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct daliasframe_t
   private class Frame(frameSize: Int, numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       builder.fixSize(Bytes(frameSize))
       val add = new SequentialAdder(input, offset, builder)
       add("Scale", vector3(float32L))
@@ -185,7 +185,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   private class OpenGLVertex(numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
     val lessThanNumVertices = numVertices.map(lessThan(_, "number of vertices")).getOrElse(any)
 
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(input, offset, builder)
       val sc = add.getContents("Texture s", float32L)
       val tc = add.getContents("Texture t", float32L)
@@ -200,7 +200,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   private class OpenGLCommand(totalNumVertices: Option[Int]) extends MoleculeBuilderDissector[OpenGLCommandValue] {
     override def defaultWIP: OpenGLCommandValue = OpenGLCommandValue(None)
 
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: OpenGLCommandValue) {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: OpenGLCommandValue): Unit = {
       val add = new SequentialAdder(input, offset, builder)
       value.typ = add("Type", OpenGLCommandType)
 
@@ -219,7 +219,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   }
 
   private class OpenGLCommands(numWords: Int, numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(input, offset, builder)
       builder.fixSize(Bytes(4L * numWords))
 
@@ -240,7 +240,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
     }
   }
 
-  override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+  override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
     val add = new RandomAdder(input, offset, builder)
     val header = add("Header", Bytes(0), Header)
 

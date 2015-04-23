@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ trait MoleculeBuilderPostProcessingDissector[Value, WIP]
 
   def defaultWIP: WIP
   def postProcess(wip: WIP): Value
-  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, wip: WIP)
+  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, wip: WIP): Unit
 }
 
 trait MoleculeBuilderDissector[Value] extends MoleculeBuilderPostProcessingDissector[Value, Value] {
@@ -51,9 +51,9 @@ object MoleculeBuilderDissector {
 
 trait MoleculeBuilderUnitDissector extends MoleculeBuilderDissector[Unit] {
   final override def defaultWIP = ()
-  final override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, wip: Unit) {
+  final override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, wip: Unit): Unit = {
     dissectMBU(input, offset, builder)
   }
 
-  def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder)
+  def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit
 }

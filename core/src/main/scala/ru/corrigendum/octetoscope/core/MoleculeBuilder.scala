@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,23 +26,23 @@ class MoleculeBuilder() {
   private[this] val notes = Seq.newBuilder[Note]
   private[this] var hasChildren_ = false
 
-  def setRepr(repr: String) { this.repr = Left(Some(repr)) }
+  def setRepr(repr: String): Unit = { this.repr = Left(Some(repr)) }
 
-  def setReprLazyO(reprOption: => Option[String]) {
+  def setReprLazyO(reprOption: => Option[String]): Unit = {
     this.repr = Right(() => reprOption)
   }
 
-  def setReprLazy(repr: => String) {
+  def setReprLazy(repr: => String): Unit = {
     setReprLazyO(Some(repr))
   }
 
-  def addChild(name: String, offset: InfoSize, piece: PlainPiece) {
+  def addChild(name: String, offset: InfoSize, piece: PlainPiece): Unit = {
     childrenBuilder += SubPiece(name, offset, piece)
     autoSize = List(autoSize, offset + piece.size).max
     hasChildren_ = true
   }
 
-  def addNote(quality: Quality.Value, text: String) { notes += Note(quality, text) }
+  def addNote(quality: Quality.Value, text: String): Unit = { notes += Note(quality, text) }
 
   def build[V](v: V): MoleculeC[V] = {
     val contents = repr.fold(new EagerContents(v, _), r => new Contents[V] {
@@ -55,5 +55,5 @@ class MoleculeBuilder() {
 
   def hasChildren: Boolean = hasChildren_
 
-  def fixSize(size: InfoSize) { fixedSize = Some(size) }
+  def fixSize(size: InfoSize): Unit = { fixedSize = Some(size) }
 }

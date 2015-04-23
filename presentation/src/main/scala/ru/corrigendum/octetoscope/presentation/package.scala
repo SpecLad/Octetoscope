@@ -61,7 +61,7 @@ package object presentation {
           case m: PlainMolecule => Some(() => m.children.map(c => helper(c, offset + c.offset)))
         },
         new DisplayTreeNodeEventListener {
-          override def doubleClicked() { doubleClickHandler(offset, size) }
+          override def doubleClicked(): Unit = { doubleClickHandler(offset, size) }
         }
       )
     }

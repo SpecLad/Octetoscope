@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ private object Common {
     override def defaultWIP: Vector3WIP[T] = Vector3WIP(None, None, None)
     override def postProcess(wip: Vector3WIP[T]): Vector3[T] = (wip.x, wip.y, wip.z)
 
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Vector3WIP[T]) {
+    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Vector3WIP[T]): Unit = {
       val add = new SequentialAdder(input, offset, builder)
       val xc = add.getContents("x", component)
       value.x = Some(xc.value)

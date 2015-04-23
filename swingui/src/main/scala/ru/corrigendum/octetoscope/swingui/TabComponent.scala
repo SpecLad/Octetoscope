@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ private object TabComponent {
     panel.add(label)
 
     val closeButton = new JButton {
-      override def paintComponent(g: Graphics) {
+      override def paintComponent(g: Graphics): Unit = {
         super.paintComponents(g)
 
         for (g2 <- managed(g.create().asInstanceOf[Graphics2D])) {
@@ -58,7 +58,7 @@ private object TabComponent {
     closeButton.setFocusable(false)
     closeButton.setBorder(BorderFactory.createLineBorder(closeButton.getForeground))
     closeButton.addActionListener(new ActionListener {
-      override def actionPerformed(e: ActionEvent) { onClick() }
+      override def actionPerformed(e: ActionEvent): Unit = { onClick() }
     })
 
     val buttonHeight = label.getFontMetrics(label.getFont).getAscent + 2

@@ -33,11 +33,11 @@ object MainPresenter {
              view: MainView,
              boxer: DialogBoxer,
              binaryReader: BinaryReader,
-             dissectorDriver: DissectorDriver) {
+             dissectorDriver: DissectorDriver): Unit = {
     var numTabs = 0
     var currentTabHandler: Option[TabHandler] = None
 
-    def closeTab(tab: MainView.Tab) {
+    def closeTab(tab: MainView.Tab): Unit = {
       tab.close()
       numTabs -= 1
       if (numTabs == 0) {
@@ -48,7 +48,7 @@ object MainPresenter {
       }
     }
 
-    def handlePieceDoubleClick(offset: InfoSize, size: InfoSize) {
+    def handlePieceDoubleClick(offset: InfoSize, size: InfoSize): Unit = {
       val selectionStart = if (offset.bits < 4) offset.bytes * 3 else offset.bytes * 3 + 1
       val selectionEnd = if (size == InfoSize()) {
         selectionStart
@@ -62,7 +62,7 @@ object MainPresenter {
     }
 
     object ViewHandler extends MainView#Sub {
-      override def notify(pub: MainView#Pub, event: Event) {
+      override def notify(pub: MainView#Pub, event: Event): Unit = {
         event match {
           case ClosedEvent => pub.dispose()
 
@@ -111,11 +111,11 @@ object MainPresenter {
                      numericViewText: String, offsetViewText: String) extends MainView.Tab#Sub {
       private[this] var rawViewTopPixel: Int = 0
 
-      private def saveRawViewTopPixel() {
+      private def saveRawViewTopPixel(): Unit = {
         rawViewTopPixel = view.rawViewTopPixel
       }
 
-      override def notify(pub: Tab#Pub, event: TabEvent) {
+      override def notify(pub: Tab#Pub, event: TabEvent): Unit = {
         event match {
           case TabClosedEvent =>
             closeTab(pub)

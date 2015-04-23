@@ -56,7 +56,7 @@ class MainPresenterSuite extends path.FunSpec {
       it must behave like userQuits
     }
 
-    def userQuits() {
+    def userQuits(): Unit = {
       it("must dispose the window") {
         view mustBe 'disposed
       }
@@ -161,7 +161,7 @@ class MainPresenterSuite extends path.FunSpec {
             it must behave like tabIsClosed
           }
 
-          def tabIsClosed() {
+          def tabIsClosed(): Unit = {
             it("must close the tab") {
               view.tabs must have size 0
               view.title mustBe "Blarf"

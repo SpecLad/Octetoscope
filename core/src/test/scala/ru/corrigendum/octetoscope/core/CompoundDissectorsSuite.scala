@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 
 class CompoundDissectorsSuite extends FunSuite {
-  def arrayTest[C <: Contents[Any]](dissector: Dissector[Any, C], contents: C) {
+  def arrayTest[C <: Contents[Any]](dissector: Dissector[Any, C], contents: C): Unit = {
     val blob = new ArrayBlob("afoobarbazb".getBytes(StandardCharsets.US_ASCII))
 
     dissector.dissect(blob, Bytes(1)) mustBe
@@ -67,7 +67,7 @@ class CompoundDissectorsSuite extends FunSuite {
     unknown.notes.loneElement.pieceQuality mustBe Quality.Broken
   }
 
-  private def bitFieldTest(byte: Byte, repr: String) {
+  private def bitFieldTest(byte: Byte, repr: String): Unit = {
     val blob = new ArrayBlob(Array[Byte](byte))
     val dissector = bitField(4, Map(1L -> "A", 2L -> "B"), unnamedReason = "xyzzy")
     val piece = dissector.dissect(blob, Bits(2))

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013, 2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.presentation
 import ru.corrigendum.octetoscope.abstractui.View
 
 class DialogBoxerImpl(view: View, appName: String) extends DialogBoxer {
-  override def showMessageBox(text: String) {
+  override def showMessageBox(text: String): Unit = {
     view.showMessageBox(text, appName)
   }
 }

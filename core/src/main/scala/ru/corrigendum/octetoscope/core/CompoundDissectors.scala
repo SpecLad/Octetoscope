@@ -24,7 +24,7 @@ import scala.collection.mutable
 
 object CompoundDissectors {
   private class Array(size: Int, itemName: String, itemDissector: PlainDissector) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder) {
+    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(input, offset, builder)
 
       for (i <- 0 until size) add("%s #%d".format(itemName, i), itemDissector)
@@ -42,7 +42,7 @@ object CompoundDissectors {
     override def postProcess(wip: mutable.ArrayBuffer[V]): IndexedSeq[V] = wip
 
     override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder,
-                           wip: mutable.ArrayBuffer[V]) {
+                           wip: mutable.ArrayBuffer[V]): Unit = {
       val add = new SequentialAdder(input, offset, builder)
       wip.sizeHint(size)
 
@@ -97,7 +97,7 @@ object CompoundDissectors {
 
     override def dissectMB(input: Blob, offset: InfoSize,
                            builder: MoleculeBuilder,
-                           wip: mutable.Builder[String, Set[String]]) {
+                           wip: mutable.Builder[String, Set[String]]): Unit = {
       val add = new SequentialAdder(input, offset, builder)
 
       val setBitNames = IndexedSeq.newBuilder[String]

@@ -139,7 +139,7 @@ object PrimitiveDissectorsSuite {
   def verifyGeneric[Value](
     dissector: DissectorC[Value], expectedRepr: Option[String], valueAssert: Value => Unit,
     expectedNoteQualities: Seq[Quality.Value], bytes: Byte*
-  ) {
+  ): Unit = {
     for (padSize <- List(0, 1)) {
       val pad = List.fill(padSize)((-1).toByte)
       val paddedBytes = pad ++ bytes ++ pad
@@ -155,14 +155,14 @@ object PrimitiveDissectorsSuite {
     }
   }
 
-  def verify[Value](dissector: DissectorC[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*) {
+  def verify[Value](dissector: DissectorC[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*): Unit = {
     verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe expectedValue, Seq.empty, bytes: _*)
   }
 
   def verifyWithQualities[Value](
     dissector: DissectorC[Value], expectedRepr: String, expectedValue: Value,
     expectedNoteQualities: Seq[Quality.Value], bytes: Byte*
-  ) {
+  ): Unit = {
     verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe expectedValue, expectedNoteQualities, bytes: _*)
   }
 }

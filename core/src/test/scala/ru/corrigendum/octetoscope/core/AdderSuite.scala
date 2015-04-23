@@ -41,7 +41,7 @@ class AdderSuite extends FunSuite {
     ))
   }
 
-  def sequentialAdderThrowTest(invokeAdder: (SequentialAdder, Throwable) => Unit) {
+  def sequentialAdderThrowTest(invokeAdder: (SequentialAdder, Throwable) => Unit): Unit = {
     val adder = new SequentialAdder(Blob.empty, InfoSize(), new MoleculeBuilder)
 
     val cause = new IndexOutOfBoundsException

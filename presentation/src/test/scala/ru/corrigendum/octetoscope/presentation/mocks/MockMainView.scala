@@ -43,25 +43,25 @@ class MockMainView extends MockView with MainView {
   def numericViewSelectionStart: Int = _numericViewSelectionStart
   def numericViewSelectionEnd: Int = _numericViewSelectionEnd
 
-  def dispose() {
+  def dispose(): Unit = {
     _disposed = true
   }
 
-  def trigger(event: MainView.Event) {
+  def trigger(event: MainView.Event): Unit = {
     publish(event)
   }
 
   override var title: String = ""
   override var numericViewWidth: Int = 0
   override def rawViewTopPixel = _rawViewTopPixel
-  def rawViewTopPixel_=(value: Int) { _rawViewTopPixel = value }
+  def rawViewTopPixel_=(value: Int): Unit = { _rawViewTopPixel = value }
 
-  override def setRawViewTexts(offsetViewText: String, numericViewText: String) {
+  override def setRawViewTexts(offsetViewText: String, numericViewText: String): Unit = {
     this._offsetViewText = offsetViewText
     this._numericViewText = numericViewText
   }
 
-  override def show() {
+  override def show(): Unit = {
     _visible = true
   }
 
@@ -72,31 +72,31 @@ class MockMainView extends MockView with MainView {
 
   def activeTab: Option[MockTab] = if (_activeTabIndex >= 0) Some(_tabs(_activeTabIndex)) else None
 
-  def activateTab(newActiveIndex: Int) {
+  def activateTab(newActiveIndex: Int): Unit = {
     _activeTabIndex = newActiveIndex
     if (_activeTabIndex >=0)
       _tabs(_activeTabIndex).trigger(MainView.TabActivatedEvent)
   }
 
-  override def enableCommand(command: MainView.Command.Value) { _disabledCommands -= command }
+  override def enableCommand(command: MainView.Command.Value): Unit = { _disabledCommands -= command }
 
-  override def disableCommand(command: MainView.Command.Value) { _disabledCommands += command }
+  override def disableCommand(command: MainView.Command.Value): Unit = { _disabledCommands += command }
 
   def isCommandEnabled(command: MainView.Command.Value) = !_disabledCommands.contains(command)
 
-  override def scrollRawView(topPixel: Int) { _rawViewTopPixel = topPixel }
+  override def scrollRawView(topPixel: Int): Unit = { _rawViewTopPixel = topPixel }
 
-  override def setNumericViewSelection(selectionStart: Int, selectionEnd: Int) {
+  override def setNumericViewSelection(selectionStart: Int, selectionEnd: Int): Unit = {
     _numericViewSelectionStart = selectionStart
     _numericViewSelectionEnd = selectionEnd
   }
 
   class MockTab(val title: String, val toolTip: String, val tree: DisplayTreeNode) extends Tab {
-    override def activate() {
+    override def activate(): Unit = {
       activateTab(_tabs.indexOf(this))
     }
 
-    override def close() {
+    override def close(): Unit = {
       _tabs -= this
       if (_tabs.isEmpty) {
         activateTab(-1)
@@ -105,7 +105,7 @@ class MockMainView extends MockView with MainView {
       }
     }
 
-    def trigger(event: MainView.TabEvent) {
+    def trigger(event: MainView.TabEvent): Unit = {
       publish(event)
     }
   }

@@ -73,7 +73,7 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.2.1'
+  gradleVersion = '2.4'
 }
 
 task installLauncher(type: Jar) {
@@ -104,9 +104,6 @@ def exportEOL = FixCrLfFilter.CrLf.newInstance('crlf')
 // directories that might have something ignorable in them.
 // See also <https://issues.gradle.org/browse/GRADLE-1883>.
 DirectoryScanner.defaultExcludes.each { DirectoryScanner.removeDefaultExclude(it) }
-// Because of a bug in Gradle, having no excludes excludes everything. This pattern shouldn't
-// match anything. See <https://github.com/gradle/gradle/pull/396>.
-DirectoryScanner.addDefaultExclude("\0")
 
 task distBinary(type: Zip) {
   classifier 'bin'

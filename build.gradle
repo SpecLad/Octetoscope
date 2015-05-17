@@ -72,10 +72,6 @@ subprojects {
   }
 }
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '2.4'
-}
-
 task installLauncher(type: Jar) {
   from project(':application').sourceSets.main.output
   archiveName 'octetoscope.jar'

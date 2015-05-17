@@ -29,11 +29,6 @@ class GenerateFileTask extends DefaultTask {
   @OutputFile
   File outputPath
 
-  @OutputDirectory
-  def getOutputDirectory() {
-    return outputPath.parentFile
-  }
-
   @TaskAction
   def generate() {
     outputPath.write(text)

@@ -26,23 +26,24 @@ import ru.corrigendum.octetoscope.presentation.{DialogBoxerImpl, MainPresenter, 
 import ru.corrigendum.octetoscope.swingui.SwingApplication
 
 object Octetoscope extends App {
-  private val APPLICATION_NAME = "Octetoscope"
+  {
+    if (args.length != 0) {
+      Console.err.println("Usage: octetoscope")
+      sys.exit(1)
+    }
 
-  if (args.length != 0) {
-    Console.err.println("Usage: octetoscope")
-    sys.exit(1)
+    val applicationName = "Octetoscope"
+    val uiStrings = MessageLocalizer.localize[UIStrings](classOf[UIStrings], UIStrings.translationMap)
+    val presentationStrings = MessageLocalizer.localize[PresentationStrings](
+      classOf[PresentationStrings], PresentationStrings.translationMap)
+
+    SwingApplication.setStyle()
+    SwingApplication.start(uiStrings,
+      view => MainPresenter.attach(
+        presentationStrings, applicationName, view,
+        new DialogBoxerImpl(view, applicationName),
+        DefaultBinaryReader,
+        getDissectorDriver(getDetector(magicMap))
+      ))
   }
-
-  val uiStrings = MessageLocalizer.localize[UIStrings](classOf[UIStrings], UIStrings.translationMap)
-  val presentationStrings = MessageLocalizer.localize[PresentationStrings](
-    classOf[PresentationStrings], PresentationStrings.translationMap)
-
-  SwingApplication.setStyle()
-  SwingApplication.start(uiStrings,
-    view => MainPresenter.attach(
-      presentationStrings, APPLICATION_NAME, view,
-      new DialogBoxerImpl(view, APPLICATION_NAME),
-      DefaultBinaryReader,
-      getDissectorDriver(getDetector(magicMap))
-    ))
 }

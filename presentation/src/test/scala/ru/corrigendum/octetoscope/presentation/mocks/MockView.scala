@@ -24,9 +24,16 @@ import ru.corrigendum.octetoscope.abstractui.View
 
 class MockView extends View {
   private[this] var _messageBoxes: List[(String, String)] = Nil
+  private[this] var _visible: Boolean = false
 
   def messageBoxes = _messageBoxes
+  def visible = _visible
+
   var selectedFile: Option[File] = None
+
+  override def show(): Unit = {
+    _visible = true
+  }
 
   override def showMessageBox(text: String, title: String): Unit = {
     _messageBoxes :+= (text, title)

@@ -25,7 +25,6 @@ import scala.collection.mutable
 
 class MockMainView extends MockView with MainView {
   private[this] var _disposed: Boolean = false
-  private[this] var _visible: Boolean = false
   private[this] val _tabs = mutable.Buffer[MockTab]()
   private[this] var _activeTabIndex: Int = -1
   private[this] var _disabledCommands = MainView.Command.ValueSet()
@@ -36,7 +35,6 @@ class MockMainView extends MockView with MainView {
   private[this] var _numericViewSelectionEnd: Int = _
 
   def disposed = _disposed
-  def visible = _visible
   def tabs: Seq[MockTab] = _tabs
   def numericViewText: String = _numericViewText
   def offsetViewText: String = _offsetViewText
@@ -59,10 +57,6 @@ class MockMainView extends MockView with MainView {
   override def setRawViewTexts(offsetViewText: String, numericViewText: String): Unit = {
     this._offsetViewText = offsetViewText
     this._numericViewText = numericViewText
-  }
-
-  override def show(): Unit = {
-    _visible = true
   }
 
   override def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab = {

@@ -36,8 +36,6 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
 
   def setRawViewTexts(offsetViewText: String, numericViewText: String): Unit
 
-  def show(): Unit
-
   def addTab(title: String, toolTip: String, root: DisplayTreeNode): MainView.Tab
 
   def enableCommand(command: MainView.Command.Value): Unit

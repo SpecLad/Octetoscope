@@ -114,10 +114,6 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     rawViewScroller.getViewport.validate()
   }
 
-  override def show(): Unit = {
-    frame.setVisible(true)
-  }
-
   override def addTab(title: String, toolTip: String, root: DisplayTreeNode): Tab = {
     lazy val tab: TabImpl = new TabImpl(TabComponent.get(title,
       () => tab.triggerEvent(MainView.TabClosedEvent)))

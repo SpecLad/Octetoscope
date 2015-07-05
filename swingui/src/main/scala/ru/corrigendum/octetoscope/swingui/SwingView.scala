@@ -27,6 +27,10 @@ private class SwingView(chooser: JFileChooser) extends View {
   private[this] val _frame = new JFrame()
   protected def frame = _frame
 
+  override def show(): Unit = {
+    frame.setVisible(true)
+  }
+
   override def showMessageBox(text: String, title: String): Unit = {
     JOptionPane.showMessageDialog(frame, text, title, JOptionPane.INFORMATION_MESSAGE)
   }

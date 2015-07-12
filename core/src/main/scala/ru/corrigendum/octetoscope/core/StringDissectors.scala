@@ -80,7 +80,7 @@ private object StringDissectors {
         case Nil => Nil
         case Left(_) :: _ =>
           val (lefts, rest) = chunks.span(_.isLeft)
-          Left(lefts.map(_.left.get).flatten.toIndexedSeq) :: groupChunks(rest)
+          Left(lefts.flatMap(_.left.get)(collection.breakOut)) :: groupChunks(rest)
         case Right(_) :: _ =>
           val (rights, rest) = chunks.span(_.isRight)
           Right(rights.map(_.right.get).mkString) :: groupChunks(rest)

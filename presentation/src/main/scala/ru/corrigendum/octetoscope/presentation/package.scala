@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope
 import java.awt.Color
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNodeEventListener, DisplayTreeNode}
+import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, DisplayTreeNodeEventListener}
 import ru.corrigendum.octetoscope.core._
 
 package object presentation {

@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.swingui
 
 import java.awt._
-import java.awt.event.{MouseEvent, MouseAdapter, WindowAdapter, WindowEvent}
+import java.awt.event.{MouseAdapter, MouseEvent, WindowAdapter, WindowEvent}
 import javax.swing._
 import javax.swing.event.{ChangeEvent, ChangeListener, TreeExpansionEvent, TreeWillExpandListener}
 import javax.swing.text.DefaultCaret

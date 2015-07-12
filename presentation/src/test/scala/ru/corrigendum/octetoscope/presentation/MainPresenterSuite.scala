@@ -44,6 +44,7 @@ class MainPresenterSuite extends path.FunSpec {
       view.title mustBe "Blarf"
       view.numericViewWidth mustBe 23
       view.isCommandEnabled(MainView.Command.Close) mustBe false
+      view.logView.title mustBe strings.logViewTitle()
     }
 
     describe("when the window is closed") {

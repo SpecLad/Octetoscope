@@ -188,6 +188,13 @@ class MainPresenterSuite extends path.FunSpec {
         }
       }
     }
+
+    describe("when the Show log command is given") {
+      view.trigger(MainView.CommandEvent(MainView.Command.ShowLog))
+      it("must show the log view") {
+        view.logView mustBe 'visible
+      }
+    }
   }
 }
 

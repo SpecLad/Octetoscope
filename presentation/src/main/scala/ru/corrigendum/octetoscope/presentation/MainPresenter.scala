@@ -102,6 +102,9 @@ object MainPresenter {
           case CommandEvent(MainView.Command.Close) =>
             closeTab(currentTabHandler.get.tab)
 
+          case CommandEvent(MainView.Command.ShowLog) =>
+            view.logView.show()
+
           case CommandEvent(_) => // workaround for bug SI-7206
         }
       }

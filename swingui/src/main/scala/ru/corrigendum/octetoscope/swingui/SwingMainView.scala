@@ -91,12 +91,6 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
     frame.dispose()
   }
 
-  override def title: String = frame.getTitle
-
-  override def title_=(title: String): Unit = {
-    frame.setTitle(title)
-  }
-
   override def numericViewWidth: Int = numericView.getColumns
 
   override def numericViewWidth_=(numCharacters: Int): Unit = {

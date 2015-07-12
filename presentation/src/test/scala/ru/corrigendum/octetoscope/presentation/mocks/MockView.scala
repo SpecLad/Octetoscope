@@ -31,6 +31,8 @@ class MockView extends View {
 
   var selectedFile: Option[File] = None
 
+  override var title: String = ""
+
   override def show(): Unit = {
     _visible = true
   }

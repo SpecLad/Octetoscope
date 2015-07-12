@@ -51,7 +51,6 @@ class MockMainView extends MockView with MainView {
     publish(event)
   }
 
-  override var title: String = ""
   override var numericViewWidth: Int = 0
   override def rawViewTopPixel = _rawViewTopPixel
   def rawViewTopPixel_=(value: Int): Unit = { _rawViewTopPixel = value }

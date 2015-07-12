@@ -30,9 +30,6 @@ trait MainView extends View with mutable.Publisher[MainView.Event] {
 
   def dispose(): Unit
 
-  def title: String
-  def title_=(title: String): Unit
-
   def numericViewWidth: Int
   def numericViewWidth_=(numCharacters: Int): Unit
 

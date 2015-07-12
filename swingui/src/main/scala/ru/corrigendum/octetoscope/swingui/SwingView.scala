@@ -41,4 +41,10 @@ private class SwingView(chooser: JFileChooser) extends View {
       case _ => None
     }
   }
+
+  override def title: String = frame.getTitle
+
+  override def title_=(title: String): Unit = {
+    frame.setTitle(title)
+  }
 }

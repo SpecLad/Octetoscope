@@ -25,4 +25,7 @@ trait View {
 
   def showMessageBox(text: String, title: String): Unit
   def showFileOpenBox(): Option[File]
+
+  def title: String
+  def title_=(title: String): Unit
 }

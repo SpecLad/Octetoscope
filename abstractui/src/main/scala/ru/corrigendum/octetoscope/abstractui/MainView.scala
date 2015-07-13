@@ -26,7 +26,7 @@ import scala.collection.mutable
 trait MainView extends View with mutable.Publisher[MainView.Event] {
   override type Pub = MainView
 
-  val logView: View
+  val logView: LogView
 
   def dispose(): Unit
 

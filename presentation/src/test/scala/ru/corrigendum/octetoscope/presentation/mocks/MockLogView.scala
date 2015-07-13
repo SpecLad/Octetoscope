@@ -16,27 +16,16 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.swingui
-
-import java.awt.{Dimension, Font}
-import javax.swing.{JScrollPane, JFileChooser, JTextArea}
+package ru.corrigendum.octetoscope.presentation.mocks
 
 import ru.corrigendum.octetoscope.abstractui.LogView
 
-private class SwingLogView(chooser: JFileChooser) extends SwingView(chooser) with LogView {
-  private[this] val logBox = new JTextArea()
-  logBox.setFont(new Font("Monospaced", Font.PLAIN, 14))
-  logBox.setEditable(false)
+import scala.collection.mutable
 
-  frame.getContentPane.add(new JScrollPane(logBox))
-
-  frame.setPreferredSize(new Dimension(700, 300))
-  frame.pack()
-  frame.setLocationRelativeTo(null)
+class MockLogView extends MockView with LogView {
+  private[this] val entries = mutable.Buffer[String]()
 
   override def addEntry(entry: String): Unit = {
-    if (logBox.getDocument.getLength > 0)
-      logBox.append("\n")
-    logBox.append(entry)
+    entries += entry
   }
 }

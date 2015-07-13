@@ -34,7 +34,7 @@ class MockMainView extends MockView with MainView {
   private[this] var _numericViewSelectionStart: Int = _
   private[this] var _numericViewSelectionEnd: Int = _
 
-  override val logView = new MockView
+  override val logView = new MockLogView
 
   def disposed = _disposed
   def tabs: Seq[MockTab] = _tabs

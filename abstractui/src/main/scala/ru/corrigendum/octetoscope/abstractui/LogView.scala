@@ -16,27 +16,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.swingui
+package ru.corrigendum.octetoscope.abstractui
 
-import java.awt.{Dimension, Font}
-import javax.swing.{JScrollPane, JFileChooser, JTextArea}
-
-import ru.corrigendum.octetoscope.abstractui.LogView
-
-private class SwingLogView(chooser: JFileChooser) extends SwingView(chooser) with LogView {
-  private[this] val logBox = new JTextArea()
-  logBox.setFont(new Font("Monospaced", Font.PLAIN, 14))
-  logBox.setEditable(false)
-
-  frame.getContentPane.add(new JScrollPane(logBox))
-
-  frame.setPreferredSize(new Dimension(700, 300))
-  frame.pack()
-  frame.setLocationRelativeTo(null)
-
-  override def addEntry(entry: String): Unit = {
-    if (logBox.getDocument.getLength > 0)
-      logBox.append("\n")
-    logBox.append(entry)
-  }
+trait LogView extends View {
+  def addEntry(entry: String): Unit
 }

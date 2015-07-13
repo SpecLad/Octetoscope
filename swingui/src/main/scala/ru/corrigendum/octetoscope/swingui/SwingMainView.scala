@@ -88,7 +88,8 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   })
 
   override def dispose(): Unit = {
-    frame.dispose()
+    logView.dispose()
+    super.dispose()
   }
 
   override def numericViewWidth: Int = numericView.getColumns

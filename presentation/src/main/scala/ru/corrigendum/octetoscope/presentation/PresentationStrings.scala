@@ -21,23 +21,26 @@ package ru.corrigendum.octetoscope.presentation
 import ru.corrigendum.octetoscope.abstractinfra.Translation
 
 trait PresentationStrings {
-  @Translation(format = "This is {0} version {1}.")
-  def appVersionString(appName: String, version: String): String
-
-  @Translation(format = "The file you have selected is too small to meaningfully dissect.")
-  def fileTooSmallToDissect(): String
+  // Error messages
+  @Translation(format = "Failed to detect the selected file's format.")
+  def errorCantDetectFileFormat(): String
 
   @Translation(format = "Failed to read file:\n{0}")
-  def errorReadingFile(error: String): String
+  def errorFailedToReadFile(error: String): String
 
-  @Translation(format = "Failed to detect the selected file's format.")
-  def cantDetectFileFormat(): String
+  @Translation(format = "The file you have selected is too small to meaningfully dissect.")
+  def errorFileTooSmallToDissect(): String
+
+  // Log entries
+  @Translation(format = "application started")
+  def logEntryAppStarted(): String
+
+  // Miscellaneous UI elements
+  @Translation(format = "This is {0} version {1}.")
+  def aboutText(appName: String, version: String): String
 
   @Translation(format = "Log")
   def logViewTitle(): String
-
-  @Translation(format = "application started")
-  def logEntryAppStarted(): String
 }
 
 object PresentationStrings {
@@ -45,6 +48,6 @@ object PresentationStrings {
 
   trait Ru extends PresentationStrings {
     @Translation(format = "Это {0} версии {1}.")
-    def appVersionString(appName: String, version: String): String
+    def aboutText(appName: String, version: String): String
   }
 }

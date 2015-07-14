@@ -67,7 +67,7 @@ class MainPresenterSuite extends path.FunSpec {
     describe("when the About command is given") {
       view.trigger(MainView.CommandEvent(MainView.Command.About))
       it("must show the About message box") {
-        boxer.messages mustBe List(strings.appVersionString("Blarf", presentVersionInfo(VersionInfo.ours)))
+        boxer.messages mustBe List(strings.aboutText("Blarf", presentVersionInfo(VersionInfo.ours)))
       }
     }
 
@@ -91,7 +91,7 @@ class MainPresenterSuite extends path.FunSpec {
 
           it("must complain and not open any tabs") {
             view.tabs must have size 0
-            boxer.messages mustBe List(strings.errorReadingFile(exception.getMessage))
+            boxer.messages mustBe List(strings.errorFailedToReadFile(exception.getMessage))
           }
         }
 
@@ -101,7 +101,7 @@ class MainPresenterSuite extends path.FunSpec {
 
           it("must complain and not open any tabs") {
             view.tabs must have size 0
-            boxer.messages mustBe List(strings.fileTooSmallToDissect())
+            boxer.messages mustBe List(strings.errorFileTooSmallToDissect())
           }
         }
 
@@ -111,7 +111,7 @@ class MainPresenterSuite extends path.FunSpec {
 
           it("must complain and not open any tabs") {
             view.tabs must have size 0
-            boxer.messages mustBe List(strings.cantDetectFileFormat())
+            boxer.messages mustBe List(strings.errorCantDetectFileFormat())
           }
         }
 

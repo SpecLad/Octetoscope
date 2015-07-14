@@ -67,7 +67,7 @@ object MainPresenter {
           case ClosedEvent => pub.dispose()
 
           case CommandEvent(MainView.Command.About) =>
-            boxer.showMessageBox(strings.appVersionString(appName, presentVersionInfo(VersionInfo.ours)))
+            boxer.showMessageBox(strings.aboutText(appName, presentVersionInfo(VersionInfo.ours)))
 
           case CommandEvent(MainView.Command.Quit) => pub.dispose()
 
@@ -80,13 +80,13 @@ object MainPresenter {
                   (blob, dissectorDriver(blob))
                 } catch {
                   case ioe: IOException =>
-                    boxer.showMessageBox(strings.errorReadingFile(ioe.getMessage))
+                    boxer.showMessageBox(strings.errorFailedToReadFile(ioe.getMessage))
                     return
                   case _: TooSmallToDissectException =>
-                    boxer.showMessageBox(strings.fileTooSmallToDissect())
+                    boxer.showMessageBox(strings.errorFileTooSmallToDissect())
                     return
                   case _: DetectionFailedException =>
-                    boxer.showMessageBox(strings.cantDetectFileFormat())
+                    boxer.showMessageBox(strings.errorCantDetectFileFormat())
                     return
                 }
 

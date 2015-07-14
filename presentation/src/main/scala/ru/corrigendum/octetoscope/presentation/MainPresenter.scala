@@ -137,6 +137,7 @@ object MainPresenter {
     view.numericViewWidth = MainPresenter.DefaultBytesPerRow * 3 - 1
     view.disableCommand(MainView.Command.Close)
     view.logView.title = strings.logViewTitle()
+    view.logView.addEntry(strings.logEntryAppStarted())
     view.show()
 
     view.subscribe(ViewHandler)

@@ -23,9 +23,11 @@ import ru.corrigendum.octetoscope.abstractui.LogView
 import scala.collection.mutable
 
 class MockLogView extends MockView with LogView {
-  private[this] val entries = mutable.Buffer[String]()
+  private[this] val _entries = mutable.ArrayBuffer[String]()
+
+  def entries: IndexedSeq[String] = _entries
 
   override def addEntry(entry: String): Unit = {
-    entries += entry
+    _entries += entry
   }
 }

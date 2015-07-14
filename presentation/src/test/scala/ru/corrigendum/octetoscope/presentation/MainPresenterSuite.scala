@@ -45,6 +45,7 @@ class MainPresenterSuite extends path.FunSpec {
       view.numericViewWidth mustBe 23
       view.isCommandEnabled(MainView.Command.Close) mustBe false
       view.logView.title mustBe strings.logViewTitle()
+      view.logView.entries.loneElement mustBe strings.logEntryAppStarted()
     }
 
     describe("when the window is closed") {

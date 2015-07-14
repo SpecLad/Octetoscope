@@ -35,6 +35,9 @@ trait PresentationStrings {
 
   @Translation(format = "Log")
   def logViewTitle(): String
+
+  @Translation(format = "application started")
+  def logEntryAppStarted(): String
 }
 
 object PresentationStrings {

@@ -102,6 +102,9 @@ object MainPresenter {
           case CommandEvent(MainView.Command.Close) =>
             closeTab(currentTabHandler.get.tab)
 
+          case CommandEvent(MainView.Command.ShowLog) =>
+            view.logView.show()
+
           case CommandEvent(_) => // workaround for bug SI-7206
         }
       }
@@ -133,6 +136,8 @@ object MainPresenter {
     view.title = appName
     view.numericViewWidth = MainPresenter.DefaultBytesPerRow * 3 - 1
     view.disableCommand(MainView.Command.Close)
+    view.logView.title = strings.logViewTitle()
+    view.logView.addEntry(strings.logEntryAppStarted())
     view.show()
 
     view.subscribe(ViewHandler)

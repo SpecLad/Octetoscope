@@ -44,6 +44,8 @@ class MainPresenterSuite extends path.FunSpec {
       view.title mustBe "Blarf"
       view.numericViewWidth mustBe 23
       view.isCommandEnabled(MainView.Command.Close) mustBe false
+      view.logView.title mustBe strings.logViewTitle()
+      view.logView.entries.loneElement mustBe strings.logEntryAppStarted()
     }
 
     describe("when the window is closed") {
@@ -186,6 +188,13 @@ class MainPresenterSuite extends path.FunSpec {
             }
           }
         }
+      }
+    }
+
+    describe("when the Show log command is given") {
+      view.trigger(MainView.CommandEvent(MainView.Command.ShowLog))
+      it("must show the log view") {
+        view.logView mustBe 'visible
       }
     }
   }

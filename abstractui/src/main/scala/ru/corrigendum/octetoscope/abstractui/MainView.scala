@@ -26,10 +26,9 @@ import scala.collection.mutable
 trait MainView extends View with mutable.Publisher[MainView.Event] {
   override type Pub = MainView
 
-  def dispose(): Unit
+  val logView: LogView
 
-  def title: String
-  def title_=(title: String): Unit
+  def dispose(): Unit
 
   def numericViewWidth: Int
   def numericViewWidth_=(numCharacters: Int): Unit
@@ -53,7 +52,9 @@ object MainView {
   sealed case class CommandEvent(command: Command.Value) extends Event
 
   object Command extends Enumeration {
-    val Open, Close, Quit, About = Value
+    val Open, Close, Quit = Value
+    val ShowLog = Value
+    val About = Value
   }
 
   private val SM = SubMenuDescription
@@ -66,6 +67,9 @@ object MainView {
         shortcut = Some(KeyStroke.getKeyStroke('W', InputEvent.CTRL_DOWN_MASK))),
       SeparatorDescription,
       CI(_.menuItemQuit(), Command.Quit)
+    )),
+    SM(_.menuTools(), Seq(
+      CI(_.menuItemShowLog(), Command.ShowLog)
     )),
     SM(_.menuHelp(), Seq(
       CI(_.menuItemAbout(), Command.About)

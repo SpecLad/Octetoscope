@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,28 +18,16 @@
 
 package ru.corrigendum.octetoscope.presentation.mocks
 
-import java.io.File
+import ru.corrigendum.octetoscope.abstractui.LogView
 
-import ru.corrigendum.octetoscope.abstractui.View
+import scala.collection.mutable
 
-class MockView extends View {
-  private[this] var _messageBoxes: List[(String, String)] = Nil
-  private[this] var _visible: Boolean = false
+class MockLogView extends MockView with LogView {
+  private[this] val _entries = mutable.ArrayBuffer[String]()
 
-  def messageBoxes = _messageBoxes
-  def visible = _visible
+  def entries: IndexedSeq[String] = _entries
 
-  var selectedFile: Option[File] = None
-
-  override var title: String = ""
-
-  override def show(): Unit = {
-    _visible = true
+  override def addEntry(entry: String): Unit = {
+    _entries += entry
   }
-
-  override def showMessageBox(text: String, title: String): Unit = {
-    _messageBoxes :+= (text, title)
-  }
-
-  override def showFileOpenBox(): Option[File] = selectedFile
 }

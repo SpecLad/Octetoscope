@@ -27,6 +27,10 @@ private class SwingView(chooser: JFileChooser) extends View {
   private[this] val _frame = new JFrame()
   protected def frame = _frame
 
+  def dispose(): Unit = {
+    frame.dispose()
+  }
+
   override def show(): Unit = {
     frame.setVisible(true)
   }
@@ -40,5 +44,11 @@ private class SwingView(chooser: JFileChooser) extends View {
       case JFileChooser.APPROVE_OPTION => Some(chooser.getSelectedFile)
       case _ => None
     }
+  }
+
+  override def title: String = frame.getTitle
+
+  override def title_=(title: String): Unit = {
+    frame.setTitle(title)
   }
 }

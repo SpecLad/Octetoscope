@@ -47,6 +47,8 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   rawViewScroller.setRowHeaderView(offsetView)
   rawViewScroller.setViewportBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new Color(225, 225, 225)))
 
+  override val logView = new SwingLogView(chooser)
+
   {
     def nonUpdatingCaret = {
       val caret = new DefaultCaret
@@ -86,13 +88,8 @@ private class SwingMainView(strings: UIStrings, chooser: JFileChooser) extends S
   })
 
   override def dispose(): Unit = {
-    frame.dispose()
-  }
-
-  override def title: String = frame.getTitle
-
-  override def title_=(title: String): Unit = {
-    frame.setTitle(title)
+    logView.dispose()
+    super.dispose()
   }
 
   override def numericViewWidth: Int = numericView.getColumns

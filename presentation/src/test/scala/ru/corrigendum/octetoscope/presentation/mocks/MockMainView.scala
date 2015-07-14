@@ -34,6 +34,8 @@ class MockMainView extends MockView with MainView {
   private[this] var _numericViewSelectionStart: Int = _
   private[this] var _numericViewSelectionEnd: Int = _
 
+  override val logView = new MockLogView
+
   def disposed = _disposed
   def tabs: Seq[MockTab] = _tabs
   def numericViewText: String = _numericViewText
@@ -49,7 +51,6 @@ class MockMainView extends MockView with MainView {
     publish(event)
   }
 
-  override var title: String = ""
   override var numericViewWidth: Int = 0
   override def rawViewTopPixel = _rawViewTopPixel
   def rawViewTopPixel_=(value: Int): Unit = { _rawViewTopPixel = value }

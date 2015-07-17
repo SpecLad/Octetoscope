@@ -19,6 +19,7 @@
 package ru.corrigendum.octetoscope.presentation
 
 import java.io.{File, IOException}
+import java.util.{GregorianCalendar, Locale, TimeZone}
 
 import org.scalatest.LoneElement._
 import org.scalatest.MustMatchers._
@@ -26,7 +27,7 @@ import org.scalatest.path
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.core._
-import ru.corrigendum.octetoscope.presentation.mocks.{MockBinaryReader, MockDialogBoxer, MockDissectorDriver, MockMainView}
+import ru.corrigendum.octetoscope.presentation.mocks._
 import ru.corrigendum.octetoscope.presentation.tools.{DisplayTreeNodeData, FakeMessageLocalizer}
 
 class MainPresenterSuite extends path.FunSpec {
@@ -37,7 +38,15 @@ class MainPresenterSuite extends path.FunSpec {
     val dissectorDriver = new MockDissectorDriver()
     val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
 
-    MainPresenter.attach(strings, "Blarf", view, boxer, binaryReader, dissectorDriver)
+    val startDate = {
+      val calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"), Locale.ROOT)
+      calendar.clear()
+      calendar.set(1993, 8, 1, 15, 0)
+      calendar.getTime
+    }
+    val clock = new MockClock(startDate, TimeZone.getTimeZone("GMT+02"))
+
+    MainPresenter.attach(strings, "Blarf", view, boxer, binaryReader, clock, dissectorDriver)
 
     it("must put the window into the initial state") {
       view mustBe 'visible
@@ -45,7 +54,7 @@ class MainPresenterSuite extends path.FunSpec {
       view.numericViewWidth mustBe 23
       view.isCommandEnabled(MainView.Command.Close) mustBe false
       view.logView.title mustBe strings.logViewTitle()
-      view.logView.entries.loneElement mustBe strings.logEntryAppStarted()
+      view.logView.entries.loneElement mustBe "1993-09-01 17:00:00 - " + strings.logEntryAppStarted()
     }
 
     describe("when the window is closed") {

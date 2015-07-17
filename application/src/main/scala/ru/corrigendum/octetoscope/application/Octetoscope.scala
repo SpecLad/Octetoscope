@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.application
 import ru.corrigendum.octetoscope.abstractui.UIStrings
 import ru.corrigendum.octetoscope.core.{getDetector, getDissectorDriver}
 import ru.corrigendum.octetoscope.dissectors.magicMap
-import ru.corrigendum.octetoscope.infra.{DefaultBinaryReader, MessageLocalizer}
+import ru.corrigendum.octetoscope.infra.{DefaultBinaryReader, DefaultClock, MessageLocalizer}
 import ru.corrigendum.octetoscope.presentation.{DialogBoxerImpl, MainPresenter, PresentationStrings}
 import ru.corrigendum.octetoscope.swingui.SwingApplication
 
@@ -43,6 +43,7 @@ object Octetoscope extends App {
         presentationStrings, applicationName, view,
         new DialogBoxerImpl(view, applicationName),
         DefaultBinaryReader,
+        DefaultClock,
         getDissectorDriver(getDetector(magicMap))
       ))
   }

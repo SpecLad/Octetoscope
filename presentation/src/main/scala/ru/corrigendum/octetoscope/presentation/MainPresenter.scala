@@ -19,8 +19,10 @@
 package ru.corrigendum.octetoscope.presentation
 
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-import ru.corrigendum.octetoscope.abstractinfra.BinaryReader
+import ru.corrigendum.octetoscope.abstractinfra.{BinaryReader, Clock}
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.abstractui.MainView._
 import ru.corrigendum.octetoscope.core._
@@ -33,9 +35,16 @@ object MainPresenter {
              view: MainView,
              boxer: DialogBoxer,
              binaryReader: BinaryReader,
+             clock: Clock,
              dissectorDriver: DissectorDriver): Unit = {
     var numTabs = 0
     var currentTabHandler: Option[TabHandler] = None
+
+    def log(entry: String): Unit = {
+      val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss - ", Locale.ROOT)
+      sdf.setTimeZone(clock.obtainTimeZone())
+      view.logView.addEntry(sdf.format(clock.obtainTimestamp()) + entry)
+    }
 
     def closeTab(tab: MainView.Tab): Unit = {
       tab.close()
@@ -137,7 +146,7 @@ object MainPresenter {
     view.numericViewWidth = MainPresenter.DefaultBytesPerRow * 3 - 1
     view.disableCommand(MainView.Command.Close)
     view.logView.title = strings.logViewTitle()
-    view.logView.addEntry(strings.logEntryAppStarted())
+    log(strings.logEntryAppStarted())
     view.show()
 
     view.subscribe(ViewHandler)

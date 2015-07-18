@@ -92,6 +92,14 @@ class MainPresenterSuite extends path.FunSpec {
 
       describe("and a file is selected") {
         view.selectedFile = Some(MainPresenterSuite.FakePath)
+        clock.timestamp.setTime(clock.timestamp.getTime + 5000)
+
+        def checkFailedDissectionLogEntries(): Unit = {
+          view.logView.entries.takeRight(2) mustBe IndexedSeq(
+            "1993-09-01 17:00:05 - " + strings.logEntryDissectingFile(MainPresenterSuite.FakePath.toString),
+            "1993-09-01 17:00:05 - " + strings.logEntryFailedToDissectFile(MainPresenterSuite.FakePath.toString)
+          )
+        }
 
         describe("and an I/O exception occurs when reading the file") {
           val exception = new IOException("whatever")
@@ -101,6 +109,7 @@ class MainPresenterSuite extends path.FunSpec {
           it("must complain and not open any tabs") {
             view.tabs must have size 0
             boxer.messages mustBe List(strings.errorFailedToReadFile(exception.getMessage))
+            checkFailedDissectionLogEntries()
           }
         }
 
@@ -111,6 +120,7 @@ class MainPresenterSuite extends path.FunSpec {
           it("must complain and not open any tabs") {
             view.tabs must have size 0
             boxer.messages mustBe List(strings.errorFileTooSmallToDissect())
+            checkFailedDissectionLogEntries()
           }
         }
 
@@ -121,6 +131,7 @@ class MainPresenterSuite extends path.FunSpec {
           it("must complain and not open any tabs") {
             view.tabs must have size 0
             boxer.messages mustBe List(strings.errorCantDetectFileFormat())
+            checkFailedDissectionLogEntries()
           }
         }
 
@@ -143,6 +154,11 @@ class MainPresenterSuite extends path.FunSpec {
             view.numericViewText mustBe presentBlobAsHexadecimal(MainPresenterSuite.FakeBlob, 8)
             view.offsetViewText mustBe generateBlobOffsets(MainPresenterSuite.FakeBlob.size, 8)
             view.rawViewTopPixel mustBe 0
+
+            view.logView.entries.takeRight(2) mustBe IndexedSeq(
+              "1993-09-01 17:00:05 - " + strings.logEntryDissectingFile(MainPresenterSuite.FakePath.toString),
+              "1993-09-01 17:00:05 - " + strings.logEntrySuccessfullyDissectedFile(MainPresenterSuite.FakePath.toString)
+            )
           }
 
           describe("when opening another tab and switching back") {

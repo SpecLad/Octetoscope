@@ -35,6 +35,15 @@ trait PresentationStrings {
   @Translation(format = "application started")
   def logEntryAppStarted(): String
 
+  @Translation(format = "dissecting file \"{0}\"...")
+  def logEntryDissectingFile(path: String): String
+
+  @Translation(format = "failed to dissect file \"{0}\"")
+  def logEntryFailedToDissectFile(path: String): String
+
+  @Translation(format = "successfully dissected file \"{0}\"")
+  def logEntrySuccessfullyDissectedFile(path: String): String
+
   // Miscellaneous UI elements
   @Translation(format = "This is {0} version {1}.")
   def aboutText(appName: String, version: String): String

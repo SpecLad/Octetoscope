@@ -85,8 +85,15 @@ object MainPresenter {
               case None =>
               case Some(path) =>
                 val (blob, piece) = try {
-                  val blob = binaryReader.readWhole(path)
-                  (blob, dissectorDriver(blob))
+                  try {
+                    log(strings.logEntryDissectingFile(path.toString))
+                    val blob = binaryReader.readWhole(path)
+                    (blob, dissectorDriver(blob))
+                  } catch {
+                    case e: Exception =>
+                      log(strings.logEntryFailedToDissectFile(path.toString))
+                      throw e
+                  }
                 } catch {
                   case ioe: IOException =>
                     boxer.showMessageBox(strings.errorFailedToReadFile(ioe.getMessage))
@@ -98,6 +105,8 @@ object MainPresenter {
                     boxer.showMessageBox(strings.errorCantDetectFileFormat())
                     return
                 }
+
+                log(strings.logEntrySuccessfullyDissectedFile(path.toString))
 
                 val numericViewText = presentBlobAsHexadecimal(blob, MainPresenter.DefaultBytesPerRow)
                 val offsetViewText = generateBlobOffsets(blob.size, MainPresenter.DefaultBytesPerRow)

@@ -23,7 +23,11 @@ import java.util.{Date, TimeZone}
 import ru.corrigendum.octetoscope.abstractinfra.Clock
 
 class MockClock(var timestamp: Date, var timeZone: TimeZone) extends Clock {
+  var executionTime: Long = 0
+
   override def obtainTimestamp(): Date = timestamp.clone().asInstanceOf[Date]
 
   override def obtainTimeZone(): TimeZone = timeZone
+
+  override def timeExecution[T](f: () => T): (Long, T) = (executionTime, f())
 }

@@ -23,4 +23,7 @@ import java.util.{Date, TimeZone}
 trait Clock {
   def obtainTimestamp(): Date
   def obtainTimeZone(): TimeZone
+
+  // returned time is in nanoseconds
+  def timeExecution[T](f: () => T): (Long, T)
 }

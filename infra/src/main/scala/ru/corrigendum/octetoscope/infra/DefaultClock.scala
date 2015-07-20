@@ -25,4 +25,11 @@ import ru.corrigendum.octetoscope.abstractinfra.Clock
 object DefaultClock extends Clock {
   override def obtainTimestamp(): Date = new Date()
   override def obtainTimeZone(): TimeZone = TimeZone.getDefault
+
+  override def timeExecution[T](f: () => T): (Long, T) = {
+    val before = System.nanoTime()
+    val result = f()
+    val after = System.nanoTime()
+    (after - before, result)
+  }
 }

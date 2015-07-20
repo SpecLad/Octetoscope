@@ -138,6 +138,7 @@ class MainPresenterSuite extends path.FunSpec {
         describe("and the file is successfully dissected") {
           binaryReader.result = MainPresenterSuite.FakeBlob
           dissectorDriver.result = MainPresenterSuite.FakePiece
+          clock.executionTime = 1234000000
           view.trigger(MainView.CommandEvent(MainView.Command.Open))
 
           it("must open a tab for the file") {
@@ -155,9 +156,11 @@ class MainPresenterSuite extends path.FunSpec {
             view.offsetViewText mustBe generateBlobOffsets(MainPresenterSuite.FakeBlob.size, 8)
             view.rawViewTopPixel mustBe 0
 
-            view.logView.entries.takeRight(2) mustBe IndexedSeq(
+            view.logView.entries.takeRight(3) mustBe IndexedSeq(
               "1993-09-01 17:00:05 - " + strings.logEntryDissectingFile(MainPresenterSuite.FakePath.toString),
-              "1993-09-01 17:00:05 - " + strings.logEntrySuccessfullyDissectedFile(MainPresenterSuite.FakePath.toString)
+              "1993-09-01 17:00:05 - "
+                + strings.logEntrySuccessfullyDissectedFile(MainPresenterSuite.FakePath.toString),
+              "                      " + strings.logEntryItTookSeconds(1.234)
             )
           }
 

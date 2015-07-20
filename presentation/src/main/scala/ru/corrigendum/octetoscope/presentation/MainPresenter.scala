@@ -40,10 +40,17 @@ object MainPresenter {
     var numTabs = 0
     var currentTabHandler: Option[TabHandler] = None
 
-    def log(entry: String): Unit = {
+    def log(entry: String, otherEntries: String*): Unit = {
       val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss - ", Locale.ROOT)
       sdf.setTimeZone(clock.obtainTimeZone())
       view.logView.addEntry(sdf.format(clock.obtainTimestamp()) + entry)
+
+      if (otherEntries.nonEmpty) {
+        val spaces = " " * sdf.toPattern.length
+
+        for (otherEntry <- otherEntries)
+          view.logView.addEntry(spaces + otherEntry)
+      }
     }
 
     def closeTab(tab: MainView.Tab): Unit = {
@@ -84,11 +91,13 @@ object MainPresenter {
             pub.showFileOpenBox() match {
               case None =>
               case Some(path) =>
-                val (blob, piece) = try {
+                val (time, (blob, piece)) = try {
                   try {
                     log(strings.logEntryDissectingFile(path.toString))
-                    val blob = binaryReader.readWhole(path)
-                    (blob, dissectorDriver(blob))
+                    clock.timeExecution {() =>
+                      val blob = binaryReader.readWhole(path)
+                      (blob, dissectorDriver(blob))
+                    }
                   } catch {
                     case e: Exception =>
                       log(strings.logEntryFailedToDissectFile(path.toString))
@@ -106,7 +115,9 @@ object MainPresenter {
                     return
                 }
 
-                log(strings.logEntrySuccessfullyDissectedFile(path.toString))
+                log(
+                  strings.logEntrySuccessfullyDissectedFile(path.toString),
+                  strings.logEntryItTookSeconds(time / 1000000000d))
 
                 val numericViewText = presentBlobAsHexadecimal(blob, MainPresenter.DefaultBytesPerRow)
                 val offsetViewText = generateBlobOffsets(blob.size, MainPresenter.DefaultBytesPerRow)

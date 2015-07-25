@@ -41,7 +41,7 @@ trait PresentationStrings {
   @Translation(format = "failed to dissect file \"{0}\"")
   def logEntryFailedToDissectFile(path: String): String
 
-  @Translation(format = "it took {0} s")
+  @Translation(format = "it took {0,number,0.000} s")
   def logEntryItTookSeconds(seconds: Double): String
 
   @Translation(format = "successfully dissected file \"{0}\"")

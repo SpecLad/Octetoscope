@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,15 +19,11 @@
 package ru.corrigendum.octetoscope.presentation
 
 import org.scalatest.MustMatchers._
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{FunSuite, OneInstancePerTest}
 import ru.corrigendum.octetoscope.presentation.mocks.MockView
 
-class DialogBoxerSuite extends FunSuite with BeforeAndAfter {
-  private[this] var view: MockView = _
-
-  before {
-    view = new MockView()
-  }
+class DialogBoxerSuite extends FunSuite with OneInstancePerTest {
+  private[this] val view: MockView = new MockView()
 
   test("message box") {
     new DialogBoxerImpl(view, "Blarf").showMessageBox("Abracadabra")

@@ -19,15 +19,11 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.MustMatchers._
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{FunSuite, OneInstancePerTest}
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-class ArrayBlobSuite extends FunSuite with BeforeAndAfter {
-  var blob: Blob = _
-
-  before {
-    blob = new ArrayBlob(Array[Byte](3, 4, 5, 6, 7))
-  }
+class ArrayBlobSuite extends FunSuite with OneInstancePerTest {
+  private[this] val blob: Blob = new ArrayBlob(Array[Byte](3, 4, 5, 6, 7))
 
   test("apply - normal") {
     blob(1) mustBe 4

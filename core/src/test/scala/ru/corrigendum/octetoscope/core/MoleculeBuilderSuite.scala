@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,14 +19,10 @@
 package ru.corrigendum.octetoscope.core
 
 import org.scalatest.MustMatchers._
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{FunSuite, OneInstancePerTest}
 
-class MoleculeBuilderSuite extends FunSuite with BeforeAndAfter {
-  var builder: MoleculeBuilder = _
-
-  before {
-    builder = new MoleculeBuilder()
-  }
+class MoleculeBuilderSuite extends FunSuite with OneInstancePerTest {
+  private[this] val builder: MoleculeBuilder = new MoleculeBuilder()
 
   test("default") {
     builder.hasChildren mustBe false

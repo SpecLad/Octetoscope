@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.presentation
 
 import java.io.{File, IOException}
-import java.util.{GregorianCalendar, Locale, TimeZone}
+import java.util.{Date, TimeZone}
 
 import org.scalatest.LoneElement._
 import org.scalatest.MustMatchers._
@@ -34,19 +34,14 @@ class MainPresenterSuite extends path.FunSpec {
   describe("A MainPresenter") {
     val view = new MockMainView()
     val boxer = new MockDialogBoxer()
+    val logger = new MockLogger()
     val binaryReader = new MockBinaryReader()
     val dissectorDriver = new MockDissectorDriver()
     val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
 
-    val startDate = {
-      val calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"), Locale.ROOT)
-      calendar.clear()
-      calendar.set(1993, 8, 1, 15, 0)
-      calendar.getTime
-    }
-    val clock = new MockClock(startDate, TimeZone.getTimeZone("GMT+02"))
+    val clock = new MockClock(new Date(0), TimeZone.getTimeZone("UTC"))
 
-    MainPresenter.attach(strings, "Blarf", view, boxer, binaryReader, clock, dissectorDriver)
+    MainPresenter.attach(strings, "Blarf", view, boxer, logger, binaryReader, clock, dissectorDriver)
 
     it("must put the window into the initial state") {
       view mustBe 'visible
@@ -54,7 +49,7 @@ class MainPresenterSuite extends path.FunSpec {
       view.numericViewWidth mustBe 23
       view.isCommandEnabled(MainView.Command.Close) mustBe false
       view.logView.title mustBe strings.logViewTitle()
-      view.logView.entries.loneElement mustBe "1993-09-01 17:00:00 - " + strings.logEntryAppStarted()
+      logger.entries.loneElement mustBe Seq(strings.logEntryAppStarted())
     }
 
     describe("when the window is closed") {
@@ -93,11 +88,12 @@ class MainPresenterSuite extends path.FunSpec {
       describe("and a file is selected") {
         view.selectedFile = Some(MainPresenterSuite.FakePath)
         clock.timestamp.setTime(clock.timestamp.getTime + 5000)
+        logger.clear()
 
         def checkFailedDissectionLogEntries(): Unit = {
-          view.logView.entries.takeRight(2) mustBe IndexedSeq(
-            "1993-09-01 17:00:05 - " + strings.logEntryDissectingFile(MainPresenterSuite.FakePath.toString),
-            "1993-09-01 17:00:05 - " + strings.logEntryFailedToDissectFile(MainPresenterSuite.FakePath.toString)
+          logger.entries mustBe Seq(
+            Seq(strings.logEntryDissectingFile(MainPresenterSuite.FakePath.toString)),
+            Seq(strings.logEntryFailedToDissectFile(MainPresenterSuite.FakePath.toString))
           )
         }
 
@@ -156,11 +152,10 @@ class MainPresenterSuite extends path.FunSpec {
             view.offsetViewText mustBe generateBlobOffsets(MainPresenterSuite.FakeBlob.size, 8)
             view.rawViewTopPixel mustBe 0
 
-            view.logView.entries.takeRight(3) mustBe IndexedSeq(
-              "1993-09-01 17:00:05 - " + strings.logEntryDissectingFile(MainPresenterSuite.FakePath.toString),
-              "1993-09-01 17:00:05 - "
-                + strings.logEntrySuccessfullyDissectedFile(MainPresenterSuite.FakePath.toString),
-              "                      " + strings.logEntryItTookSeconds(1.234)
+            logger.entries mustBe Seq(
+              Seq(strings.logEntryDissectingFile(MainPresenterSuite.FakePath.toString)),
+              Seq(strings.logEntrySuccessfullyDissectedFile(MainPresenterSuite.FakePath.toString),
+                  strings.logEntryItTookSeconds(1.234))
             )
           }
 

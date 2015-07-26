@@ -19,8 +19,6 @@
 package ru.corrigendum.octetoscope.presentation
 
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 import ru.corrigendum.octetoscope.abstractinfra.{BinaryReader, Clock}
 import ru.corrigendum.octetoscope.abstractui.MainView
@@ -34,24 +32,12 @@ object MainPresenter {
              appName: String,
              view: MainView,
              boxer: DialogBoxer,
+             logger: Logger,
              binaryReader: BinaryReader,
              clock: Clock,
              dissectorDriver: DissectorDriver): Unit = {
     var numTabs = 0
     var currentTabHandler: Option[TabHandler] = None
-
-    def log(entry: String, otherEntries: String*): Unit = {
-      val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss - ", Locale.ROOT)
-      sdf.setTimeZone(clock.obtainTimeZone())
-      view.logView.addEntry(sdf.format(clock.obtainTimestamp()) + entry)
-
-      if (otherEntries.nonEmpty) {
-        val spaces = " " * sdf.toPattern.length
-
-        for (otherEntry <- otherEntries)
-          view.logView.addEntry(spaces + otherEntry)
-      }
-    }
 
     def closeTab(tab: MainView.Tab): Unit = {
       tab.close()
@@ -93,14 +79,14 @@ object MainPresenter {
               case Some(path) =>
                 val (time, (blob, piece)) = try {
                   try {
-                    log(strings.logEntryDissectingFile(path.toString))
+                    logger.log(strings.logEntryDissectingFile(path.toString))
                     clock.timeExecution {() =>
                       val blob = binaryReader.readWhole(path)
                       (blob, dissectorDriver(blob))
                     }
                   } catch {
                     case e: Exception =>
-                      log(strings.logEntryFailedToDissectFile(path.toString))
+                      logger.log(strings.logEntryFailedToDissectFile(path.toString))
                       throw e
                   }
                 } catch {
@@ -115,7 +101,7 @@ object MainPresenter {
                     return
                 }
 
-                log(
+                logger.log(
                   strings.logEntrySuccessfullyDissectedFile(path.toString),
                   strings.logEntryItTookSeconds(time / 1000000000d))
 
@@ -166,7 +152,7 @@ object MainPresenter {
     view.numericViewWidth = MainPresenter.DefaultBytesPerRow * 3 - 1
     view.disableCommand(MainView.Command.Close)
     view.logView.title = strings.logViewTitle()
-    log(strings.logEntryAppStarted())
+    logger.log(strings.logEntryAppStarted())
     view.show()
 
     view.subscribe(ViewHandler)

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -39,20 +39,16 @@ class PieceSuite extends FunSuite {
   }
 
   test("Contents.equals") {
-    val cont1 = new Contents[Int] {
-      override val value: Int = 5
+    val cont1 = new Contents[Int](5) {
       override def reprO: Option[String] = Some("abc")
     }
-    val cont2 = new Contents[Short] {
-      override val value: Short = 5
+    val cont2 = new Contents[Short](5) {
       override def reprO: Option[String] = Some("abc")
     }
-    val cont3 = new Contents[Int] {
-      override val value: Int = 4
+    val cont3 = new Contents[Int](4) {
       override def reprO: Option[String] = Some("abc")
     }
-    val cont4 = new Contents[Int] {
-      override val value: Int = 5
+    val cont4 = new Contents[Int](5) {
       override def reprO: Option[String] = Some("def")
     }
 
@@ -64,17 +60,15 @@ class PieceSuite extends FunSuite {
   }
 
   test("Contents.toString") {
-    val cont = new Contents[Int] {
-      override val value: Int = 5
+    val cont = new Contents[Int](5) {
       override def reprO: Option[String] = Some("abc")
     }
     cont.toString mustBe "Contents(5, Some(abc))"
   }
 
   test("ContentsR.reprO") {
-    val cont = new ContentsR[Int] {
+    val cont = new ContentsR[Int](0) {
       override def repr: String = "foo"
-      override val value: Int = 0
     }
 
     cont.reprO mustBe Some("foo")

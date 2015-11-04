@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -108,11 +108,10 @@ private object NumberDissectors {
       val int = readInt32L(input, offset)
       val float = java.lang.Float.intBitsToFloat(int)
 
-      Atom(Bytes(4), new ContentsR[Float] {
-        override val value: Float = float
+      Atom(Bytes(4), new ContentsR(float) {
         override def repr: String =
-          if (float.isNaN) "%sNaN(0x%06x)".format(if (int < 0) "-" else "", int & 0x7FFFFF)
-          else "%.9g".formatLocal(Locale.ROOT, float) // 9 digits is the minimum number to ensure uniqueness
+          if (value.isNaN) "%sNaN(0x%06x)".format(if (int < 0) "-" else "", int & 0x7FFFFF)
+          else "%.9g".formatLocal(Locale.ROOT, value) // 9 digits is the minimum number to ensure uniqueness
       })
     }
   }

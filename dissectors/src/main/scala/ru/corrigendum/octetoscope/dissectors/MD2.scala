@@ -165,16 +165,14 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
       if (word == Int.MinValue)
         return Atom(Bytes(4),
-          new ContentsR[Option[OpenGLCommandTypeValue]] {
+          new ContentsR(None) {
             override def repr: String = intPiece.contents.repr
-            override val value = None
           },
           Seq(Note(Quality.Broken, "too many vertices for a triangle fan")))
 
       val cmdType = if (word < 0) TriangleFan(-word) else if (word > 0) TriangleStrip(word) else OpenGLEnd
-      val piece = Atom(Bytes(4), new ContentsR[Option[OpenGLCommandTypeValue]] {
-        override def repr: String = intPiece.contents.repr + " -> " + cmdType.toString
-        override val value: Option[OpenGLCommandTypeValue] = Some(cmdType)
+      val piece = Atom(Bytes(4), new ContentsR(Some(cmdType)) {
+        override def repr: String = intPiece.contents.repr + " -> " + value.get.toString
       })
 
       if (word != 0 && Math.abs(word) < 3) piece.withNote(Note(Quality.Bad, "too few vertices for a triangle"))

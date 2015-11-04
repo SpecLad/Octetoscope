@@ -68,15 +68,13 @@ object CompoundDissectors {
       val contents = piece.contents
 
       enumerators.get(contents.value) match {
-        case Some(enumerator) =>
-          Atom(piece.size, new ContentsR[Option[E]] {
-            override def repr: String = contents.repr + " -> " + enumerator.toString
-            override val value: Option[E] = Some(enumerator)
+        case s: Some[E] =>
+          Atom(piece.size, new ContentsR(s) {
+            override def repr: String = contents.repr + " -> " + value.get.toString
           })
         case None =>
-          Atom(piece.size, new ContentsR[Option[E]] {
+          Atom(piece.size, new ContentsR(None) {
             override def repr: String = contents.repr
-            override val value: Option[E] = None
           }, Seq(Note(Quality.Broken, "unknown enumerator")))
       }
     }

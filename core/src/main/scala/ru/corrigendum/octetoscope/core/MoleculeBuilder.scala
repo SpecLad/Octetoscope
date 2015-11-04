@@ -45,8 +45,7 @@ class MoleculeBuilder() {
   def addNote(quality: Quality.Value, text: String): Unit = { notes += Note(quality, text) }
 
   def build[V](v: V): MoleculeC[V] = {
-    val contents = repr.fold(new EagerContents(v, _), r => new Contents[V] {
-      override val value: V = v
+    val contents = repr.fold(new EagerContents(v, _), r => new Contents(v) {
       override def reprO: Option[String] = r()
     })
 

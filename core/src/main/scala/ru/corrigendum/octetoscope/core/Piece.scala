@@ -24,8 +24,7 @@ object Quality extends Enumeration {
 
 sealed case class Note(pieceQuality: Quality.Value, text: String)
 
-trait Contents[+V] {
-  val value: V
+abstract class Contents[+V](final val value: V) {
   def reprO: Option[String]
 
   final override def equals(obj: Any): Boolean = obj match {
@@ -38,28 +37,24 @@ trait Contents[+V] {
   override def toString: String = "Contents(%s, %s)".format(value, reprO)
 }
 
-trait ContentsR[+V] extends Contents[V] {
+abstract class ContentsR[+V](value: V) extends Contents[V](value) {
   final override def reprO: Option[String] = Some(repr)
   def repr: String
 }
 
-object EmptyContents extends Contents[Unit] {
+object EmptyContents extends Contents[Unit](()) {
   override def reprO: Option[String] = None
-  override val value: Unit = ()
 }
 
-sealed class ToStringContents[+V](v: V) extends ContentsR[V] {
-  override val value: V = v
+sealed class ToStringContents[+V](v: V) extends ContentsR[V](v) {
   override def repr: String = v.toString
 }
 
-sealed class EagerContents[+V](v: V, r: Option[String] = None) extends Contents[V] {
-  override val value: V = v
+sealed class EagerContents[+V](v: V, r: Option[String] = None) extends Contents[V](v) {
   override def reprO: Option[String] = r
 }
 
-sealed class EagerContentsR[+V](v: V, r: String) extends ContentsR[V] {
-  override val value: V = v
+sealed class EagerContentsR[+V](v: V, r: String) extends ContentsR[V](v) {
   override def repr: String = r
 }
 

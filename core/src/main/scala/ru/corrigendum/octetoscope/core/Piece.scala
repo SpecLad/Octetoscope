@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -48,17 +48,17 @@ object EmptyContents extends Contents[Unit] {
   override val value: Unit = ()
 }
 
-class ToStringContents[+V](v: V) extends ContentsR[V] {
+sealed class ToStringContents[+V](v: V) extends ContentsR[V] {
   override val value: V = v
   override def repr: String = v.toString
 }
 
-class EagerContents[+V](v: V, r: Option[String] = None) extends Contents[V] {
+sealed class EagerContents[+V](v: V, r: Option[String] = None) extends Contents[V] {
   override val value: V = v
   override def reprO: Option[String] = r
 }
 
-class EagerContentsR[+V](v: V, r: String) extends ContentsR[V] {
+sealed class EagerContentsR[+V](v: V, r: String) extends ContentsR[V] {
   override val value: V = v
   override def repr: String = r
 }

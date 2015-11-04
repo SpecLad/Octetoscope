@@ -74,44 +74,42 @@ object MainPresenter {
           case CommandEvent(MainView.Command.Quit) => pub.dispose()
 
           case CommandEvent(MainView.Command.Open) =>
-            pub.showFileOpenBox() match {
-              case None =>
-              case Some(path) =>
-                val (time, (blob, piece)) = try {
-                  try {
-                    logger.log(strings.logEntryDissectingFile(path.toString))
-                    clock.timeExecution {() =>
-                      val blob = binaryReader.readWhole(path)
-                      (blob, dissectorDriver(blob))
-                    }
-                  } catch {
-                    case e: Exception =>
-                      logger.log(strings.logEntryFailedToDissectFile(path.toString))
-                      throw e
+            pub.showFileOpenBox().foreach { path =>
+              val (time, (blob, piece)) = try {
+                try {
+                  logger.log(strings.logEntryDissectingFile(path.toString))
+                  clock.timeExecution {() =>
+                    val blob = binaryReader.readWhole(path)
+                    (blob, dissectorDriver(blob))
                   }
                 } catch {
-                  case ioe: IOException =>
-                    boxer.showMessageBox(strings.errorFailedToReadFile(ioe.getMessage))
-                    return
-                  case _: TooSmallToDissectException =>
-                    boxer.showMessageBox(strings.errorFileTooSmallToDissect())
-                    return
-                  case _: DetectionFailedException =>
-                    boxer.showMessageBox(strings.errorCantDetectFileFormat())
-                    return
+                  case e: Exception =>
+                    logger.log(strings.logEntryFailedToDissectFile(path.toString))
+                    throw e
                 }
+              } catch {
+                case ioe: IOException =>
+                  boxer.showMessageBox(strings.errorFailedToReadFile(ioe.getMessage))
+                  return
+                case _: TooSmallToDissectException =>
+                  boxer.showMessageBox(strings.errorFileTooSmallToDissect())
+                  return
+                case _: DetectionFailedException =>
+                  boxer.showMessageBox(strings.errorCantDetectFileFormat())
+                  return
+              }
 
-                logger.log(
-                  strings.logEntrySuccessfullyDissectedFile(path.toString),
-                  strings.logEntryItTookSeconds(time / 1000000000d))
+              logger.log(
+                strings.logEntrySuccessfullyDissectedFile(path.toString),
+                strings.logEntryItTookSeconds(time / 1000000000d))
 
-                val numericViewText = presentBlobAsHexadecimal(blob, MainPresenter.DefaultBytesPerRow)
-                val offsetViewText = generateBlobOffsets(blob.size, MainPresenter.DefaultBytesPerRow)
-                val newTab = pub.addTab(path.getName, path.toString, presentPiece(piece, handlePieceDoubleClick))
-                numTabs += 1
-                newTab.subscribe(new TabHandler(newTab, path.getName, numericViewText, offsetViewText))
-                newTab.activate()
-                view.enableCommand(MainView.Command.Close)
+              val numericViewText = presentBlobAsHexadecimal(blob, MainPresenter.DefaultBytesPerRow)
+              val offsetViewText = generateBlobOffsets(blob.size, MainPresenter.DefaultBytesPerRow)
+              val newTab = pub.addTab(path.getName, path.toString, presentPiece(piece, handlePieceDoubleClick))
+              numTabs += 1
+              newTab.subscribe(new TabHandler(newTab, path.getName, numericViewText, offsetViewText))
+              newTab.activate()
+              view.enableCommand(MainView.Command.Close)
             }
 
           case CommandEvent(MainView.Command.Close) =>

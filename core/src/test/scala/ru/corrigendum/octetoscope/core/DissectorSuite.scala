@@ -87,7 +87,7 @@ class DissectorSuite extends FunSuite {
 
     val molecule = truncated.dissect(Blob.empty)
     molecule.children mustBe Seq(SubPiece("alpha", InfoSize(), child))
-    molecule.notes.loneElement.pieceQuality mustBe Quality.Broken
+    molecule.notes.loneElement.severity mustBe NoteSeverity.Failure
     molecule.notes.loneElement.text must include ("\"beta\"")
     molecule.contents.value mustBe "1"
   }

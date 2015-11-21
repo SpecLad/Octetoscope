@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ trait Dissector[+V, +C <: Contents[V]] {
   def dissect(input: Blob, offset: InfoSize = InfoSize()): Piece[C]
 
   def +?(constraint: Constraint[V]): Dissector[V, C] =
-    SpecialDissectors.constrained(this, constraint, Quality.Dubious)
+    SpecialDissectors.constrained(this, constraint, NoteSeverity.Warning)
   def +(constraint: Constraint[V]): Dissector[V, C] =
-    SpecialDissectors.constrained(this, constraint, Quality.Bad)
+    SpecialDissectors.constrained(this, constraint, NoteSeverity.Error)
 }
 
 trait MoleculeDissector[+V, +C <: Contents[V]] extends Dissector[V, C] {

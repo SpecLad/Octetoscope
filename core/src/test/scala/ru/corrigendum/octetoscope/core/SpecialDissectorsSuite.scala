@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import ru.corrigendum.octetoscope.core.mocks.{MockConstraint, MockDissector}
 
 class SpecialDissectorsSuite extends FunSuite {
   test("transformed") {
-    val note = Note(Quality.Good, "transformed")
+    val note = Note(NoteSeverity.Info, "transformed")
     val transform = (piece: PieceCR[String]) => piece.withNote(note)
 
     val transformed = SpecialDissectors.transformed(MockDissector, transform)
@@ -37,7 +37,7 @@ class SpecialDissectorsSuite extends FunSuite {
   }
 
   test("constrained - satisfied") {
-    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, Quality.Dubious)
+    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, NoteSeverity.Warning)
 
     val blob = new ArrayBlob(Array[Byte]('a', 'b'))
 
@@ -45,12 +45,12 @@ class SpecialDissectorsSuite extends FunSuite {
   }
 
   test("constrained - unsatisfied") {
-    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, Quality.Dubious)
+    val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, NoteSeverity.Warning)
 
     val blob = new ArrayBlob(Array[Byte]('a'))
 
     val piece = constrained.dissect(blob)
 
-    piece mustBe Atom(Bytes(1), new ToStringContents("a"), Seq(Note(Quality.Dubious, "constrained (Dubious)")))
+    piece mustBe Atom(Bytes(1), new ToStringContents("a"), Seq(Note(NoteSeverity.Warning, "constrained (Warning)")))
   }
 }

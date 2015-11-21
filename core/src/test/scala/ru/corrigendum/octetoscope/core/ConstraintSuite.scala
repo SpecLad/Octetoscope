@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,12 +29,12 @@ class ConstraintSuite extends FunSuite {
       override def check(value: Nothing): Boolean = false
     }
 
-    // Doesn't really make sense to constrain with the Good quality,
+    // Doesn't really make sense to constrain with an informational note,
     // but let's test it anyway.
-    constraint.note(Quality.Good) mustBe "should"
-    constraint.note(Quality.Dubious) mustBe "should"
-    constraint.note(Quality.Bad) mustBe "must"
-    constraint.note(Quality.Broken) mustBe "must"
+    constraint.note(NoteSeverity.Info) mustBe "should"
+    constraint.note(NoteSeverity.Warning) mustBe "should"
+    constraint.note(NoteSeverity.Error) mustBe "must"
+    constraint.note(NoteSeverity.Failure) mustBe "must"
   }
 
   test("Constraint.apply") {
@@ -42,15 +42,15 @@ class ConstraintSuite extends FunSuite {
 
     val c1 = new Constraint[Any] {
       override def check(value: Any): Boolean = true
-      override def note(quality: Quality.Value): String = throw new NotImplementedError()
+      override def note(severity: NoteSeverity.Value): String = throw new NotImplementedError()
     }
     val c2 = new Constraint[Any] {
       override def check(value: Any): Boolean = false
-      override def note(quality: Quality.Value): String = quality.toString
+      override def note(severity: NoteSeverity.Value): String = severity.toString
     }
 
-    c1.apply(piece, Quality.Bad) mustBe piece
-    c2.apply(c2.apply(piece, Quality.Good), Quality.Dubious) mustBe
-      piece.withNote(Note(Quality.Good, "Good")).withNote(Note(Quality.Dubious, "Dubious"))
+    c1.apply(piece, NoteSeverity.Error) mustBe piece
+    c2.apply(c2.apply(piece, NoteSeverity.Info), NoteSeverity.Warning) mustBe
+      piece.withNote(Note(NoteSeverity.Info, "Info")).withNote(Note(NoteSeverity.Warning, "Warning"))
   }
 }

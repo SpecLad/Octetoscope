@@ -43,7 +43,7 @@ object PrimitiveDissectors {
         Atom(Bytes(expected.length), new EagerContents(Some(()), Some(interpretation)))
       } else {
         val note = "expected \"%s\" (0x%s)".format(interpretation, expected.map("%02x".format(_)).mkString)
-        Atom(Bytes(expected.length), new EagerContents(None, None), Seq(Note(Quality.Broken, note)))
+        Atom(Bytes(expected.length), new EagerContents(None, None), Seq(Note(NoteSeverity.Failure, note)))
       }
     }
   }

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@ object SpecialDissectors {
   ): Dissector[V, C] = new Transformed(old, transform)
 
   def constrained[V, C <: Contents[V]](
-    dissector: Dissector[V, C], constraint: Constraint[V], quality: Quality.Value
+    dissector: Dissector[V, C], constraint: Constraint[V], severity: NoteSeverity.Value
   ): Dissector[V, C] = {
-    transformed(dissector, (piece: Piece[C]) => constraint.apply(piece, quality))
+    transformed(dissector, (piece: Piece[C]) => constraint.apply(piece, severity))
   }
 }

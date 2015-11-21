@@ -87,7 +87,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
   }
 
   test("ascii(ish)String") {
-    for ((dissector, qualities) <- Seq((asciiString _, Seq(Quality.Broken)), (asciiishString _, Seq()))) {
+    for ((dissector, qualities) <- Seq((asciiString _, Seq(NoteSeverity.Failure)), (asciiishString _, Seq()))) {
       verify(dissector(0), "\"\"", Some(""))
       verify(dissector(4), "\"abcd\"", Some("abcd"), 'a', 'b', 'c', 'd')
       verify(dissector(999), "\"" + "abc" * 333 + "\"", Some("abc" * 333),
@@ -111,11 +111,11 @@ class PrimitiveDissectorsSuite extends FunSuite {
 
   test("ascii(ish)ZString") {
     for ((dissector, qualitiesOnDecodingErrors) <- Seq(
-        (asciiZString _, Seq(Quality.Bad, Quality.Broken)), (asciiishZString _, Seq(Quality.Bad)))) {
+        (asciiZString _, Seq(NoteSeverity.Error, NoteSeverity.Failure)), (asciiishZString _, Seq(NoteSeverity.Error)))) {
       verify(dissector(4), "\"abc\"", Some("abc"), 'a', 'b', 'c', 0)
       verify(dissector(4), "\"ab\"", Some("ab"), 'a', 'b', 0, 'd')
-      verifyWithQualities(dissector(0), "\"\"", Some(""), Seq(Quality.Bad))
-      verifyWithQualities(dissector(4), "\"abcd\"", Some("abcd"), Seq(Quality.Bad), 'a', 'b', 'c', 'd')
+      verifyWithQualities(dissector(0), "\"\"", Some(""), Seq(NoteSeverity.Error))
+      verifyWithQualities(dissector(4), "\"abcd\"", Some("abcd"), Seq(NoteSeverity.Error), 'a', 'b', 'c', 'd')
       verifyWithQualities(dissector(3), "\"a\" 0xf0 \"b\"", None, qualitiesOnDecodingErrors, 'a', 0xf0.toByte, 'b')
     }
   }
@@ -125,7 +125,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(dissector, "123", Some(()), 1, 2, 3)
 
     dissector.dissect(new ArrayBlob(Array[Byte](4, 5, 6))) mustBe
-      Atom(Bytes(3), new EagerContents(None), Seq(Note(Quality.Broken, "expected \"123\" (0x010203)")))
+      Atom(Bytes(3), new EagerContents(None), Seq(Note(NoteSeverity.Failure, "expected \"123\" (0x010203)")))
   }
 
   test("bit") {
@@ -138,7 +138,7 @@ class PrimitiveDissectorsSuite extends FunSuite {
 object PrimitiveDissectorsSuite {
   def verifyGeneric[Value](
     dissector: DissectorC[Value], expectedRepr: Option[String], valueAssert: Value => Unit,
-    expectedNoteQualities: Seq[Quality.Value], bytes: Byte*
+    expectedNoteQualities: Seq[NoteSeverity.Value], bytes: Byte*
   ): Unit = {
     for (padSize <- List(0, 1)) {
       val pad = List.fill(padSize)((-1).toByte)
@@ -150,7 +150,7 @@ object PrimitiveDissectorsSuite {
         size_ mustBe Bytes(bytes.size)
         valueAssert(contents.value)
         contents.reprO mustBe expectedRepr
-        notes.map(_.pieceQuality).sorted mustBe expectedNoteQualities.sorted
+        notes.map(_.severity).sorted mustBe expectedNoteQualities.sorted
       }
     }
   }
@@ -161,7 +161,7 @@ object PrimitiveDissectorsSuite {
 
   def verifyWithQualities[Value](
     dissector: DissectorC[Value], expectedRepr: String, expectedValue: Value,
-    expectedNoteQualities: Seq[Quality.Value], bytes: Byte*
+    expectedNoteQualities: Seq[NoteSeverity.Value], bytes: Byte*
   ): Unit = {
     verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe expectedValue, expectedNoteQualities, bytes: _*)
   }

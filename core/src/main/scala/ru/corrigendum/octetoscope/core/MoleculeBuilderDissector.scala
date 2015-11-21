@@ -31,7 +31,7 @@ trait MoleculeBuilderPostProcessingDissector[Value, WIP]
     } catch {
       case trunc: MoleculeBuilderDissector.TruncatedException =>
         if (!builder.hasChildren) throw trunc.getCause
-        builder.addNote(Quality.Broken, "truncated at \"%s\"".format(trunc.subPieceName))
+        builder.addNote(NoteSeverity.Failure, "truncated at \"%s\"".format(trunc.subPieceName))
     }
     builder.build(postProcess(value))
   }

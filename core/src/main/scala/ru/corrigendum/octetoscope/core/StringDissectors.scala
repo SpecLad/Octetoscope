@@ -111,7 +111,7 @@ private object StringDissectors {
         new EagerContentsR(value,
           if (groupedChunks.isEmpty) "\"\""
           else groupedChunks.map(stringifyChunk).mkString(" ")),
-        if (value.isEmpty && !allowDecodingErrors) Note(Quality.Broken, "invalid encoding") +: assess(actualLength)
+        if (value.isEmpty && !allowDecodingErrors) Note(NoteSeverity.Failure, "invalid encoding") +: assess(actualLength)
         else assess(actualLength))
     }
   }
@@ -134,6 +134,6 @@ private object StringDissectors {
 
     override protected def assess(actualLength: Int): Seq[Note] =
       if (actualLength < length) super.assess(actualLength)
-      else Seq(Note(Quality.Bad, "missing NUL terminator"))
+      else Seq(Note(NoteSeverity.Error, "missing NUL terminator"))
   }
 }

@@ -75,7 +75,7 @@ object CompoundDissectors {
         case None =>
           Atom(piece.size, new ContentsR(None) {
             override def repr: String = contents.repr
-          }, Seq(Note(Quality.Broken, "unknown enumerator")))
+          }, Seq(Note(NoteSeverity.Failure, "unknown enumerator")))
       }
     }
   }

@@ -73,9 +73,9 @@ class AdderSuite extends FunSuite {
     val molecule = builder.build(())
 
     molecule.children(0).piece.notes mustBe Nil
-    molecule.children(1).piece.notes mustBe Seq(Note(Quality.Bad, c1.note(Quality.Bad)))
+    molecule.children(1).piece.notes mustBe Seq(Note(NoteSeverity.Error, c1.note(NoteSeverity.Error)))
     molecule.children(2).piece.notes mustBe Seq(
-      Note(Quality.Bad, c1.note(Quality.Bad)), Note(Quality.Bad, c2.note(Quality.Bad)))
+      Note(NoteSeverity.Error, c1.note(NoteSeverity.Error)), Note(NoteSeverity.Error, c2.note(NoteSeverity.Error)))
   }
 
   test("random adder") {
@@ -110,7 +110,7 @@ class AdderSuite extends FunSuite {
     inside(builder.build(())) { case Molecule(size_, _, children, notes) =>
       size_ mustBe InfoSize()
       children mustBe empty
-      notes.loneElement.pieceQuality mustBe Quality.Broken
+      notes.loneElement.severity mustBe NoteSeverity.Failure
       notes.loneElement.text must include ("\"omega\"")
     }
   }

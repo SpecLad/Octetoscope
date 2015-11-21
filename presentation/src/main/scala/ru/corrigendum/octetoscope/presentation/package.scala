@@ -25,11 +25,11 @@ import ru.corrigendum.octetoscope.abstractui.{DisplayTreeNode, DisplayTreeNodeEv
 import ru.corrigendum.octetoscope.core._
 
 package object presentation {
-  private[presentation] val QualityColors = Map(
-    Quality.Good -> Color.WHITE,
-    Quality.Dubious -> Color.YELLOW,
-    Quality.Bad -> Color.PINK,
-    Quality.Broken -> new Color(255, 200, 255)
+  private[presentation] val SeverityColors = Map(
+    NoteSeverity.Info -> Color.WHITE,
+    NoteSeverity.Warning -> Color.YELLOW,
+    NoteSeverity.Error -> Color.PINK,
+    NoteSeverity.Failure -> new Color(255, 200, 255)
   )
 
   private[presentation] def presentVersionInfo(vi: VersionInfo): String = {
@@ -55,7 +55,7 @@ package object presentation {
 
       DisplayTreeNode(
         displayText.result(),
-        np.piece.notes.map(n => (QualityColors(n.pieceQuality), n.text)),
+        np.piece.notes.map(n => (SeverityColors(n.severity), n.text)),
         np.piece match {
           case _: PlainAtom => None
           case m: PlainMolecule => Some(() => m.children.map(c => helper(c, offset + c.offset)))

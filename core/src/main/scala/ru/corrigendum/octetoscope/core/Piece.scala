@@ -18,11 +18,22 @@
 
 package ru.corrigendum.octetoscope.core
 
-object Quality extends Enumeration {
-  val Good, Dubious, Bad, Broken = Value
+object NoteSeverity extends Enumeration {
+  // No problems with the dissected value. The note is just for information.
+  val Info = Value
+
+  // The dissected value is problematic (e.g. deprecated) according to the format definition.
+  val Warning = Value
+
+  // The dissected value is illegal/unacceptable according to the format definition.
+  val Error = Value
+
+  // The value couldn't be dissected. The fault could be either the file's (broken encoding)
+  // or ours (inadequate dissector).
+  val Failure = Value
 }
 
-sealed case class Note(pieceQuality: Quality.Value, text: String)
+sealed case class Note(severity: NoteSeverity.Value, text: String)
 
 abstract class Contents[+V](final val value: V) {
   def reprO: Option[String]

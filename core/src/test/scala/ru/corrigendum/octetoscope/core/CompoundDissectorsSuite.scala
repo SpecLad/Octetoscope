@@ -64,7 +64,7 @@ class CompoundDissectorsSuite extends FunSuite {
     val unknown = dissector.dissect(blob, Bytes(1))
     unknown.size mustBe Bytes(1)
     unknown.contents mustBe new EagerContentsR(None, "2")
-    unknown.notes.loneElement.pieceQuality mustBe Quality.Broken
+    unknown.notes.loneElement.severity mustBe NoteSeverity.Failure
   }
 
   private def bitFieldTest(byte: Byte, repr: String): Unit = {

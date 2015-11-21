@@ -64,11 +64,11 @@ class MoleculeBuilderSuite extends FunSuite with OneInstancePerTest {
   }
 
   test("with notes") {
-    builder.addNote(Quality.Dubious, "foo")
-    builder.addNote(Quality.Bad, "bar")
+    builder.addNote(NoteSeverity.Warning, "foo")
+    builder.addNote(NoteSeverity.Error, "bar")
     builder.build(5) mustBe Molecule(InfoSize(), new EagerContents(5), Seq(), notes = Seq(
-      Note(Quality.Dubious, "foo"),
-      Note(Quality.Bad, "bar"))
+      Note(NoteSeverity.Warning, "foo"),
+      Note(NoteSeverity.Error, "bar"))
     )
   }
 

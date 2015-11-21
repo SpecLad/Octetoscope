@@ -42,7 +42,7 @@ class MoleculeBuilder() {
     hasChildren_ = true
   }
 
-  def addNote(quality: Quality.Value, text: String): Unit = { notes += Note(quality, text) }
+  def addNote(severity: NoteSeverity.Value, text: String): Unit = { notes += Note(severity, text) }
 
   def build[V](v: V): MoleculeC[V] = {
     val contents = repr.fold(new EagerContents(v, _), r => new Contents(v) {

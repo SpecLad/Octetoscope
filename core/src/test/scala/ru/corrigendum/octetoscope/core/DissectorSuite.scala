@@ -21,14 +21,16 @@ package ru.corrigendum.octetoscope.core
 import org.scalatest.FunSuite
 import org.scalatest.LoneElement._
 import org.scalatest.MustMatchers._
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 class DissectorSuite extends FunSuite {
   test("MoleculeBuilderPostProcessingDissector.defaultValue") {
     val mbd = new MoleculeBuilderPostProcessingDissector[String, Int] {
       override def defaultWIP: Int = 1
       override def postProcess(wip: Int): String = wip.toString
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Int): Unit = { }
+      override def dissectMB(context: DissectionContext,
+                             offset: InfoSize,
+                             builder: MoleculeBuilder,
+                             value: Int): Unit = { }
     }
 
     mbd.defaultValue mustBe "1"
@@ -42,14 +44,17 @@ class DissectorSuite extends FunSuite {
     val mbd = new MoleculeBuilderPostProcessingDissector[String, WIP] {
       override def defaultWIP: WIP = WIP(1)
       override def postProcess(wip: WIP): String = wip.i.toString
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP): Unit = {
+      override def dissectMB(context: DissectionContext,
+                             offset: InfoSize,
+                             builder: MoleculeBuilder,
+                             value: WIP): Unit = {
         value.i mustBe 1
         value.i = 2
         builder.addChild("alpha", Bytes(1), child)
       }
     }
 
-    mbd.dissect(Blob.empty) mustBe
+    mbd.dissect(DissectionContext()) mustBe
       Molecule(Bytes(2), new EagerContents("2"), Seq(
         SubPiece("alpha", Bytes(1), child)
       ))
@@ -61,12 +66,15 @@ class DissectorSuite extends FunSuite {
     val truncated = new MoleculeBuilderPostProcessingDissector[Unit, Unit] {
       override def defaultWIP = ()
       override def postProcess(wip: Unit): Unit = wip
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Unit): Unit = {
+      override def dissectMB(context: DissectionContext,
+                             offset: InfoSize,
+                             builder: MoleculeBuilder,
+                             value: Unit): Unit = {
         throw new MoleculeBuilderDissector.TruncatedException(cause, "alpha")
       }
     }
 
-    val exc = the [IndexOutOfBoundsException] thrownBy truncated.dissect(Blob.empty)
+    val exc = the [IndexOutOfBoundsException] thrownBy truncated.dissect(DissectionContext())
     exc must be theSameInstanceAs cause
   }
 
@@ -78,14 +86,17 @@ class DissectorSuite extends FunSuite {
     val truncated = new MoleculeBuilderPostProcessingDissector[String, WIP] {
       override def defaultWIP = WIP(0)
       override def postProcess(wip: WIP): String = wip.i.toString
-      override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: WIP): Unit = {
+      override def dissectMB(context: DissectionContext,
+                             offset: InfoSize,
+                             builder: MoleculeBuilder,
+                             value: WIP): Unit = {
         value.i = 1
         builder.addChild("alpha", InfoSize(), child)
         throw new MoleculeBuilderDissector.TruncatedException(new IndexOutOfBoundsException, "beta")
       }
     }
 
-    val molecule = truncated.dissect(Blob.empty)
+    val molecule = truncated.dissect(DissectionContext())
     molecule.children mustBe Seq(SubPiece("alpha", InfoSize(), child))
     molecule.notes.loneElement.severity mustBe NoteSeverity.Failure
     molecule.notes.loneElement.text must include ("\"beta\"")
@@ -96,13 +107,13 @@ class DissectorSuite extends FunSuite {
     val child = Atom(Bytes(1), new ToStringContents("a"))
 
     val mbud = new MoleculeBuilderUnitDissector {
-      override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
         builder.addChild("alpha", Bytes(1), child)
       }
     }
 
     val builder = new MoleculeBuilder
-    mbud.dissectMB(Blob.empty, InfoSize(), builder, ())
+    mbud.dissectMB(DissectionContext(), InfoSize(), builder, ())
 
     builder.build(()) mustBe
       Molecule(Bytes(2), EmptyContents, Seq(

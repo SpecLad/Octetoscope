@@ -20,8 +20,10 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
+sealed case class DissectionContext(input: Blob = Blob.empty)
+
 trait Dissector[+V, +C <: Contents[V]] {
-  def dissect(input: Blob, offset: InfoSize = InfoSize()): Piece[C]
+  def dissect(context: DissectionContext, offset: InfoSize = InfoSize()): Piece[C]
 
   def +?(constraint: Constraint[V]): Dissector[V, C] =
     SpecialDissectors.constrained(this, constraint, NoteSeverity.Warning)
@@ -30,7 +32,7 @@ trait Dissector[+V, +C <: Contents[V]] {
 }
 
 trait MoleculeDissector[+V, +C <: Contents[V]] extends Dissector[V, C] {
-  override def dissect(input: Blob, offset: InfoSize = InfoSize()): Molecule[C]
+  override def dissect(context: DissectionContext, offset: InfoSize = InfoSize()): Molecule[C]
 }
 
 trait DissectorWithDefaultValue[+V, +C <: Contents[V]] extends Dissector[V, C] {

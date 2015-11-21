@@ -30,7 +30,7 @@ class CompoundDissectorsSuite extends FunSuite {
   def arrayTest[C <: Contents[Any]](dissector: Dissector[Any, C], contents: C): Unit = {
     val blob = new ArrayBlob("afoobarbazb".getBytes(StandardCharsets.US_ASCII))
 
-    dissector.dissect(blob, Bytes(1)) mustBe
+    dissector.dissect(DissectionContext(blob), Bytes(1)) mustBe
       Molecule(Bytes(9), contents, Seq(
         SubPiece("Item #0", Bytes(0), Atom(Bytes(3), new EagerContentsR(Some("foo"), "\"foo\""))),
         SubPiece("Item #1", Bytes(3), Atom(Bytes(3), new EagerContentsR(Some("bar"), "\"bar\""))),
@@ -59,9 +59,10 @@ class CompoundDissectorsSuite extends FunSuite {
     }
 
     val dissector = enum(sInt8, Map(1.toByte -> foo))
-    dissector.dissect(blob, Bytes(0)) mustBe Atom(Bytes(1), new EagerContentsR(Some(foo), "1 -> FOO"))
+    dissector.dissect(DissectionContext(blob), Bytes(0)) mustBe
+      Atom(Bytes(1), new EagerContentsR(Some(foo), "1 -> FOO"))
 
-    val unknown = dissector.dissect(blob, Bytes(1))
+    val unknown = dissector.dissect(DissectionContext(blob), Bytes(1))
     unknown.size mustBe Bytes(1)
     unknown.contents mustBe new EagerContentsR(None, "2")
     unknown.notes.loneElement.severity mustBe NoteSeverity.Failure
@@ -69,8 +70,9 @@ class CompoundDissectorsSuite extends FunSuite {
 
   private def bitFieldTest(byte: Byte, repr: String): Unit = {
     val blob = new ArrayBlob(Array[Byte](byte))
+    val dc = DissectionContext(blob)
     val dissector = bitField(4, Map(1L -> "A", 2L -> "B"), unnamedReason = "xyzzy")
-    val piece = dissector.dissect(blob, Bits(2))
+    val piece = dissector.dissect(dc, Bits(2))
 
     val value = (if ((byte & 0x10) != 0) Set("A") else Set()) ++ (if ((byte & 0x08) != 0) Set("B") else Set())
 
@@ -78,10 +80,10 @@ class CompoundDissectorsSuite extends FunSuite {
       Bits(4),
       new EagerContentsR(value, repr),
       Seq(
-        SubPiece("Bit #0 (xyzzy)", Bits(0), bit.dissect(blob, Bits(2))),
-        SubPiece("A", Bits(1), bit.dissect(blob, Bits(3))),
-        SubPiece("B", Bits(2), bit.dissect(blob, Bits(4))),
-        SubPiece("Bit #3 (xyzzy)", Bits(3), bit.dissect(blob, Bits(5)))
+        SubPiece("Bit #0 (xyzzy)", Bits(0), bit.dissect(dc, Bits(2))),
+        SubPiece("A", Bits(1), bit.dissect(dc, Bits(3))),
+        SubPiece("B", Bits(2), bit.dissect(dc, Bits(4))),
+        SubPiece("Bit #3 (xyzzy)", Bits(3), bit.dissect(dc, Bits(5)))
       ),
       Nil)
   }
@@ -104,10 +106,11 @@ class CompoundDissectorsSuite extends FunSuite {
 
   test("bitField - should be zero") {
     val blob = new ArrayBlob(Array[Byte](0x01))
+    val dc = DissectionContext(blob)
     val dissector = bitField(2, Map(0L -> "A", 1L -> "B"), sbz = Set("A", "B"))
-    val piece = dissector.dissect(blob, Bits(6))
+    val piece = dissector.dissect(dc, Bits(6))
 
-    piece.children(0).piece mustBe bit.dissect(blob, Bits(6))
-    piece.children(1).piece mustBe (bit +? CommonConstraints.`false`).dissect(blob, Bits(7))
+    piece.children(0).piece mustBe bit.dissect(dc, Bits(6))
+    piece.children(1).piece mustBe (bit +? CommonConstraints.`false`).dissect(dc, Bits(7))
   }
 }

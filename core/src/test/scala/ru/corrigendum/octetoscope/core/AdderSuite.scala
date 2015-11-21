@@ -22,7 +22,6 @@ import org.scalatest.FunSuite
 import org.scalatest.Inside._
 import org.scalatest.LoneElement._
 import org.scalatest.MustMatchers._
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 
@@ -31,7 +30,7 @@ class AdderSuite extends FunSuite {
     val blob = new ArrayBlob(Array[Byte](-1, 1, 0, 0, 0, 2, 0, 0, 0, -1))
     val builder = new MoleculeBuilder
 
-    val adder = new SequentialAdder(blob, Bytes(1), builder)
+    val adder = new SequentialAdder(DissectionContext(blob), Bytes(1), builder)
     adder("alpha", sInt32L) mustBe 1
     adder.getContents("beta", sInt32L) mustBe new ToStringContents(2)
 
@@ -42,7 +41,7 @@ class AdderSuite extends FunSuite {
   }
 
   def sequentialAdderThrowTest(invokeAdder: (SequentialAdder, Throwable) => Unit): Unit = {
-    val adder = new SequentialAdder(Blob.empty, InfoSize(), new MoleculeBuilder)
+    val adder = new SequentialAdder(DissectionContext(), InfoSize(), new MoleculeBuilder)
 
     val cause = new IndexOutOfBoundsException
     val exc = the [MoleculeBuilderDissector.TruncatedException] thrownBy invokeAdder(adder, cause)
@@ -53,7 +52,7 @@ class AdderSuite extends FunSuite {
   test("sequential adder - throw") {
     sequentialAdderThrowTest { (adder, cause) =>
       adder("alpha", new DissectorC[Unit] {
-        override def dissect(input: Blob, offset: InfoSize) = throw cause
+        override def dissect(context: DissectionContext, offset: InfoSize) = throw cause
       })
     }
   }
@@ -62,7 +61,7 @@ class AdderSuite extends FunSuite {
     val blob = new ArrayBlob(Array[Byte](1, 2, 3))
     val builder = new MoleculeBuilder
 
-    val adder = new SequentialAdder(blob, Bytes(0), builder)
+    val adder = new SequentialAdder(DissectionContext(blob), Bytes(0), builder)
     val c1 = lessThan(2.toByte, "two")
     val c2 = lessThan(3.toByte, "three")
 
@@ -83,13 +82,13 @@ class AdderSuite extends FunSuite {
 
     val dissector = new DissectorWithDefaultValueC[Int] {
       override def defaultValue: Int = 1
-      override def dissect(input: Blob, offset: InfoSize): Piece[Contents[Int]] = {
+      override def dissect(context: DissectionContext, offset: InfoSize): Piece[Contents[Int]] = {
         offset mustBe Bytes(3)
         Atom(Bytes(3), new EagerContents(2))
       }
     }
 
-    val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
+    val adder = new RandomAdder(DissectionContext(), Bytes(1), builder)
     adder("omega", Bytes(2), dissector) mustBe 2
 
     builder.build(()) mustBe Molecule(Bytes(5), EmptyContents, Seq(
@@ -101,10 +100,11 @@ class AdderSuite extends FunSuite {
 
     val dissector = new DissectorWithDefaultValueC[Int] {
       override def defaultValue: Int = 1
-      override def dissect(input: Blob, offset: InfoSize): Piece[Contents[Int]] = throw new IndexOutOfBoundsException
+      override def dissect(context: DissectionContext, offset: InfoSize): Piece[Contents[Int]] =
+        throw new IndexOutOfBoundsException
     }
 
-    val adder = new RandomAdder(Blob.empty, Bytes(1), builder)
+    val adder = new RandomAdder(DissectionContext(), Bytes(1), builder)
     adder("omega", Bytes(2), dissector) mustBe 1
 
     inside(builder.build(())) { case Molecule(size_, _, children, notes) =>

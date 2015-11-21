@@ -18,7 +18,6 @@
 
 package ru.corrigendum.octetoscope.dissectors
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
@@ -39,8 +38,11 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   private object Header extends MoleculeBuilderDissector[HeaderValue] {
     override def defaultWIP = new HeaderValue
 
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: HeaderValue): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMB(context: DissectionContext,
+                           offset: InfoSize,
+                           builder: MoleculeBuilder,
+                           value: HeaderValue): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
 
       val correctMagic = add("Identification", magic(MagicBytes, "IDP2")).isDefined
       if (!correctMagic) return
@@ -64,8 +66,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       value.offFrames = add.filtered("Offset of frames", sInt32L)(nonNegative)
       value.offOpenGL = add.filtered("Offset of OpenGL commands", sInt32L)(nonNegative)
 
-      val fileSizeConstraint = if (input.size - offset.bytes <= Int.MaxValue)
-        noMoreThan((input.size - offset.bytes).toInt, "actual file size") else any
+      val fileSizeConstraint = if (context.input.size - offset.bytes <= Int.MaxValue)
+        noMoreThan((context.input.size - offset.bytes).toInt, "actual file size") else any
 
       value.fileSize = add.filtered("File size", sInt32L)(nonNegative, fileSizeConstraint)
     }
@@ -89,8 +91,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct dstvert_t.
   private object TexCoordPair extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
       val sc = add.getContents("s", sInt16L)
       val tc = add.getContents("t", sInt16L)
       builder.setReprLazy("(%s, %s)".format(sc.repr, tc.repr))
@@ -106,8 +108,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       .map(num => if (num > Short.MaxValue) any else lessThan(num.toShort, "the number of texture coordinate pairs"))
       .getOrElse(any)
 
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
       def formatSeq(elements: Seq[Any]) = elements.mkString("(", ", ", ")")
 
       val vi = add("Vertex indices", collectingArray(3, "Index",
@@ -122,8 +124,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct dtrivertx_t
   private object Vertex extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
 
       val coordsC = add.getContents("Coordinates", vector3(uInt8))
       val lniC = add.getContents("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
@@ -134,9 +136,9 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct daliasframe_t
   private class Frame(frameSize: Int, numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       builder.fixSize(Bytes(frameSize))
-      val add = new SequentialAdder(input, offset, builder)
+      val add = new SequentialAdder(context, offset, builder)
       add("Scale", vector3(float32L))
       add("Translation", vector3(float32L))
       val nameC = add.getContents("Name", asciiishZString(16))
@@ -159,8 +161,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   }
 
   private object OpenGLCommandType extends DissectorCR[Option[OpenGLCommandTypeValue]] {
-    override def dissect(input: Blob, offset: InfoSize): PieceCR[Option[OpenGLCommandTypeValue]] = {
-      val intPiece = sInt32L.dissect(input, offset)
+    override def dissect(context: DissectionContext, offset: InfoSize): PieceCR[Option[OpenGLCommandTypeValue]] = {
+      val intPiece = sInt32L.dissect(context, offset)
       val word = intPiece.contents.value
 
       if (word == Int.MinValue)
@@ -183,8 +185,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   private class OpenGLVertex(numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
     val lessThanNumVertices = numVertices.map(lessThan(_, "number of vertices")).getOrElse(any)
 
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
       val sc = add.getContents("Texture s", float32L)
       val tc = add.getContents("Texture t", float32L)
       val indC = add.getContents("Index", sInt32L + nonNegative + lessThanNumVertices)
@@ -198,8 +200,11 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   private class OpenGLCommand(totalNumVertices: Option[Int]) extends MoleculeBuilderDissector[OpenGLCommandValue] {
     override def defaultWIP: OpenGLCommandValue = OpenGLCommandValue(None)
 
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: OpenGLCommandValue): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMB(context: DissectionContext,
+                           offset: InfoSize,
+                           builder: MoleculeBuilder,
+                           value: OpenGLCommandValue): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
       value.typ = add("Type", OpenGLCommandType)
 
       for (typ <- value.typ) {
@@ -217,8 +222,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   }
 
   private class OpenGLCommands(numWords: Int, numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
       builder.fixSize(Bytes(4L * numWords))
 
       var dissectedWords = 0
@@ -238,8 +243,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
     }
   }
 
-  override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-    val add = new RandomAdder(input, offset, builder)
+  override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+    val add = new RandomAdder(context, offset, builder)
     val header = add("Header", Bytes(0), Header)
 
     for (offSkins <- header.offSkins; numSkins <- header.numSkins)

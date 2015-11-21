@@ -18,8 +18,6 @@
 
 package ru.corrigendum.octetoscope.core
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-
 object PrimitiveDissectors {
   def sInt8: DissectorCR[Byte] = NumberDissectors.SInt8
   def uInt8: DissectorCR[Short] = NumberDissectors.UInt8
@@ -36,10 +34,10 @@ object PrimitiveDissectors {
   def asciiishZString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiZString(length, true)
 
   private class Magic(expected: Array[Byte], interpretation: String) extends DissectorC[Option[Unit]] {
-    override def dissect(input: Blob, offset: InfoSize): AtomC[Option[Unit]] = {
+    override def dissect(context: DissectionContext, offset: InfoSize): AtomC[Option[Unit]] = {
       val Bytes(bo) = offset
 
-      if (input.getRangeAsArray(bo, bo + expected.length).sameElements(expected)) {
+      if (context.input.getRangeAsArray(bo, bo + expected.length).sameElements(expected)) {
         Atom(Bytes(expected.length), new EagerContents(Some(()), Some(interpretation)))
       } else {
         val note = "expected \"%s\" (0x%s)".format(interpretation, expected.map("%02x".format(_)).mkString)
@@ -51,8 +49,8 @@ object PrimitiveDissectors {
   def magic(expected: Array[Byte], interpretation: String): DissectorC[Option[Unit]] = new Magic(expected, interpretation)
 
   private object Bit extends DissectorCR[Boolean] {
-    override def dissect(input: Blob, offset: InfoSize): PieceCR[Boolean] = {
-      val byte = input(offset.bytes)
+    override def dissect(context: DissectionContext, offset: InfoSize): PieceCR[Boolean] = {
+      val byte = context.input(offset.bytes)
       val bit = (byte & (1 << (7 - offset.bits))) != 0
 
       Atom(Bits(1), new EagerContentsR(bit, if(bit) "True" else "False"))

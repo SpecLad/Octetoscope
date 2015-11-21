@@ -31,7 +31,7 @@ class SpecialDissectorsSuite extends FunSuite {
 
     val blob = new ArrayBlob(Array[Byte]('0'))
 
-    val piece = transformed.dissect(blob)
+    val piece = transformed.dissect(DissectionContext(blob))
 
     piece mustBe Atom(Bytes(1), new ToStringContents("0"), notes = Seq(note))
   }
@@ -39,9 +39,9 @@ class SpecialDissectorsSuite extends FunSuite {
   test("constrained - satisfied") {
     val constrained = SpecialDissectors.constrained(MockDissector, MockConstraint, NoteSeverity.Warning)
 
-    val blob = new ArrayBlob(Array[Byte]('a', 'b'))
+    val dc = DissectionContext(new ArrayBlob(Array[Byte]('a', 'b')))
 
-    constrained.dissect(blob) mustBe MockDissector.dissect(blob)
+    constrained.dissect(dc) mustBe MockDissector.dissect(dc)
   }
 
   test("constrained - unsatisfied") {
@@ -49,7 +49,7 @@ class SpecialDissectorsSuite extends FunSuite {
 
     val blob = new ArrayBlob(Array[Byte]('a'))
 
-    val piece = constrained.dissect(blob)
+    val piece = constrained.dissect(DissectionContext(blob))
 
     piece mustBe Atom(Bytes(1), new ToStringContents("a"), Seq(Note(NoteSeverity.Warning, "constrained (Warning)")))
   }

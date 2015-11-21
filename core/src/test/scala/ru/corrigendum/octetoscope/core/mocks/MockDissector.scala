@@ -20,13 +20,12 @@ package ru.corrigendum.octetoscope.core.mocks
 
 import java.nio.charset.StandardCharsets
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core._
 
 object MockDissector extends DissectorCR[String] {
-  override def dissect(input: Blob, offset: InfoSize) = {
-    val str = new String(input.getRangeAsArray(offset.bytes), StandardCharsets.US_ASCII)
+  override def dissect(context: DissectionContext, offset: InfoSize) = {
+    val str = new String(context.input.getRangeAsArray(offset.bytes), StandardCharsets.US_ASCII)
 
-    Atom(Bytes(input.size) - offset, new ToStringContents(str))
+    Atom(Bytes(context.input.size) - offset, new ToStringContents(str))
   }
 }

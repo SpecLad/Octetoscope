@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets
 
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.mocks.MockDissector
 
 class DissectorDriverSuite extends FunSuite {
@@ -33,7 +32,8 @@ class DissectorDriverSuite extends FunSuite {
 
   test("failure - file too small") {
     val driver = getDissectorDriver(Function.const(Some(new PlainDissector {
-      override def dissect(input: Blob, offset: InfoSize): PlainPiece = throw new IndexOutOfBoundsException
+      override def dissect(context: DissectionContext, offset: InfoSize): PlainPiece =
+        throw new IndexOutOfBoundsException
     })))
 
     a [TooSmallToDissectException] must be thrownBy driver(DissectorDriverSuite.FakeBlob)

@@ -18,7 +18,6 @@
 
 package ru.corrigendum.octetoscope.dissectors
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
@@ -39,8 +38,11 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   private object Header extends MoleculeBuilderDissector[HeaderValue] {
     override def defaultWIP: HeaderValue = new HeaderValue
 
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: HeaderValue): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMB(context: DissectionContext,
+                           offset: InfoSize,
+                           builder: MoleculeBuilder,
+                           value: HeaderValue): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
 
       val correctMagic = add("Identification", magic(MagicBytes, "IDPO")).isDefined
       if (!correctMagic) return
@@ -79,8 +81,8 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   }
 
   private class Skin(width: Int, height: Int) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
 
       add("Type", enum(sInt32L, Map(0 -> "ALIAS_SKIN_SINGLE", 1 -> "ALIAS_SKIN_GROUP"))) match {
         case Some("ALIAS_SKIN_SINGLE") =>
@@ -99,8 +101,8 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
   // Quake's struct stvert_t.
   private object TexCoordPair extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
 
       /* The only bit that really makes sense to be set here is ALIAS_ONSEAM; the other bits
          are set by Quake itself during rendering (see R_AliasPreparePoints). However, Quake blindly
@@ -124,8 +126,8 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   private class Triangle(numVertices: Int) extends MoleculeBuilderUnitDissector {
     val lessThanNumVertices = lessThan(numVertices, "the number of vertices")
 
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
       /* Quake occasionally compares these values for equality, so we
          don't just treat any non-zero value as Front. */
       val faceDirection = add("Face direction", enum(sInt32L, Map(0 -> "Back", 1 -> "Front"))).getOrElse("???")
@@ -141,8 +143,8 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
   // Quake's struct trivertx_t.
   private object Vertex extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
 
       val coordsC = add.getContents("Coordinates", vector3(uInt8))
       val lniC = add.getContents("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
@@ -153,8 +155,8 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
   // Quake's struct daliasframe_t.
   private class SingleFrame(numVertices: Int) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
 
       /* The bounding box corners are actually the same structure as
          Vertex, but let's show off the fact that the LNI is unused here. */
@@ -171,8 +173,8 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   }
 
   private class Frame(numVertices: Int) extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
 
       add("Type", enum(sInt32L, Map(0 -> "ALIAS_SINGLE", 1 -> "ALIAS_GROUP"))) match {
         case Some("ALIAS_SINGLE") =>
@@ -195,10 +197,10 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
     }
   }
 
-  override def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+  override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
     builder.setRepr("Quake model")
 
-    val add = new SequentialAdder(input, offset, builder)
+    val add = new SequentialAdder(context, offset, builder)
 
     val header = add("Header", Header)
 

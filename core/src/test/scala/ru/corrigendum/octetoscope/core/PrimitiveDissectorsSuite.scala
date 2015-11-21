@@ -124,14 +124,14 @@ class PrimitiveDissectorsSuite extends FunSuite {
     val dissector = magic(Array[Byte](1, 2, 3), "123")
     verify(dissector, "123", Some(()), 1, 2, 3)
 
-    dissector.dissect(new ArrayBlob(Array[Byte](4, 5, 6))) mustBe
+    dissector.dissect(DissectionContext(new ArrayBlob(Array[Byte](4, 5, 6)))) mustBe
       Atom(Bytes(3), new EagerContents(None), Seq(Note(NoteSeverity.Failure, "expected \"123\" (0x010203)")))
   }
 
   test("bit") {
-    val blob = new ArrayBlob(Array[Byte](0x40, 0x7B))
-    bit.dissect(blob, InfoSize(0, 1)) mustBe Atom(Bits(1), new EagerContentsR(true, "True"))
-    bit.dissect(blob, InfoSize(1, 5)) mustBe Atom(Bits(1), new EagerContentsR(false, "False"))
+    val dc = DissectionContext(new ArrayBlob(Array[Byte](0x40, 0x7B)))
+    bit.dissect(dc, InfoSize(0, 1)) mustBe Atom(Bits(1), new EagerContentsR(true, "True"))
+    bit.dissect(dc, InfoSize(1, 5)) mustBe Atom(Bits(1), new EagerContentsR(false, "False"))
   }
 }
 
@@ -144,7 +144,7 @@ object PrimitiveDissectorsSuite {
       val pad = List.fill(padSize)((-1).toByte)
       val paddedBytes = pad ++ bytes ++ pad
       val blob = new ArrayBlob(paddedBytes.toArray)
-      val piece = dissector.dissect(blob, Bytes(padSize))
+      val piece = dissector.dissect(DissectionContext(blob), Bytes(padSize))
 
       inside(piece) { case Atom(size_, contents, notes) =>
         size_ mustBe Bytes(bytes.size)

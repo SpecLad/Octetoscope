@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,9 +18,7 @@
 
 package ru.corrigendum.octetoscope.core
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-
-class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuilder) {
+class SequentialAdder(context: DissectionContext, initialOffset: InfoSize, builder: MoleculeBuilder) {
   var internalOffset = InfoSize()
 
   def apply[V](name: String, dissector: DissectorC[V]): V = {
@@ -36,7 +34,7 @@ class SequentialAdder(blob: Blob, initialOffset: InfoSize, builder: MoleculeBuil
 
   def getContents[V, C <: Contents[V]](name: String, dissector: Dissector[V, C]): C = {
     val piece = try {
-      dissector.dissect(blob, initialOffset + internalOffset)
+      dissector.dissect(context, initialOffset + internalOffset)
     } catch {
       case e: IndexOutOfBoundsException =>
         throw new MoleculeBuilderDissector.TruncatedException(e, name)

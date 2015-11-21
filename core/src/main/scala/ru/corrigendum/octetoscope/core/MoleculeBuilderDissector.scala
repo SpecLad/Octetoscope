@@ -18,16 +18,14 @@
 
 package ru.corrigendum.octetoscope.core
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-
 trait MoleculeBuilderPostProcessingDissector[Value, WIP]
     extends MoleculeDissectorC[Value] with DissectorWithDefaultValueC[Value] {
   final override def defaultValue = postProcess(defaultWIP)
-  final override def dissect(input: Blob, offset: InfoSize): MoleculeC[Value] = {
+  final override def dissect(context: DissectionContext, offset: InfoSize): MoleculeC[Value] = {
     val value = defaultWIP
     val builder = new MoleculeBuilder()
     try {
-      dissectMB(input, offset, builder, value)
+      dissectMB(context, offset, builder, value)
     } catch {
       case trunc: MoleculeBuilderDissector.TruncatedException =>
         if (!builder.hasChildren) throw trunc.getCause
@@ -38,7 +36,7 @@ trait MoleculeBuilderPostProcessingDissector[Value, WIP]
 
   def defaultWIP: WIP
   def postProcess(wip: WIP): Value
-  def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, wip: WIP): Unit
+  def dissectMB(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder, wip: WIP): Unit
 }
 
 trait MoleculeBuilderDissector[Value] extends MoleculeBuilderPostProcessingDissector[Value, Value] {
@@ -51,9 +49,12 @@ object MoleculeBuilderDissector {
 
 trait MoleculeBuilderUnitDissector extends MoleculeBuilderDissector[Unit] {
   final override def defaultWIP = ()
-  final override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, wip: Unit): Unit = {
-    dissectMBU(input, offset, builder)
+  final override def dissectMB(context: DissectionContext,
+                               offset: InfoSize,
+                               builder: MoleculeBuilder,
+                               wip: Unit): Unit = {
+    dissectMBU(context, offset, builder)
   }
 
-  def dissectMBU(input: Blob, offset: InfoSize, builder: MoleculeBuilder): Unit
+  def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit
 }

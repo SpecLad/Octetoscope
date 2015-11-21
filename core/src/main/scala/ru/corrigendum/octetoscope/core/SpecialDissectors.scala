@@ -18,13 +18,12 @@
 
 package ru.corrigendum.octetoscope.core
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-
 object SpecialDissectors {
   private class Transformed[V, C <: Contents[V]](
     old: Dissector[V, C], transform: Piece[C] => Piece[C]
   ) extends Dissector[V, C] {
-    override def dissect(input: Blob, offset: InfoSize): Piece[C] = transform(old.dissect(input, offset))
+    override def dissect(context: DissectionContext, offset: InfoSize): Piece[C] =
+      transform(old.dissect(context, offset))
   }
 
   def transformed[V, C <: Contents[V]](

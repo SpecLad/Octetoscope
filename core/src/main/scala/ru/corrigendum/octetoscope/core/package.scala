@@ -52,7 +52,7 @@ package object core {
     (blob: Blob) =>
       try {
         val dissector = detector(blob).getOrElse(throw new DetectionFailedException)
-        dissector.dissect(blob)
+        dissector.dissect(DissectionContext(blob))
       } catch {
         // This should happen rarely, if ever, since most dissectors will return truncated
         // molecules instead of throwing.

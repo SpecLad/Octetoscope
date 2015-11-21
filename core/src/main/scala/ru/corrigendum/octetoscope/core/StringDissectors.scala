@@ -40,11 +40,11 @@ private object StringDissectors {
     protected def findActualLength(input: Blob, byteOffset: Long): Int
     protected def assess(actualLength: Int): Seq[Note] = Nil
 
-    final override def dissect(input: Blob, offset: InfoSize): AtomCR[Option[String]] = {
+    final override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Option[String]] = {
       val Bytes(bo) = offset
 
-      val actualLength = findActualLength(input, bo)
-      val inBuffer = ByteBuffer.wrap(input.getRangeAsArray(bo, bo + actualLength))
+      val actualLength = findActualLength(context.input, bo)
+      val inBuffer = ByteBuffer.wrap(context.input.getRangeAsArray(bo, bo + actualLength))
       val outBuffer = CharBuffer.allocate(256)
       val decoder = StandardCharsets.US_ASCII.newDecoder()
 

@@ -60,28 +60,28 @@ private object NumberDissectors {
       Atom(Bytes(byteSize), new ToStringContents[Int](value))
 
   object SInt8 extends DissectorCR[Byte] {
-    override def dissect(input: Blob, offset: InfoSize): AtomCR[Byte] = {
+    override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Byte] = {
       val Bytes(bo) = offset
-      val value = input(bo)
+      val value = context.input(bo)
       getNumberAtom(1, value)
     }
   }
 
   object UInt8 extends DissectorCR[Short] {
-    override def dissect(input: Blob, offset: InfoSize): AtomCR[Short] = {
+    override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Short] = {
       val Bytes(bo) = offset
-      val byte = input(bo)
+      val byte = context.input(bo)
       val value = if (byte >= 0) byte else 256 + byte
       getNumberAtom(1, value.toShort)
     }
   }
 
   object SInt16L extends DissectorCR[Short] {
-    override def dissect(input: Blob, offset: InfoSize): AtomCR[Short] = {
+    override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Short] = {
       val Bytes(bo) = offset
 
-      val value = ((input(bo) & 0xFF) |
-        ((input(bo + 1) & 0xFF) << 8)).toShort
+      val value = ((context.input(bo) & 0xFF) |
+        ((context.input(bo + 1) & 0xFF) << 8)).toShort
 
       getNumberAtom(2, value)
     }
@@ -96,16 +96,16 @@ private object NumberDissectors {
   }
 
   object SInt32L extends DissectorCR[Int] {
-    override def dissect(input: Blob, offset: InfoSize): AtomCR[Int] = {
-      val value = readInt32L(input, offset)
+    override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Int] = {
+      val value = readInt32L(context.input, offset)
 
       getNumberAtom(4, value)
     }
   }
 
   object Float32L extends DissectorCR[Float] {
-    override def dissect(input: Blob, offset: InfoSize): AtomCR[Float] = {
-      val int = readInt32L(input, offset)
+    override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Float] = {
+      val int = readInt32L(context.input, offset)
       val float = java.lang.Float.intBitsToFloat(int)
 
       Atom(Bytes(4), new ContentsR(float) {

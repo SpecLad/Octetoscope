@@ -18,7 +18,6 @@
 
 package ru.corrigendum.octetoscope.dissectors
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
 import ru.corrigendum.octetoscope.core._
 
 private object Common {
@@ -27,8 +26,11 @@ private object Common {
     override def defaultWIP: Vector3WIP[T] = Vector3WIP(None, None, None)
     override def postProcess(wip: Vector3WIP[T]): Vector3[T] = (wip.x, wip.y, wip.z)
 
-    override def dissectMB(input: Blob, offset: InfoSize, builder: MoleculeBuilder, value: Vector3WIP[T]): Unit = {
-      val add = new SequentialAdder(input, offset, builder)
+    override def dissectMB(context: DissectionContext,
+                           offset: InfoSize,
+                           builder: MoleculeBuilder,
+                           value: Vector3WIP[T]): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
       val xc = add.getContents("x", component)
       value.x = Some(xc.value)
       val yc = add.getContents("y", component)

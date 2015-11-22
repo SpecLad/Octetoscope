@@ -35,7 +35,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   val MagicBytes = Array[Byte]('I', 'D', 'P', '2')
 
   // Quake II's struct dmdl_t.
-  private object Header extends MoleculeBuilderDissector[HeaderValue] {
+  private object Header extends SimpleMoleculeBuilderDissector[HeaderValue] {
     override def defaultWIP = new HeaderValue
 
     override def dissectMB(context: DissectionContext,
@@ -198,7 +198,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   private case class OpenGLCommandValue(var typ: Option[OpenGLCommandTypeValue])
 
-  private class OpenGLCommand(totalNumVertices: Option[Int]) extends MoleculeBuilderDissector[OpenGLCommandValue] {
+  private class OpenGLCommand(totalNumVertices: Option[Int])
+      extends SimpleMoleculeBuilderDissector[OpenGLCommandValue] {
     override def defaultWIP: OpenGLCommandValue = OpenGLCommandValue(None)
 
     override def dissectMB(context: DissectionContext,

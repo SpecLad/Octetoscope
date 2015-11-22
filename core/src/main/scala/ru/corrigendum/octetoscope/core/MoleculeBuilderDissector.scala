@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.core
 
-trait MoleculeBuilderPostProcessingDissector[Value, WIP]
+trait MoleculeBuilderDissector[Value, WIP]
     extends MoleculeDissectorC[Value] with DissectorWithDefaultValueC[Value] {
   final override def defaultValue = postProcess(defaultWIP)
   final override def dissect(context: DissectionContext, offset: InfoSize): MoleculeC[Value] = {
@@ -39,15 +39,15 @@ trait MoleculeBuilderPostProcessingDissector[Value, WIP]
   def dissectMB(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder, wip: WIP): Unit
 }
 
-trait MoleculeBuilderDissector[Value] extends MoleculeBuilderPostProcessingDissector[Value, Value] {
-  final override def postProcess(wip: Value): Value = wip
-}
-
 object MoleculeBuilderDissector {
   class TruncatedException(cause: Throwable, val subPieceName: String) extends Exception(cause)
 }
 
-trait MoleculeBuilderUnitDissector extends MoleculeBuilderDissector[Unit] {
+trait SimpleMoleculeBuilderDissector[Value] extends MoleculeBuilderDissector[Value, Value] {
+  final override def postProcess(wip: Value): Value = wip
+}
+
+trait MoleculeBuilderUnitDissector extends SimpleMoleculeBuilderDissector[Unit] {
   final override def defaultWIP = ()
   final override def dissectMB(context: DissectionContext,
                                offset: InfoSize,

@@ -23,8 +23,8 @@ import org.scalatest.LoneElement._
 import org.scalatest.MustMatchers._
 
 class DissectorSuite extends FunSuite {
-  test("MoleculeBuilderPostProcessingDissector.defaultValue") {
-    val mbd = new MoleculeBuilderPostProcessingDissector[String, Int] {
+  test("MoleculeBuilderDissector.defaultValue") {
+    val mbd = new MoleculeBuilderDissector[String, Int] {
       override def defaultWIP: Int = 1
       override def postProcess(wip: Int): String = wip.toString
       override def dissectMB(context: DissectionContext,
@@ -36,12 +36,12 @@ class DissectorSuite extends FunSuite {
     mbd.defaultValue mustBe "1"
   }
 
-  test("MoleculeBuilderPostProcessingDissector.dissect") {
+  test("MoleculeBuilderDissector.dissect") {
     case class WIP(var i: Int)
 
     val child = Atom(Bytes(1), new ToStringContents("a"))
 
-    val mbd = new MoleculeBuilderPostProcessingDissector[String, WIP] {
+    val mbd = new MoleculeBuilderDissector[String, WIP] {
       override def defaultWIP: WIP = WIP(1)
       override def postProcess(wip: WIP): String = wip.i.toString
       override def dissectMB(context: DissectionContext,
@@ -60,10 +60,10 @@ class DissectorSuite extends FunSuite {
       ))
   }
 
-  test("MoleculeBuilderPostProcessingDissector - truncated - empty") {
+  test("MoleculeBuilderDissector - truncated - empty") {
     val cause = new IndexOutOfBoundsException
 
-    val truncated = new MoleculeBuilderPostProcessingDissector[Unit, Unit] {
+    val truncated = new MoleculeBuilderDissector[Unit, Unit] {
       override def defaultWIP = ()
       override def postProcess(wip: Unit): Unit = wip
       override def dissectMB(context: DissectionContext,
@@ -78,12 +78,12 @@ class DissectorSuite extends FunSuite {
     exc must be theSameInstanceAs cause
   }
 
-  test("MoleculeBuilderPostProcessingDissector - truncated - non-empty") {
+  test("MoleculeBuilderDissector - truncated - non-empty") {
     case class WIP(var i: Int)
 
     val child = Atom(Bytes(1), EmptyContents)
 
-    val truncated = new MoleculeBuilderPostProcessingDissector[String, WIP] {
+    val truncated = new MoleculeBuilderDissector[String, WIP] {
       override def defaultWIP = WIP(0)
       override def postProcess(wip: WIP): String = wip.i.toString
       override def dissectMB(context: DissectionContext,

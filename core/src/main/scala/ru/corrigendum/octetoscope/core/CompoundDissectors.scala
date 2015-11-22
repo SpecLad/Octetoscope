@@ -36,7 +36,7 @@ object CompoundDissectors {
 
   private class CollectingArray[V](
     size: Int, itemName: String, itemDissector: DissectorC[V], reprFuncMaybe: Option[Seq[V] => String]
-  ) extends MoleculeBuilderPostProcessingDissector[IndexedSeq[V], mutable.ArrayBuffer[V]] {
+  ) extends MoleculeBuilderDissector[IndexedSeq[V], mutable.ArrayBuffer[V]] {
     override def defaultWIP: mutable.ArrayBuffer[V] = mutable.ArrayBuffer[V]()
 
     override def postProcess(wip: mutable.ArrayBuffer[V]): IndexedSeq[V] = wip
@@ -89,7 +89,7 @@ object CompoundDissectors {
                          namedBits: Map[Long, String],
                          sbz: Set[String],
                          unnamedReason: String)
-      extends MoleculeBuilderPostProcessingDissector[Set[String], mutable.Builder[String, Set[String]]] {
+      extends MoleculeBuilderDissector[Set[String], mutable.Builder[String, Set[String]]] {
     override def defaultWIP: mutable.Builder[String, Set[String]] = Set.newBuilder[String]
     override def postProcess(wip: mutable.Builder[String, Set[String]]): Set[String] = wip.result()
 

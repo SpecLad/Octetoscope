@@ -35,7 +35,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   val MagicBytes = Array[Byte]('I', 'D', 'P', 'O')
 
   // Quake II's struct mdl_t.
-  private object Header extends MoleculeBuilderDissector[HeaderValue] {
+  private object Header extends SimpleMoleculeBuilderDissector[HeaderValue] {
     override def defaultWIP: HeaderValue = new HeaderValue
 
     override def dissectMB(context: DissectionContext,

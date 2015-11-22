@@ -22,7 +22,7 @@ import ru.corrigendum.octetoscope.core._
 
 private object Common {
   private class Vector3Dissector[T](component: DissectorCR[T])
-      extends MoleculeBuilderPostProcessingDissector[Vector3[T], Vector3WIP[T]] {
+      extends MoleculeBuilderDissector[Vector3[T], Vector3WIP[T]] {
     override def defaultWIP: Vector3WIP[T] = Vector3WIP(None, None, None)
     override def postProcess(wip: Vector3WIP[T]): Vector3[T] = (wip.x, wip.y, wip.z)
 

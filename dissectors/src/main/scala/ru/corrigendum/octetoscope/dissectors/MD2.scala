@@ -66,8 +66,9 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       value.offFrames = add.filtered("Offset of frames", sInt32L)(nonNegative)
       value.offOpenGL = add.filtered("Offset of OpenGL commands", sInt32L)(nonNegative)
 
-      val fileSizeConstraint = if (context.input.size - offset.bytes <= Int.MaxValue)
-        noMoreThan((context.input.size - offset.bytes).toInt, "actual file size") else any
+      val softSize = (context.softLimit - offset).bytes
+      val fileSizeConstraint = if (softSize < Int.MaxValue)
+        noMoreThan(softSize.toInt, "actual file size") else any
 
       value.fileSize = add.filtered("File size", sInt32L)(nonNegative, fileSizeConstraint)
     }

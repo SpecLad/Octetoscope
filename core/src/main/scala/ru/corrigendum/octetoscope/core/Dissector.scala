@@ -20,7 +20,14 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-sealed case class DissectionContext(input: Blob = Blob.empty)
+sealed case class DissectionContext(input: Blob, softLimit: InfoSize) {
+  require(softLimit <= Bytes(input.size))
+}
+
+object DissectionContext {
+  def apply(): DissectionContext = DissectionContext(Blob.empty, InfoSize())
+  def apply(input: Blob): DissectionContext = DissectionContext(input, Bytes(input.size))
+}
 
 trait Dissector[+V, +C <: Contents[V]] {
   def dissect(context: DissectionContext, offset: InfoSize = InfoSize()): Piece[C]

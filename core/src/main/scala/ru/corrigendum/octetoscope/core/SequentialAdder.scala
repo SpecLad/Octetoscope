@@ -21,6 +21,8 @@ package ru.corrigendum.octetoscope.core
 class SequentialAdder(context: DissectionContext, initialOffset: InfoSize, builder: MoleculeBuilder) {
   var internalOffset = InfoSize()
 
+  def limitReached: Boolean = initialOffset + internalOffset >= context.softLimit
+
   def apply[V](name: String, dissector: DissectorC[V]): V = {
     getContents(name, dissector).value
   }

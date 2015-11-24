@@ -77,6 +77,23 @@ class AdderSuite extends FunSuite {
       Note(NoteSeverity.Error, c1.note(NoteSeverity.Error)), Note(NoteSeverity.Error, c2.note(NoteSeverity.Error)))
   }
 
+  test("sequential adder - limitReached") {
+    val blob = new ArrayBlob(Array[Byte](1, 2, 3, 4))
+    val builder = new MoleculeBuilder
+
+    val adder = new SequentialAdder(DissectionContext(blob, Bytes(3)), Bytes(1), builder)
+    adder.limitReached mustBe false
+
+    adder("alpha", sInt8)
+    adder.limitReached mustBe false
+
+    adder("beta", sInt8)
+    adder.limitReached mustBe true
+
+    adder("gamma", sInt8)
+    adder.limitReached mustBe true
+  }
+
   test("random adder") {
     val builder = new MoleculeBuilder
 

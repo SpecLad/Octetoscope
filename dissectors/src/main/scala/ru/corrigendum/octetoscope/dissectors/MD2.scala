@@ -18,9 +18,11 @@
 
 package ru.corrigendum.octetoscope.dissectors
 
+import scala.util.control.Breaks._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
+import ru.corrigendum.octetoscope.core.SpecialDissectors._
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.dissectors.Common.vector3
 
@@ -136,9 +138,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   }
 
   // Quake II's struct daliasframe_t
-  private class Frame(frameSize: Int, numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
+  private class Frame(numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      builder.fixSize(Bytes(frameSize))
       val add = new SequentialAdder(context, offset, builder)
       add("Scale", vector3(float32L))
       add("Translation", vector3(float32L))
@@ -228,16 +229,16 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(context, offset, builder)
       builder.fixSize(Bytes(4L * numWords))
 
-      var dissectedWords = 0
       val cmdDissector = new OpenGLCommand(numVertices)
 
-      while (dissectedWords < numWords) {
-        val cmd = add("Command", cmdDissector)
-        cmd.typ match {
-          case Some(TriangleFan(n)) => dissectedWords += 1 + 3 * n
-          case Some(TriangleStrip(n)) => dissectedWords += 1 + 3 * n
-          case Some(OpenGLEnd) => return
-          case None => dissectedWords = Int.MaxValue
+      breakable {
+        while (!add.limitReached) {
+          val cmd = add("Command", cmdDissector)
+          cmd.typ match {
+            case Some(OpenGLEnd) => return
+            case None => break
+            case _ =>
+          }
         }
       }
 
@@ -260,10 +261,12 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
         new Triangle(header.numVertices, header.numTexCoords)))
 
     for (numFrames <- header.numFrames; offFrames <- header.offFrames; frameSize <- header.frameSize)
-      add("Frames", Bytes(offFrames), array(numFrames, "Frame", new Frame(frameSize, header.numVertices)))
+      add("Frames", Bytes(offFrames), array(numFrames, "Frame",
+        fixedSize(new Frame(header.numVertices), Bytes(frameSize))))
 
     for (numOpenGL <- header.numOpenGL; offOpenGL <- header.offOpenGL)
-      add("OpenGL commands", Bytes(offOpenGL), new OpenGLCommands(numOpenGL, header.numVertices))
+      add("OpenGL commands", Bytes(offOpenGL),
+        fixedSize(new OpenGLCommands(numOpenGL, header.numVertices), Bytes(4 * numOpenGL)))
 
     builder.setRepr("Quake II model")
 

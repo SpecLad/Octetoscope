@@ -35,4 +35,22 @@ object SpecialDissectors {
   ): Dissector[V, C] = {
     transformed(dissector, (piece: Piece[C]) => constraint.apply(piece, severity))
   }
+
+  private class FixedSize[V, C <: Contents[V]](
+    underlying: DissectorWithDefaultValue[V, C], size: InfoSize
+  ) extends DissectorWithDefaultValue[V, C] {
+    override def defaultValue: V = underlying.defaultValue
+
+    override def dissect(context: DissectionContext, offset: InfoSize): Piece[C] = {
+      require(size <= Bytes(context.input.size) - offset)
+      underlying.dissect(context.copy(softLimit = offset + size), offset).withSize(size)
+    }
+  }
+
+  // While this can wrap any dissector, it should only be used with MoleculeDissectors.
+  // A molecule's actual size can always be recalculated from its children, but if an
+  // atom's size is forcibly changed, the original size is lost.
+  def fixedSize[V, C <: Contents[V]](
+    underlying: DissectorWithDefaultValue[V, C], size: InfoSize
+  ): DissectorWithDefaultValue[V, C] = new FixedSize(underlying, size)
 }

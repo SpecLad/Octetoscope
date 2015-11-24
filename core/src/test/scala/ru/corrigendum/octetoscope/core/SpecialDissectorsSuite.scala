@@ -53,4 +53,27 @@ class SpecialDissectorsSuite extends FunSuite {
 
     piece mustBe Atom(Bytes(1), new ToStringContents("a"), Seq(Note(NoteSeverity.Warning, "constrained (Warning)")))
   }
+
+  test("fixedSize") {
+    var softLimit: InfoSize = null
+    val dissector = new DissectorWithDefaultValueC[String] {
+      override def defaultValue: String = "quux"
+
+      override def dissect(context: DissectionContext, offset: InfoSize): PieceC[String] = {
+        softLimit = context.softLimit
+        MockDissector.dissect(context, offset)
+      }
+    }
+
+    val dc = DissectionContext(new ArrayBlob(Array[Byte]('a', 'b', 'c')))
+
+    val fsd = SpecialDissectors.fixedSize(dissector, InfoSize(1, 5))
+    fsd.defaultValue mustBe dissector.defaultValue
+
+    val piece = fsd.dissect(dc, InfoSize(1, 2))
+
+    softLimit mustBe InfoSize(2, 7)
+    piece.size mustBe InfoSize(1, 5)
+    piece.withSize(InfoSize(1, 6)) mustBe dissector.dissect(dc, InfoSize(1, 2))
+  }
 }

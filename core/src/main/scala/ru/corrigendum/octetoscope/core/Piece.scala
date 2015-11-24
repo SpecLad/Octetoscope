@@ -74,6 +74,7 @@ abstract sealed class Piece[+C <: Contents[Any]] {
   def contents: C
   def notes: Seq[Note]
 
+  def withSize(size: InfoSize): Piece[C]
   def withNote(note: Note): Piece[C]
 }
 
@@ -82,6 +83,7 @@ sealed case class Atom[+C <: Contents[Any]](
   contents: C,
   notes: Seq[Note] = List()
 ) extends Piece[C] {
+  override def withSize(size: InfoSize): Atom[C] = copy(size = size)
   override def withNote(note: Note): Atom[C] = copy(notes = notes :+ note)
 }
 
@@ -93,5 +95,6 @@ sealed case class Molecule[+C <: Contents[Any]](
   children: Seq[SubPiece],
   notes: Seq[Note] = List()
 ) extends Piece[C] {
+  override def withSize(size: InfoSize): Molecule[C] = copy(size = size)
   override def withNote(note: Note): Molecule[C] = copy(notes = notes :+ note)
 }

@@ -27,6 +27,7 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
   val MagicBytes = Array[Byte]('I', 'D', 'P', '3')
 
   private class HeaderValue {
+    var nameC: Option[ContentsR[Any]] = None
     var numFrames: Option[Int] = None
     var numTags: Option[Int] = None
     var numSurfaces: Option[Int] = None
@@ -50,7 +51,7 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
       val version = add("Version", sInt32L + equalTo(15, "MD3_VERSION"))
       if (version != 15) return
 
-      add("Name", asciiishZString(64))
+      wip.nameC = Some(add.getContents("Name", asciiishZString(64)))
       add("Flags", bitField(32, Map.empty, unnamedReason = "unused"))
 
       wip.numFrames = add.filtered("Number of frames",
@@ -77,7 +78,7 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     val add = new RandomAdder(context, offset, builder)
     val header = add("Header", Bytes(0), Header)
 
-    builder.setRepr("Quake III model")
+    builder.setReprLazy(header.nameC.fold("Quake III model")("Quake III model " + _.repr))
 
     for (fileSize <- header.fileSize)
       builder.fixSize(Bytes(fileSize))

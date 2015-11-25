@@ -23,6 +23,13 @@ import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 import ru.corrigendum.octetoscope.core._
 
+/*
+  Quake III models (*.md3).
+
+  Dissection is based on the Quake III Arena source code,
+  available at <https://github.com/id-Software/Quake-III-Arena>.
+*/
+
 private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
   val MagicBytes = Array[Byte]('I', 'D', 'P', '3')
 

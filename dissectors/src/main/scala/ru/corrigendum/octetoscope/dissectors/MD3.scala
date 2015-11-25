@@ -53,9 +53,9 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
       add("Name", asciiishZString(64))
       add("Flags", bitField(32, Map.empty, unnamedReason = "unused"))
 
-      wip.numFrames = add.filtered("Number of frames", sInt32L)(nonNegative)
-      wip.numTags = add.filtered("Number of tags", sInt32L)(nonNegative)
-      wip.numSurfaces = add.filtered("Number of surfaces", sInt32L)(nonNegative)
+      wip.numFrames = add.filtered("Number of frames", sInt32L +? noMoreThan(1024, "MD3_MAX_FRAMES"))(nonNegative)
+      wip.numTags = add.filtered("Number of tags", sInt32L +? noMoreThan(16, "MD3_MAX_TAGS"))(nonNegative)
+      wip.numSurfaces = add.filtered("Number of surfaces", sInt32L +? noMoreThan(32, "MD3_MAX_SURFACES"))(nonNegative)
 
       // though it is unused, being a count it presumably must still be >= 0
       add("Number of skins (unused)", sInt32L + nonNegative)

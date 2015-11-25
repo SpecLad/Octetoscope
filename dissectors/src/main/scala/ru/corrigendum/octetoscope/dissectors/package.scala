@@ -23,6 +23,7 @@ import ru.corrigendum.octetoscope.core.PlainDissector
 package object dissectors {
   val magicMap: Seq[(Array[Byte], PlainDissector)] = Seq(
     MDL.MagicBytes -> MDL,
-    MD2.MagicBytes -> MD2
+    MD2.MagicBytes -> MD2,
+    MD3.MagicBytes -> MD3
   )
 }

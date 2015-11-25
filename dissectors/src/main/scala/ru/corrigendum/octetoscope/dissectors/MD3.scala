@@ -74,6 +74,21 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     }
   }
 
+  // Quake III's md3Frame_t
+  private object Frame extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
+
+      add("Lower bound", Common.vector3(float32L))
+      add("Upper bound", Common.vector3(float32L))
+      add("Local origin", Common.vector3(float32L))
+      add("Radius", float32L)
+      val nameC = add.getContents("Name", asciiishZString(16))
+
+      builder.setReprLazy(nameC.repr)
+    }
+  }
+
   override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
     val add = new RandomAdder(context, offset, builder)
     val header = add("Header", Bytes(0), Header)
@@ -82,5 +97,8 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
 
     for (fileSize <- header.fileSize)
       builder.fixSize(Bytes(fileSize))
+
+    for (numFrames <- header.numFrames; offFrames <- header.offFrames)
+      add("Frames", Bytes(offFrames), array(numFrames, "Frame", Frame))
   }
 }

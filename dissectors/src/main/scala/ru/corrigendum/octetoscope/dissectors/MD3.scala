@@ -53,7 +53,8 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
       add("Name", asciiishZString(64))
       add("Flags", bitField(32, Map.empty, unnamedReason = "unused"))
 
-      wip.numFrames = add.filtered("Number of frames", sInt32L +? noMoreThan(1024, "MD3_MAX_FRAMES"))(nonNegative)
+      wip.numFrames = add.filtered("Number of frames",
+        sInt32L +? noMoreThan(1024, "MD3_MAX_FRAMES") + positive)(nonNegative)
       wip.numTags = add.filtered("Number of tags", sInt32L +? noMoreThan(16, "MD3_MAX_TAGS"))(nonNegative)
       wip.numSurfaces = add.filtered("Number of surfaces", sInt32L +? noMoreThan(32, "MD3_MAX_SURFACES"))(nonNegative)
 

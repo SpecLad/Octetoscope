@@ -111,6 +111,63 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     }
   }
 
+  private class SurfaceHeaderValue {
+    var nameC: Option[ContentsR[Any]] = None
+    var numFrames: Option[Int] = None
+    var numShaders: Option[Int] = None
+    var numVertices: Option[Int] = None
+    var numTriangles: Option[Int] = None
+    var offTriangles: Option[Int] = None
+    var offShaders: Option[Int] = None
+    var offTexCoords: Option[Int] = None
+    var offNormals: Option[Int] = None
+    var surfaceSize: Option[Int] = None
+  }
+
+  // Quake III's md3Surface_t
+  private class SurfaceHeader(expectedNumFrames: Option[Int])
+      extends SimpleMoleculeBuilderDissector[SurfaceHeaderValue] {
+    override def defaultWIP: SurfaceHeaderValue = new SurfaceHeaderValue
+
+    override def dissectMB(context: DissectionContext, offset: InfoSize,
+                           builder: MoleculeBuilder, wip: SurfaceHeaderValue): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
+
+      add("Identification (unused)", padding(Bytes(4)))
+      wip.nameC = Some(add.getContents("Name", asciiishZString(64)))
+      add("Flags", bitField(32, Map.empty, unnamedReason = "unused"))
+
+      val nfc = expectedNumFrames.fold[Constraint[Int]](any)(equalTo(_, "global frame count"))
+      wip.numFrames = add.filtered("Number of frames", sInt32L + nfc)(nonNegative)
+
+      wip.numShaders = add.filtered("Number of shaders", sInt32L +? noMoreThan(256, "MD3_MAX_SHADERS"))(nonNegative)
+      wip.numVertices = add.filtered("Number of vertices", sInt32L +? noMoreThan(4096, "MD3_MAX_VERTS"))(nonNegative)
+      wip.numTriangles = add.filtered("Number of triangles",
+        sInt32L +? noMoreThan(8192, "MD3_MAX_TRIANGLES"))(nonNegative)
+      wip.offTriangles = add.filtered("Offset of triangles", sInt32L)(nonNegative)
+      wip.offShaders = add.filtered("Offset of shaders", sInt32L)(nonNegative)
+      wip.offTexCoords = add.filtered("Offset of texture coordinates", sInt32L)(nonNegative)
+      wip.offNormals = add.filtered("Offset of normals", sInt32L)(nonNegative)
+
+      val remaining = (context.softLimit - offset).bytes
+      val sizeConstraint = if (remaining < Int.MaxValue)
+        noMoreThan(remaining.toInt, "distance to EOF") else any
+      wip.surfaceSize = add.filtered("Surface size", sInt32L + sizeConstraint)(nonNegative)
+    }
+  }
+
+  private class Surface(expectedNumFrames: Option[Int]) extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new RandomAdder(context, offset, builder)
+      val header = add("Header", Bytes(0), new SurfaceHeader(expectedNumFrames))
+
+      builder.setReprLazyO(header.nameC.map(_.repr))
+
+      for (surfaceSize <- header.surfaceSize)
+        builder.fixSize(Seq(Bytes(surfaceSize), Bytes(context.input.size) - offset).min)
+    }
+  }
+
   override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
     val add = new RandomAdder(context, offset, builder)
     val header = add("Header", Bytes(0), Header)
@@ -125,5 +182,8 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
 
     for (numTags <- header.numTags; offTags <- header.offTags)
       add("Tags", Bytes(offTags), array(numTags, "Tag", Tag))
+
+    for (numSurfaces <- header.numSurfaces; offSurfaces <- header.offSurfaces)
+      add("Surfaces", Bytes(offSurfaces), array(numSurfaces, "Surface", new Surface(header.numFrames)))
   }
 }

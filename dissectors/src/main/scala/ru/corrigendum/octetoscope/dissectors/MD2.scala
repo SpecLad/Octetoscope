@@ -72,7 +72,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       val fileSizeConstraint = if (softSize < Int.MaxValue)
         noMoreThan(softSize.toInt, "actual file size") else any
 
-      value.fileSize = add.filtered("File size", sInt32L)(nonNegative, fileSizeConstraint)
+      value.fileSize = add.filtered("File size", sInt32L + fileSizeConstraint)(nonNegative)
     }
   }
 
@@ -271,6 +271,6 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
     builder.setRepr("Quake II model")
 
     for (fileSize <- header.fileSize)
-      builder.fixSize(Bytes(fileSize))
+      builder.fixSize(Seq(Bytes(fileSize), Bytes(context.input.size) - offset).min)
   }
 }

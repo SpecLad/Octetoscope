@@ -77,7 +77,7 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
       val fileSizeConstraint = if (softSize < Int.MaxValue)
         noMoreThan(softSize.toInt, "actual file size") else any
 
-      wip.fileSize = add.filtered("File size", sInt32L)(nonNegative, fileSizeConstraint)
+      wip.fileSize = add.filtered("File size", sInt32L + fileSizeConstraint)(nonNegative)
     }
   }
 
@@ -118,7 +118,7 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     builder.setReprLazy(header.nameC.fold("Quake III model")("Quake III model " + _.repr))
 
     for (fileSize <- header.fileSize)
-      builder.fixSize(Bytes(fileSize))
+      builder.fixSize(Seq(Bytes(fileSize), Bytes(context.input.size) - offset).min)
 
     for (numFrames <- header.numFrames; offFrames <- header.offFrames)
       add("Frames", Bytes(offFrames), array(numFrames, "Frame", Frame))

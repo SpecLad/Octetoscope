@@ -26,6 +26,13 @@ import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 class PrimitiveDissectorsSuite extends FunSuite {
   import PrimitiveDissectorsSuite._
 
+  test("padding") {
+    val dc = DissectionContext(new ArrayBlob(Array[Byte](0, 0, 0)))
+    padding(InfoSize(1, 7)).dissect(dc, InfoSize(1, 1)) mustBe Atom(InfoSize(1, 7), EmptyContents)
+
+    an [IndexOutOfBoundsException] must be thrownBy padding(InfoSize(2, 0)).dissect(dc, InfoSize(1, 1))
+  }
+
   test("sInt8") {
     verify(sInt8, "-128", -128, -128)
     verify(sInt8, "-100", -100, -100)

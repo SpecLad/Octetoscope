@@ -157,6 +157,16 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     }
   }
 
+  // Quake III's md3Shader_t
+  private object Shader extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
+
+      add("Name", asciiishZString(64))
+      add("Index (unused)", sInt32L)
+    }
+  }
+
   private class Surface(expectedNumFrames: Option[Int]) extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new RandomAdder(context, offset, builder)
@@ -172,6 +182,9 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
       for (numTriangles <- header.numTriangles; offTriangles <- header.offTriangles)
         add("Triangles", Bytes(offTriangles), array(numTriangles, "Triangle",
           collectingArray(3, "Vertex index", sInt32L + nonNegative + lessThanNumVerices, formatSeq)))
+
+      for (numShaders <- header.numShaders; offShaders <- header.offShaders)
+        add("Shaders", Bytes(offShaders), array(numShaders, "Shader", Shader))
     }
   }
 

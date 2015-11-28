@@ -167,6 +167,16 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     }
   }
 
+  // Quake III's md3St_t.
+  private object TexCoordPair extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
+      val sc = add.getContents("s", float32L)
+      val tc = add.getContents("t", float32L)
+      builder.setReprLazy("(%s, %s)".format(sc.repr, tc.repr))
+    }
+  }
+
   private class Surface(expectedNumFrames: Option[Int]) extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new RandomAdder(context, offset, builder)
@@ -185,6 +195,9 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
 
       for (numShaders <- header.numShaders; offShaders <- header.offShaders)
         add("Shaders", Bytes(offShaders), array(numShaders, "Shader", Shader))
+
+      for (numVertices <- header.numVertices; offTexCoords <- header.offTexCoords)
+        add("Texture coordinates", Bytes(offTexCoords), array(numVertices, "Texture coordinate pair", TexCoordPair))
     }
   }
 

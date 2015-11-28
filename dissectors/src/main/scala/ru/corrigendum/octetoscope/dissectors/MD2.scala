@@ -113,7 +113,6 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
-      def formatSeq(elements: Seq[Any]) = elements.mkString("(", ", ", ")")
 
       val vi = add("Vertex indices", collectingArray(3, "Index",
         sInt16L + nonNegative + lessThanNumVertices, formatSeq))

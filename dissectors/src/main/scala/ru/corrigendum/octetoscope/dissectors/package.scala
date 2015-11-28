@@ -26,4 +26,6 @@ package object dissectors {
     MD2.MagicBytes -> MD2,
     MD3.MagicBytes -> MD3
   )
+
+  private[dissectors] def formatSeq(elements: Seq[Any]) = elements.mkString("(", ", ", ")")
 }

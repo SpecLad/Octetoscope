@@ -132,8 +132,6 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
          don't just treat any non-zero value as Front. */
       val faceDirection = add("Face direction", enum(sInt32L, Map(0 -> "Back", 1 -> "Front"))).getOrElse("???")
 
-      def formatSeq(elements: Seq[Any]) = elements.mkString("(", ", ", ")")
-
       val vic = add.getContents("Vertex indices",
         collectingArray(3, "Index", sInt32L + nonNegative + lessThanNumVertices, formatSeq))
 

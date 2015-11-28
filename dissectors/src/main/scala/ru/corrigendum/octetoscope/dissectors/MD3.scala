@@ -162,7 +162,8 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
 
-      add("Name", asciiishZString(64))
+      val nameC = add.getContents("Name", asciiishZString(64))
+      builder.setRepr(nameC.repr)
       add("Index (unused)", sInt32L)
     }
   }

@@ -165,6 +165,12 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
 
       for (surfaceSize <- header.surfaceSize)
         builder.fixSize(Seq(Bytes(surfaceSize), Bytes(context.input.size) - offset).min)
+
+      val lessThanNumVerices = header.numVertices.fold[Constraint[Int]](any)(lessThan(_, "number of vertices"))
+
+      for (numTriangles <- header.numTriangles; offTriangles <- header.offTriangles)
+        add("Triangles", Bytes(offTriangles), array(numTriangles, "Triangle",
+          collectingArray(3, "Vertex index", sInt32L + nonNegative + lessThanNumVerices, formatSeq)))
     }
   }
 

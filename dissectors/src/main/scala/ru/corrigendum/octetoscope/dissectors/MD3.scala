@@ -120,7 +120,7 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     var offTriangles: Option[Int] = None
     var offShaders: Option[Int] = None
     var offTexCoords: Option[Int] = None
-    var offNormals: Option[Int] = None
+    var offVertices: Option[Int] = None
     var surfaceSize: Option[Int] = None
   }
 
@@ -148,7 +148,7 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
       wip.offTriangles = add.filtered("Offset of triangles", sInt32L)(nonNegative)
       wip.offShaders = add.filtered("Offset of shaders", sInt32L)(nonNegative)
       wip.offTexCoords = add.filtered("Offset of texture coordinates", sInt32L)(nonNegative)
-      wip.offNormals = add.filtered("Offset of normals", sInt32L)(nonNegative)
+      wip.offVertices = add.filtered("Offset of vertices", sInt32L)(nonNegative)
 
       val remaining = (context.softLimit - offset).bytes
       val sizeConstraint = if (remaining < Int.MaxValue)
@@ -177,6 +177,19 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     }
   }
 
+  // Quake III's md3XyzNormal_t
+  private object Vertex extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
+
+      val coordsC = add.getContents("Coordinates", Common.vector3(sInt16L))
+      val lngC = add.getContents("Normal longitude", uInt8)
+      val latC = add.getContents("Normal latitude", uInt8)
+
+      builder.setReprLazyO(coordsC.reprO.map("%s | (%s, %s)".format(_, latC.repr, lngC.repr)))
+    }
+  }
+
   private class Surface(expectedNumFrames: Option[Int]) extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new RandomAdder(context, offset, builder)
@@ -198,6 +211,9 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
 
       for (numVertices <- header.numVertices; offTexCoords <- header.offTexCoords)
         add("Texture coordinates", Bytes(offTexCoords), array(numVertices, "Texture coordinate pair", TexCoordPair))
+
+      for (numFrames <- header.numFrames; offFrames <- header.offVertices; numVertices <- header.numVertices)
+        add("Vertices", Bytes(offFrames), array(numFrames, "Frame", array(numVertices, "Vertex", Vertex)))
     }
   }
 

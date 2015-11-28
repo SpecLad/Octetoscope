@@ -191,7 +191,7 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
   }
 
   private class OpenGLVertex(numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
-    val lessThanNumVertices = numVertices.map(lessThan(_, "number of vertices")).getOrElse(any)
+    private[this] val lessThanNumVertices = numVertices.map(lessThan(_, "number of vertices")).getOrElse(any)
 
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)

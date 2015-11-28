@@ -18,16 +18,16 @@
 
 package ru.corrigendum.octetoscope.core
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-
 import scala.collection.mutable
 
 object CompoundDissectors {
   private class Array(size: Int, itemName: String, itemDissector: PlainDissector) extends MoleculeBuilderUnitDissector {
+    private[this] val names = Array.tabulate(size)("%s #%d".format(itemName, _))
+
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
 
-      for (i <- 0 until size) add("%s #%d".format(itemName, i), itemDissector)
+      for (i <- 0 until size) add(names(i), itemDissector)
     }
   }
 
@@ -37,6 +37,8 @@ object CompoundDissectors {
   private class CollectingArray[V](
     size: Int, itemName: String, itemDissector: DissectorC[V], reprFuncMaybe: Option[Seq[V] => String]
   ) extends MoleculeBuilderDissector[IndexedSeq[V], mutable.ArrayBuffer[V]] {
+    private[this] val names = Array.tabulate(size)("%s #%d".format(itemName, _))
+
     override def defaultWIP: mutable.ArrayBuffer[V] = mutable.ArrayBuffer[V]()
 
     override def postProcess(wip: mutable.ArrayBuffer[V]): IndexedSeq[V] = wip
@@ -46,7 +48,7 @@ object CompoundDissectors {
       val add = new SequentialAdder(context, offset, builder)
       wip.sizeHint(size)
 
-      for (i <- 0 until size) wip += add("%s #%d".format(itemName, i), itemDissector)
+      for (i <- 0 until size) wip += add(names(i), itemDissector)
 
       reprFuncMaybe.foreach(f => builder.setReprLazy(f(wip)))
     }

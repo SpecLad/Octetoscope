@@ -104,20 +104,25 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct dtriangle_t
   private class Triangle(numVertices: Option[Int], numTexCoords: Option[Int]) extends MoleculeBuilderUnitDissector {
-    val lessThanNumVertices = numVertices
-      .map(num => if (num > Short.MaxValue) any else lessThan(num.toShort, "the number of vertices"))
-      .getOrElse(any)
-    val lessThanNumTexCoords = numTexCoords
-      .map(num => if (num > Short.MaxValue) any else lessThan(num.toShort, "the number of texture coordinate pairs"))
-      .getOrElse(any)
+    private[this] val vertexIndicesDissector = {
+      val lessThanNumVertices = numVertices
+        .map(num => if (num > Short.MaxValue) any else lessThan(num.toShort, "the number of vertices"))
+        .getOrElse(any)
+      collectingArray(3, "Index", sInt16L + nonNegative + lessThanNumVertices, formatSeq)
+    }
+
+    private[this] val texCoordIndicesDissector = {
+      val lessThanNumTexCoords = numTexCoords
+        .map(num => if (num > Short.MaxValue) any else lessThan(num.toShort, "the number of texture coordinate pairs"))
+        .getOrElse(any)
+      collectingArray(3, "Index", sInt16L + nonNegative + lessThanNumTexCoords, formatSeq)
+    }
 
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
 
-      val vi = add("Vertex indices", collectingArray(3, "Index",
-        sInt16L + nonNegative + lessThanNumVertices, formatSeq))
-      val ti = add("Texture coordinate pair indices", collectingArray(3, "Index",
-        sInt16L + nonNegative + lessThanNumTexCoords, formatSeq))
+      val vi = add("Vertex indices", vertexIndicesDissector)
+      val ti = add("Texture coordinate pair indices", texCoordIndicesDissector)
 
       if (vi.length == 3 && ti.length == 3)
         builder.setReprLazy(formatSeq((vi, ti).zipped.map(_ + "/" + _)))
@@ -138,6 +143,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
 
   // Quake II's struct daliasframe_t
   private class Frame(numVertices: Option[Int]) extends MoleculeBuilderUnitDissector {
+    private[this] val verticesDissector = numVertices.map(array(_, "Vertex", Vertex))
+
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
       add("Scale", vector3(float32L))
@@ -145,8 +152,8 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       val nameC = add.getContents("Name", asciiishZString(16))
       builder.setReprLazy(nameC.repr)
 
-      for (numVertices <- numVertices)
-        add("Vertices", array(numVertices, "Vertex", Vertex))
+      for (verticesDissector <- verticesDissector)
+        add("Vertices", verticesDissector)
     }
   }
 

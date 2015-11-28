@@ -81,13 +81,15 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
   }
 
   private class Skin(width: Int, height: Int) extends MoleculeBuilderUnitDissector {
+    val rowsDissector = array(height, "Row", array(width, "Color index", uInt8))
+
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
 
       add("Type", enum(sInt32L, Map(0 -> "ALIAS_SKIN_SINGLE", 1 -> "ALIAS_SKIN_GROUP"))) match {
         case Some("ALIAS_SKIN_SINGLE") =>
           builder.setRepr("Single skin")
-          add("Rows", array(height, "Row", array(width, "Color index", uInt8)))
+          add("Rows", rowsDissector)
         case _ => // Quake doesn't explicitly check for ALIAS_SKIN_GROUP
           for (numSkins <- add.filtered("Number of skins", sInt32L)(positive))
           {
@@ -124,7 +126,10 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
   // Quake's struct dtriangle_t
   private class Triangle(numVertices: Int) extends MoleculeBuilderUnitDissector {
-    val lessThanNumVertices = lessThan(numVertices, "the number of vertices")
+    private[this] val indicesDissector = {
+      val lessThanNumVertices = lessThan(numVertices, "the number of vertices")
+      collectingArray(3, "Index", sInt32L + nonNegative + lessThanNumVertices, formatSeq)
+    }
 
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
@@ -132,8 +137,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
          don't just treat any non-zero value as Front. */
       val faceDirection = add("Face direction", enum(sInt32L, Map(0 -> "Back", 1 -> "Front"))).getOrElse("???")
 
-      val vic = add.getContents("Vertex indices",
-        collectingArray(3, "Index", sInt32L + nonNegative + lessThanNumVertices, formatSeq))
+      val vic = add.getContents("Vertex indices", indicesDissector)
 
       builder.setReprLazyO(vic.reprO.map("%s %s".format(faceDirection, _)))
     }
@@ -153,6 +157,8 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
 
   // Quake's struct daliasframe_t.
   private class SingleFrame(numVertices: Int) extends MoleculeBuilderUnitDissector {
+    private[this] val verticesDissector = array(numVertices, "Vertex", Vertex)
+
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
 
@@ -166,17 +172,19 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       val nameC = add.getContents("Name", asciiishZString(16))
       builder.setReprLazy(nameC.repr)
 
-      add("Vertices", array(numVertices, "Vertex", Vertex))
+      add("Vertices", verticesDissector)
     }
   }
 
   private class Frame(numVertices: Int) extends MoleculeBuilderUnitDissector {
+    private[this] val frameDissector = new SingleFrame(numVertices)
+
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
 
       add("Type", enum(sInt32L, Map(0 -> "ALIAS_SINGLE", 1 -> "ALIAS_GROUP"))) match {
         case Some("ALIAS_SINGLE") =>
-          val sfC = add.getContents("Single frame", new SingleFrame(numVertices))
+          val sfC = add.getContents("Single frame", frameDissector)
           builder.setReprLazyO(sfC.reprO.map("Single frame %s".format(_)))
         case _ => // Quake doesn't explicitly check for ALIAS_GROUP
           // Quake's struct daliasgroup_t.
@@ -189,7 +197,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
             add("Unused", uInt8)
 
             add("Frame intervals", array(numFrames, "Interval", float32L + positive))
-            add("Frames", array(numFrames, "Frame", new SingleFrame(numVertices)))
+            add("Frames", array(numFrames, "Frame", frameDissector))
           }
       }
     }

@@ -167,7 +167,7 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
     }
   }
 
-  // Quake III's md3St_t.
+  // Quake III's md3St_t
   private object TexCoordPair extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)

@@ -141,9 +141,10 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
       wip.numFrames = add.filtered("Number of frames", sInt32L + nfc)(nonNegative)
 
       wip.numShaders = add.filtered("Number of shaders", sInt32L +? noMoreThan(256, "MD3_MAX_SHADERS"))(nonNegative)
-      wip.numVertices = add.filtered("Number of vertices", sInt32L +? noMoreThan(4096, "MD3_MAX_VERTS"))(nonNegative)
+      wip.numVertices = add.filtered("Number of vertices",
+        sInt32L +? noMoreThan(1000, "SHADER_MAX_VERTEXES"))(nonNegative)
       wip.numTriangles = add.filtered("Number of triangles",
-        sInt32L +? noMoreThan(8192, "MD3_MAX_TRIANGLES"))(nonNegative)
+        sInt32L +? noMoreThan(2000, "SHADER_MAX_INDEXES / 3"))(nonNegative)
       wip.offTriangles = add.filtered("Offset of triangles", sInt32L)(nonNegative)
       wip.offShaders = add.filtered("Offset of shaders", sInt32L)(nonNegative)
       wip.offTexCoords = add.filtered("Offset of texture coordinates", sInt32L)(nonNegative)

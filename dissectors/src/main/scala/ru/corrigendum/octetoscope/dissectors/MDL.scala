@@ -120,7 +120,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
         Map(2L -> "ALIAS_ONSEAM", 3L -> "ALIAS_Z_CLIP", 4L -> "ALIAS_BOTTOM_CLIP",
             5L -> "ALIAS_RIGHT_CLIP", 6L -> "ALIAS_TOP_CLIP", 7L -> "ALIAS_LEFT_CLIP"),
         sbz = Set("ALIAS_Z_CLIP", "ALIAS_BOTTOM_CLIP", "ALIAS_RIGHT_CLIP", "ALIAS_TOP_CLIP", "ALIAS_LEFT_CLIP"),
-        unnamedReason = "unused"))
+        unnamedReason = "unused"))._1
 
       val sc = add.getContents("s", sInt32L)
       val tc = add.getContents("t", sInt32L)

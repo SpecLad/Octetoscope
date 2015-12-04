@@ -87,17 +87,20 @@ object CompoundDissectors {
 
   private val bitSbz = PrimitiveDissectors.bit +? CommonConstraints.`false`
 
+  private type BitFieldWIP = (mutable.Builder[String, Set[String]], mutable.Builder[Long, Set[Long]])
+
   private class BitField(totalBits: Long,
                          namedBits: Map[Long, String],
                          sbz: Set[String],
                          unnamedReason: String)
-      extends MoleculeBuilderDissector[Set[String], mutable.Builder[String, Set[String]]] {
-    override def defaultWIP: mutable.Builder[String, Set[String]] = Set.newBuilder[String]
-    override def postProcess(wip: mutable.Builder[String, Set[String]]): Set[String] = wip.result()
+      extends MoleculeBuilderDissector[(Set[String], Set[Long]), BitFieldWIP] {
+    override def defaultWIP: BitFieldWIP = (Set.newBuilder[String], Set.newBuilder[Long])
+    override def postProcess(wip: BitFieldWIP): (Set[String], Set[Long]) =
+      (wip._1.result(), wip._2.result())
 
     override def dissectMB(context: DissectionContext, offset: InfoSize,
                            builder: MoleculeBuilder,
-                           wip: mutable.Builder[String, Set[String]]): Unit = {
+                           wip: BitFieldWIP): Unit = {
       val add = new SequentialAdder(context, offset, builder)
 
       val setBitNames = IndexedSeq.newBuilder[String]
@@ -107,11 +110,13 @@ object CompoundDissectors {
           case Some(name) =>
             if (add(name, if (sbz(name)) bitSbz else PrimitiveDissectors.bit)) {
               setBitNames += name
-              wip += name
+              wip._1 += name
             }
           case None =>
-            if (add("Bit #%d (%s)".format(i, unnamedReason), PrimitiveDissectors.bit))
+            if (add("Bit #%d (%s)".format(i, unnamedReason), PrimitiveDissectors.bit)) {
               setBitNames += "#" + i
+              wip._2 += i
+            }
         }
 
       builder.setRepr(setBitNames.result().mkString("<", " | ", ">"))
@@ -121,6 +126,6 @@ object CompoundDissectors {
   def bitField(totalBits: Long,
                namedBits: Map[Long, String],
                sbz: Set[String] = Set.empty,
-               unnamedReason: String = "unknown"): MoleculeDissectorWithDefaultValueC[Set[String]] =
+               unnamedReason: String = "unknown"): MoleculeDissectorWithDefaultValueC[(Set[String], Set[Long])] =
     new BitField(totalBits, namedBits, sbz, unnamedReason)
 }

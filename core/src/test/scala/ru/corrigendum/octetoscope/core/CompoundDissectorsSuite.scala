@@ -74,7 +74,10 @@ class CompoundDissectorsSuite extends FunSuite {
     val dissector = bitField(4, Map(1L -> "A", 2L -> "B"), unnamedReason = "xyzzy")
     val piece = dissector.dissect(dc, Bits(2))
 
-    val value = (if ((byte & 0x10) != 0) Set("A") else Set()) ++ (if ((byte & 0x08) != 0) Set("B") else Set())
+    val value = (
+      (if ((byte & 0x10) != 0) Set("A") else Set()) ++ (if ((byte & 0x08) != 0) Set("B") else Set()),
+      (if ((byte & 0x20) != 0) Set(0L) else Set()) ++ (if ((byte & 0x04) != 0) Set(3L) else Set())
+    )
 
     piece mustBe Molecule(
       Bits(4),

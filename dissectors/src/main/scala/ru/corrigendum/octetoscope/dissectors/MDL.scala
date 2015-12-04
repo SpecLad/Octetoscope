@@ -45,10 +45,16 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(context, offset, builder)
 
       val correctMagic = add("Identification", magic(MagicBytes, "IDPO")).isDefined
-      if (!correctMagic) return
+      if (!correctMagic) {
+        builder.addNote(NoteSeverity.Failure, "incorrect identification")
+        return
+      }
 
       val version = add("Version", sInt32L + equalTo(6, "ALIAS_VERSION"))
-      if (version != 6) return
+      if (version != 6) {
+        builder.addNote(NoteSeverity.Failure, "unsupported version")
+        return
+      }
 
       add("Scale", vector3(float32L))
       add("Translation", vector3(float32L))

@@ -53,10 +53,16 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(context, offset, builder)
 
       val correctMagic = add("Identification", magic(MagicBytes, "IDP3")).isDefined
-      if (!correctMagic) return
+      if (!correctMagic) {
+        builder.addNote(NoteSeverity.Failure, "incorrect identification")
+        return
+      }
 
       val version = add("Version", sInt32L + equalTo(15, "MD3_VERSION"))
-      if (version != 15) return
+      if (version != 15) {
+        builder.addNote(NoteSeverity.Failure, "unsupported version")
+        return
+      }
 
       wip.nameC = Some(add.getContents("Name", asciiishZString(64)))
       add("Flags", bitField(32, Map.empty, unnamedReason = "unused"))

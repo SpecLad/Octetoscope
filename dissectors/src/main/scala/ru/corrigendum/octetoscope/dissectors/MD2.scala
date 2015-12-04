@@ -47,10 +47,16 @@ private[dissectors] object MD2 extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(context, offset, builder)
 
       val correctMagic = add("Identification", magic(MagicBytes, "IDP2")).isDefined
-      if (!correctMagic) return
+      if (!correctMagic) {
+        builder.addNote(NoteSeverity.Failure, "incorrect identification")
+        return
+      }
 
       val version = add("Version", sInt32L + equalTo(8, "ALIAS_VERSION"))
-      if (version != 8) return
+      if (version != 8) {
+        builder.addNote(NoteSeverity.Failure, "unsupported version")
+        return
+      }
 
       add("Skin width", sInt32L + positive)
       add("Skin height", sInt32L + positive +? noMoreThan(480, "MAX_LBM_HEIGHT"))

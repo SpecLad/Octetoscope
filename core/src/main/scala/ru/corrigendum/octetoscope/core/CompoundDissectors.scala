@@ -92,8 +92,11 @@ object CompoundDissectors {
   private class BitField(totalBits: Long,
                          namedBits: Map[Long, String],
                          sbz: Set[String],
-                         unnamedReason: String)
-      extends MoleculeBuilderDissector[(Set[String], Set[Long]), BitFieldWIP] {
+                         unnamedReason: String,
+                         unnamedConstraint: Constraint[Boolean]
+                        ) extends MoleculeBuilderDissector[(Set[String], Set[Long]), BitFieldWIP] {
+    private[this] val unnamedBit = PrimitiveDissectors.bit + unnamedConstraint
+
     override def defaultWIP: BitFieldWIP = (Set.newBuilder[String], Set.newBuilder[Long])
     override def postProcess(wip: BitFieldWIP): (Set[String], Set[Long]) =
       (wip._1.result(), wip._2.result())
@@ -113,7 +116,7 @@ object CompoundDissectors {
               wip._1 += name
             }
           case None =>
-            if (add("Bit #%d (%s)".format(i, unnamedReason), PrimitiveDissectors.bit)) {
+            if (add("Bit #%d (%s)".format(i, unnamedReason), unnamedBit)) {
               setBitNames += "#" + i
               wip._2 += i
             }
@@ -126,6 +129,8 @@ object CompoundDissectors {
   def bitField(totalBits: Long,
                namedBits: Map[Long, String],
                sbz: Set[String] = Set.empty,
-               unnamedReason: String = "unknown"): MoleculeDissectorWithDefaultValueC[(Set[String], Set[Long])] =
-    new BitField(totalBits, namedBits, sbz, unnamedReason)
+               unnamedReason: String = "unknown",
+               unnamedConstraint: Constraint[Boolean] = CommonConstraints.any
+              ): MoleculeDissectorWithDefaultValueC[(Set[String], Set[Long])] =
+    new BitField(totalBits, namedBits, sbz, unnamedReason, unnamedConstraint)
 }

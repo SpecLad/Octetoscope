@@ -116,4 +116,14 @@ class CompoundDissectorsSuite extends FunSuite {
     piece.children(0).piece mustBe bit.dissect(dc, Bits(6))
     piece.children(1).piece mustBe (bit +? CommonConstraints.`false`).dissect(dc, Bits(7))
   }
+
+  test("bifField - unnamedConstraint") {
+    val blob = new ArrayBlob(Array[Byte](0x60))
+    val dc = DissectionContext(blob)
+    val dissector = bitField(2, Map(1L -> "A"), unnamedConstraint = CommonConstraints.`false`)
+    val piece = dissector.dissect(dc, Bits(1))
+
+    piece.children(0).piece mustBe (bit + CommonConstraints.`false`).dissect(dc, Bits(1))
+    piece.children(1).piece mustBe bit.dissect(dc, Bits(2))
+  }
 }

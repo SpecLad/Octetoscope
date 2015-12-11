@@ -18,6 +18,9 @@
 
 package ru.corrigendum.octetoscope.core
 
+// useful as a WIP for dissectors returning simple values
+case class Variable[T](var value: T)
+
 trait MoleculeBuilderDissector[Value, WIP]
     extends MoleculeDissectorC[Value] with DissectorWithDefaultValueC[Value] {
   final override def defaultValue = postProcess(defaultWIP)

@@ -18,6 +18,9 @@
 
 package ru.corrigendum.octetoscope.dissectors
 
+import java.text.SimpleDateFormat
+import java.util.{Locale, TimeZone, Date}
+
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
@@ -33,6 +36,25 @@ import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 
 object Gzip extends MoleculeBuilderUnitDissector {
   val MagicBytes = Array(31.toByte, 139.toByte)
+
+  private object MTime extends DissectorCR[Unit] {
+    private val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT)
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
+
+    override def dissect(context: DissectionContext, offset: InfoSize): Piece[ContentsR[Unit]] = {
+      // The spec doesn't say whether the timestamp is signed or unsigned.
+      // It does say that it's "in Unix format", though, and Unix time is usually signed.
+      val intPiece = sInt32L.dissect(context, offset)
+
+      Atom(Bytes(4), new ContentsR(()) {
+        override def repr: String = {
+          val timeRepr = if (intPiece.contents.value == 0) "no time stamp available"
+            else dateFormat.format(new Date(intPiece.contents.value * 1000L))
+          intPiece.contents.repr + " - " + timeRepr
+        }
+      })
+    }
+  }
 
   // the return value is whether the member was fully dissected
   private object Member extends MoleculeBuilderDissector[Boolean, Variable[Boolean]] {
@@ -60,6 +82,8 @@ object Gzip extends MoleculeBuilderUnitDissector {
         builder.addNote(NoteSeverity.Failure, "a reserved header flag is set")
         return
       }
+
+      add("Modification time", MTime)
 
       // TODO: complete this
     }

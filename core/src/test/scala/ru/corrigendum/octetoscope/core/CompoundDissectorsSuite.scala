@@ -58,7 +58,7 @@ class CompoundDissectorsSuite extends FunSuite {
       override def toString: String = "FOO"
     }
 
-    val dissector = enum(sInt8, Map(1.toByte -> foo))
+    val dissector = enum(sInt8, Map((1: Byte) -> foo))
     dissector.dissect(DissectionContext(blob), Bytes(0)) mustBe
       Atom(Bytes(1), new EagerContentsR(Some(foo), "1 -> FOO"))
 

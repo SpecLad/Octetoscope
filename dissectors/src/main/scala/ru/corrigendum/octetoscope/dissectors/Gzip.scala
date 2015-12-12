@@ -72,7 +72,7 @@ object Gzip extends MoleculeBuilderUnitDissector {
         return
       }
 
-      val compressionMethod = add("Compression method", enum(uInt8, Map(8.toShort -> "deflate")))
+      val compressionMethod = add("Compression method", enum(uInt8, Map((8: Short) -> "deflate")))
 
       val (flags, reservedFlags) = add("Flags", bitField(8,
         Map(3L -> "FCOMMENT", 4L -> "FNAME", 5L -> "FEXTRA", 6L -> "FHCRC", 7L -> "FTEXT"),

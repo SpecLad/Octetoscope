@@ -148,7 +148,7 @@ object PrimitiveDissectorsSuite {
     expectedNoteSeverities: Seq[NoteSeverity.Value], bytes: Byte*
   ): Unit = {
     for (padSize <- List(0, 1)) {
-      val pad = List.fill(padSize)((-1).toByte)
+      val pad = List.fill(padSize)(-1: Byte)
       val paddedBytes = pad ++ bytes ++ pad
       val blob = new ArrayBlob(paddedBytes.toArray)
       val piece = dissector.dissect(DissectionContext(blob), Bytes(padSize))

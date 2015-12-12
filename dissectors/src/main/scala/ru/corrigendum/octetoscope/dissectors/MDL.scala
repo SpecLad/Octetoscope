@@ -155,7 +155,7 @@ private[dissectors] object MDL extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(context, offset, builder)
 
       val coordsC = add.getContents("Coordinates", vector3(uInt8))
-      val lniC = add.getContents("Light normal index", uInt8 + lessThan(162.toShort, "NUMVERTEXNORMALS"))
+      val lniC = add.getContents("Light normal index", uInt8 + lessThan(162: Short, "NUMVERTEXNORMALS"))
 
       builder.setReprLazyO(coordsC.reprO.map("%s | #%s".format(_, lniC.repr)))
     }

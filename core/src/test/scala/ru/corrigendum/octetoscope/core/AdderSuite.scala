@@ -62,8 +62,8 @@ class AdderSuite extends FunSuite {
     val builder = new MoleculeBuilder
 
     val adder = new SequentialAdder(DissectionContext(blob), Bytes(0), builder)
-    val c1 = lessThan(2.toByte, "two")
-    val c2 = lessThan(3.toByte, "three")
+    val c1 = lessThan(2: Byte, "two")
+    val c2 = lessThan(3: Byte, "three")
 
     adder.filtered("alpha", sInt8)(c1, c2) mustBe Some(1)
     adder.filtered("beta", sInt8)(c1, c2) mustBe None

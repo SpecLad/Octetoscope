@@ -85,6 +85,25 @@ object Gzip extends MoleculeBuilderUnitDissector {
 
       add("Modification time", MTime)
 
+      // The spec is unclear on whether XFL is a bit field or an enumeration.
+      // On one hand, "slowest algorithm" and "fastest algorithm" seem mutually exclusive.
+      // On the other hand, their values are powers of two, and gzip will use a value of
+      // 0 if the algorithm used is neither slowest nor fastest. Plus the field is called "flags".
+      // Since there is more evidence in favor of the bit field option, we'll assume that.
+
+      val extraFlagNames = if (compressionMethod.contains("deflate"))
+        Map(5L -> "Fastest algorithm", 6L -> "Maximum compression") else Map[Long, String]()
+
+      add("Extra flags", bitField(8, extraFlagNames))
+
+      add("Operating system", enum(uInt8, Map(
+        (0: Short) -> "FAT file system", 1 -> "Amiga", 2 -> "VMS", 3 -> "Unix",
+        4 -> "VM/CMS", 5 -> "Atari", 6 -> "HPFS file system", 7 -> "Macintosh",
+        8 -> "Z-System", 9 -> "CP/M", 10 -> "TOPS-20", 11 -> "NTFS file system",
+        12 -> "SMS/QDOS", 13 -> "Acorn RISC OS", 14 -> "VFAT file system", 15 -> "MVS",
+        16 -> "BeOS", 17 -> "Tandem/NSK", 18 -> "THEOS", 255 -> "unknown"
+      )))
+
       // TODO: complete this
     }
   }

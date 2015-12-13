@@ -29,8 +29,11 @@ class PrimitiveDissectorsSuite extends FunSuite {
   test("padding") {
     val dc = DissectionContext(new ArrayBlob(Array[Byte](0, 0, 0)))
     padding(InfoSize(1, 7)).dissect(dc, InfoSize(1, 1)) mustBe Atom(InfoSize(1, 7), EmptyContents)
+    padding(InfoSize()).dissect(dc, InfoSize()) mustBe Atom(InfoSize(), EmptyContents)
+    padding(InfoSize()).dissect(dc, Bytes(3)) mustBe Atom(InfoSize(), EmptyContents)
 
     an [IndexOutOfBoundsException] must be thrownBy padding(InfoSize(2, 0)).dissect(dc, InfoSize(1, 1))
+    an [IndexOutOfBoundsException] must be thrownBy padding(InfoSize()).dissect(dc, InfoSize(3, 1))
   }
 
   test("sInt8") {

@@ -25,6 +25,7 @@ import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
+import ru.corrigendum.octetoscope.core.SpecialDissectors._
 
 /*
   Gzip compression format.
@@ -53,6 +54,16 @@ object Gzip extends MoleculeBuilderUnitDissector {
           intPiece.contents.repr + " - " + timeRepr
         }
       })
+    }
+  }
+
+  private object ExtraSubfield extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
+      val siC = add.getContents("Subfield ID", asciiishString(2))
+      builder.setReprLazy(siC.repr)
+      val len = add("Length", uInt16L)
+      add("Data", opaque(Bytes(len))) // TODO: dissect known subfields
     }
   }
 
@@ -103,6 +114,11 @@ object Gzip extends MoleculeBuilderUnitDissector {
         12 -> "SMS/QDOS", 13 -> "Acorn RISC OS", 14 -> "VFAT file system", 15 -> "MVS",
         16 -> "BeOS", 17 -> "Tandem/NSK", 18 -> "THEOS", 255 -> "unknown"
       )))
+
+      if (flags("FEXTRA")) {
+        val xlen = add("Extra length", uInt16L)
+        add("Extra field", fixedSize(sequence("Subfield", ExtraSubfield), Bytes(xlen)))
+      }
 
       // TODO: complete this
     }

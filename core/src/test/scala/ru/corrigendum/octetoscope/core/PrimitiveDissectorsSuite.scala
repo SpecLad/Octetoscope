@@ -60,6 +60,16 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(sInt16L, "32767", 32767, -1, 127)
   }
 
+  test("uInt16L") {
+    verify(uInt16L, "0", 0, 0, 0)
+    verify(uInt16L, "1", 1, 1, 0)
+    verify(uInt16L, "128", 128, -128, 0)
+    verify(uInt16L, "256", 256, 0, 1)
+    verify(uInt16L, "32768", 32768, 0, -128)
+    verify(uInt16L, "32769", 32769, 1, -128)
+    verify(uInt16L, "65535", 65535, -1, -1)
+  }
+
   test("sInt32L") {
     verify(sInt32L, "-2147483648", -2147483648, 0, 0, 0, -128)
     verify(sInt32L, "-50462977", -50462977, -1, -2, -3, -4)

@@ -87,6 +87,17 @@ private object NumberDissectors {
     }
   }
 
+  object UInt16L extends DissectorCR[Int] {
+    override def dissect(context: DissectionContext, offset: InfoSize): Piece[ContentsR[Int]] = {
+      val Bytes(bo) = offset
+
+      val value = (context.input(bo) & 0xFF) |
+        ((context.input(bo + 1) & 0xFF) << 8)
+
+      getNumberAtom(2, value)
+    }
+  }
+
   private def readInt32L(input: Blob, offset: InfoSize) = {
     val Bytes(bo) = offset
     (input(bo) & 0xFF) |

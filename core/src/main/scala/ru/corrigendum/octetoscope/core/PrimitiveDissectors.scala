@@ -32,6 +32,7 @@ object PrimitiveDissectors {
   def sInt8: DissectorCR[Byte] = NumberDissectors.SInt8
   def uInt8: DissectorCR[Short] = NumberDissectors.UInt8
   def sInt16L: DissectorCR[Short] = NumberDissectors.SInt16L
+  def uInt16L: DissectorCR[Int] = NumberDissectors.UInt16L
   def sInt32L: DissectorCR[Int] = NumberDissectors.SInt32L
   def float32L: DissectorCR[Float] = NumberDissectors.Float32L
 

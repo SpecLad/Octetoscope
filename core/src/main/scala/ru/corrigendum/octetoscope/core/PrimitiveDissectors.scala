@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.core
 
 object PrimitiveDissectors {
-  private class Padding(length: InfoSize) extends DissectorC[Unit] {
+  private class Opaque(length: InfoSize) extends DissectorC[Unit] {
     override def dissect(context: DissectionContext, offset: InfoSize): Piece[Contents[Unit]] = {
       if (offset + length > Bytes(context.input.size))
         throw new IndexOutOfBoundsException
@@ -27,7 +27,7 @@ object PrimitiveDissectors {
     }
   }
 
-  def padding(length: InfoSize): DissectorC[Unit] = new Padding(length)
+  def opaque(length: InfoSize): DissectorC[Unit] = new Opaque(length)
 
   def sInt8: DissectorCR[Byte] = NumberDissectors.SInt8
   def uInt8: DissectorCR[Short] = NumberDissectors.UInt8

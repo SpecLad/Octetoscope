@@ -139,7 +139,7 @@ private[dissectors] object MD3 extends MoleculeBuilderUnitDissector {
                            builder: MoleculeBuilder, wip: SurfaceHeaderValue): Unit = {
       val add = new SequentialAdder(context, offset, builder)
 
-      add("Identification (unused)", padding(Bytes(4)))
+      add("Identification (unused)", opaque(Bytes(4)))
       wip.nameC = Some(add.getContents("Name", asciiishZString(64)))
       add("Flags", bitField(32, Map.empty, unnamedReason = "unused"))
 

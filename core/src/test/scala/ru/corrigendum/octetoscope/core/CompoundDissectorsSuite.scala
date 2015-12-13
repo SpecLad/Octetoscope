@@ -52,6 +52,28 @@ class CompoundDissectorsSuite extends FunSuite {
       new EagerContents(Seq(Some("foo"), Some("bar"), Some("baz")), Some("foo - bar - baz")))
   }
 
+  test("sequence") {
+    val blob = new ArrayBlob("afoobarbaz".getBytes(StandardCharsets.US_ASCII))
+    val itemDissector = asciiString(3)
+    val dissector = sequence("Item", itemDissector)
+
+    dissector.dissect(DissectionContext(blob, softLimit = Bytes(1)), Bytes(1)) mustBe
+      Molecule(Bytes(0), EmptyContents, Seq())
+
+    dissector.dissect(DissectionContext(blob, softLimit = Bytes(7)), Bytes(1)) mustBe
+      Molecule(Bytes(6), EmptyContents, Seq(
+        SubPiece("Item", Bytes(0), itemDissector.dissect(DissectionContext(blob), Bytes(1))),
+        SubPiece("Item", Bytes(3), itemDissector.dissect(DissectionContext(blob), Bytes(4)))
+      ))
+
+    dissector.dissect(DissectionContext(blob, softLimit = Bytes(8)), Bytes(1)) mustBe
+      Molecule(Bytes(9), EmptyContents, Seq(
+        SubPiece("Item", Bytes(0), itemDissector.dissect(DissectionContext(blob), Bytes(1))),
+        SubPiece("Item", Bytes(3), itemDissector.dissect(DissectionContext(blob), Bytes(4))),
+        SubPiece("Item", Bytes(6), itemDissector.dissect(DissectionContext(blob), Bytes(7)))
+      ))
+  }
+
   test("enum") {
     val blob = new ArrayBlob(Array[Byte](1, 2))
     val foo = new Object {

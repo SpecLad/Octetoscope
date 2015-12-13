@@ -64,6 +64,16 @@ object CompoundDissectors {
   ): MoleculeDissectorWithDefaultValueC[IndexedSeq[V]] =
     new CollectingArray[V](size, itemName, itemDissector, Some(reprFunc))
 
+  private class Sequence(itemName: String, itemDissector: PlainDissector) extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
+      while (!add.limitReached) add(itemName, itemDissector)
+    }
+  }
+
+  def sequence(itemName: String, itemDissector: PlainDissector): MoleculeBuilderUnitDissector =
+    new Sequence(itemName, itemDissector)
+
   private class Enum[V, E](underlying: DissectorCR[V], enumerators: Map[V, E]) extends DissectorCR[Option[E]] {
     override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Option[E]] = {
       val piece = underlying.dissect(context, offset)

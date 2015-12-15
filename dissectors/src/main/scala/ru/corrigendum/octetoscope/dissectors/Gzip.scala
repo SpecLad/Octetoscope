@@ -32,6 +32,10 @@ import ru.corrigendum.octetoscope.core.SpecialDissectors._
 
   Dissection is based on RFC 1952 (https://www.ietf.org/rfc/rfc1952.pdf),
   as supplemented by the description at http://www.gzip.org/format.txt (last modified on 2002-07-02).
+
+  Random Access extension dissection is based on the dictzip 1.12.1 manpage (http://www.dict.org/).
+  BZGF extension dissection is based on the SAM/BAM specification, last modified on 18 Nov 2015
+  (https://samtools.github.io/hts-specs/SAMv1.pdf).
 */
 
 
@@ -62,13 +66,18 @@ object Gzip extends MoleculeBuilderUnitDissector {
       val add = new SequentialAdder(context, offset, builder)
 
       val knownSubfields = Map[Option[String], String](
+        // registered subfields
         Some("AC") -> "Acorn RISC OS/BBC MOS file type information",
         Some("Ap") -> "Apollo file type information",
         Some("cp") -> "file compressed by cpio",
         Some("GS") -> "gzsig",
         Some("KN") -> "KeyNote assertion (RFC 2704)",
         Some("Mc") -> "Macintosh info (Type and Creator values)",
-        Some("RO") -> "Acorn Risc OS file type information"
+        Some("RO") -> "Acorn Risc OS file type information",
+
+        // unregistered subfields
+        Some("BC") -> "BZGF (BAM)",
+        Some("RA") -> "Random Access (dictzip)"
       )
 
       val siC = add.getContents("Subfield ID", enum(asciiishString(2), knownSubfields))

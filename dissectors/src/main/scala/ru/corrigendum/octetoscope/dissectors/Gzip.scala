@@ -60,7 +60,18 @@ object Gzip extends MoleculeBuilderUnitDissector {
   private object ExtraSubfield extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
-      val siC = add.getContents("Subfield ID", asciiishString(2))
+
+      val knownSubfields = Map[Option[String], String](
+        Some("AC") -> "Acorn RISC OS/BBC MOS file type information",
+        Some("Ap") -> "Apollo file type information",
+        Some("cp") -> "file compressed by cpio",
+        Some("GS") -> "gzsig",
+        Some("KN") -> "KeyNote assertion (RFC 2704)",
+        Some("Mc") -> "Macintosh info (Type and Creator values)",
+        Some("RO") -> "Acorn Risc OS file type information"
+      )
+
+      val siC = add.getContents("Subfield ID", enum(asciiishString(2), knownSubfields))
       builder.setReprLazy(siC.repr)
       val len = add("Length", uInt16L)
       add("Data", opaque(Bytes(len))) // TODO: dissect known subfields

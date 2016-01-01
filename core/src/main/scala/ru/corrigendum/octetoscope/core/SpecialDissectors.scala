@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -50,6 +50,8 @@ object SpecialDissectors {
   // While this can wrap any dissector, it should only be used with MoleculeDissectors.
   // A molecule's actual size can always be recalculated from its children, but if an
   // atom's size is forcibly changed, the original size is lost.
+  // It's also safe to use this with dissectors whose output always ends exactly at the
+  // soft limit, since such output's size won't need to be changed.
   def fixedSize[V, C <: Contents[V]](
     underlying: DissectorWithDefaultValue[V, C], size: InfoSize
   ): DissectorWithDefaultValue[V, C] = new FixedSize(underlying, size)

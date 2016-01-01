@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,7 +26,14 @@ import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 class PrimitiveDissectorsSuite extends FunSuite {
   import PrimitiveDissectorsSuite._
 
-  test("opaque") {
+  test("opaque (unsized)") {
+    val dc = DissectionContext(new ArrayBlob(Array[Byte](0, 0)))
+    opaque.dissect(dc, InfoSize(2, 0)) mustBe Atom(InfoSize(), EmptyContents)
+    opaque.dissect(dc.copy(softLimit = Bytes(1)), InfoSize(0, 3)) mustBe Atom(InfoSize(0, 5), EmptyContents)
+    opaque.dissect(dc.copy(softLimit = InfoSize()), InfoSize()) mustBe Atom(InfoSize(), EmptyContents)
+  }
+
+  test("opaque (sized)") {
     val dc = DissectionContext(new ArrayBlob(Array[Byte](0, 0, 0)))
     opaque(InfoSize(1, 7)).dissect(dc, InfoSize(1, 1)) mustBe Atom(InfoSize(1, 7), EmptyContents)
     opaque(InfoSize()).dissect(dc, InfoSize()) mustBe Atom(InfoSize(), EmptyContents)

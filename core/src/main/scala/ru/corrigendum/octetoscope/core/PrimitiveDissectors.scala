@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,16 @@
 package ru.corrigendum.octetoscope.core
 
 object PrimitiveDissectors {
-  private class Opaque(length: InfoSize) extends DissectorC[Unit] {
+  private object UnsizedOpaque extends DissectorWithDefaultValueC[Unit] {
+    override def defaultValue: Unit = ()
+    override def dissect(context: DissectionContext, offset: InfoSize): Piece[Contents[Unit]] = {
+      Atom(context.softLimit - offset, EmptyContents)
+    }
+  }
+
+  def opaque: DissectorWithDefaultValueC[Unit] = UnsizedOpaque
+
+  private class SizedOpaque(length: InfoSize) extends DissectorC[Unit] {
     override def dissect(context: DissectionContext, offset: InfoSize): Piece[Contents[Unit]] = {
       if (offset + length > Bytes(context.input.size))
         throw new IndexOutOfBoundsException
@@ -27,7 +36,7 @@ object PrimitiveDissectors {
     }
   }
 
-  def opaque(length: InfoSize): DissectorC[Unit] = new Opaque(length)
+  def opaque(length: InfoSize): DissectorC[Unit] = new SizedOpaque(length)
 
   def sInt8: DissectorCR[Byte] = NumberDissectors.SInt8
   def uInt8: DissectorCR[Short] = NumberDissectors.UInt8

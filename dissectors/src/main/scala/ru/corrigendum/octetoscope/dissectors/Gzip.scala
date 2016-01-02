@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2015-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -61,6 +61,29 @@ object Gzip extends MoleculeBuilderUnitDissector {
     }
   }
 
+  private object RandomAccessSubfield extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
+
+      val ver = add("Version", uInt16L)
+      if (ver != 1) {
+        builder.addNote(NoteSeverity.Failure, "unsupported version")
+        return
+      }
+
+      add("Chunk length", uInt16L)
+      val chunkCount = add("Chunk count", uInt16L)
+      add("Chunk lengths after compression", array(chunkCount, "Length", uInt16L))
+    }
+  }
+
+  private object BZGFSubfield extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      val add = new SequentialAdder(context, offset, builder)
+      add("Member size minus 1", uInt16L)
+    }
+  }
+
   private object ExtraSubfield extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
@@ -83,7 +106,17 @@ object Gzip extends MoleculeBuilderUnitDissector {
       val siC = add.getContents("Subfield ID", enum(asciiishString(2), knownSubfields))
       builder.setReprLazy(siC.repr)
       val len = add("Length", uInt16L)
-      add("Data", opaque(Bytes(len))) // TODO: dissect known subfields
+      add("Data", fixedSize(
+        if (siC.value.contains(knownSubfields(Some("BC")))) BZGFSubfield
+        else if (siC.value.contains(knownSubfields(Some("RA")))) RandomAccessSubfield
+        else opaque,
+        Bytes(len))
+      )
+
+      // Possible improvement: the BC and RA chunks allow us to determine the compressed size
+      // of the member. We can use it to set the size of the corresponding piece so that subsequent
+      // members can be dissected even if the current member dissection fails (e.g. if it's
+      // corrupted or uses an unknown compression method).
     }
   }
 

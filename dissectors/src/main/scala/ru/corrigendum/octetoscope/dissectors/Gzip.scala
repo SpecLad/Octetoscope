@@ -88,28 +88,30 @@ object Gzip extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
 
-      val knownSubfields = Map[Option[String], String](
+      case class SubfieldType(name: String, dissector: Option[DissectorWithDefaultValueC[Unit]] = None) {
+        override def toString = name
+      }
+
+      val knownSubfields = Map[Option[String], SubfieldType](
         // registered subfields
-        Some("AC") -> "Acorn RISC OS/BBC MOS file type information",
-        Some("Ap") -> "Apollo file type information",
-        Some("cp") -> "file compressed by cpio",
-        Some("GS") -> "gzsig",
-        Some("KN") -> "KeyNote assertion (RFC 2704)",
-        Some("Mc") -> "Macintosh info (Type and Creator values)",
-        Some("RO") -> "Acorn Risc OS file type information",
+        Some("AC") -> SubfieldType("Acorn RISC OS/BBC MOS file type information"),
+        Some("Ap") -> SubfieldType("Apollo file type information"),
+        Some("cp") -> SubfieldType("file compressed by cpio"),
+        Some("GS") -> SubfieldType("gzsig"),
+        Some("KN") -> SubfieldType("KeyNote assertion (RFC 2704)"),
+        Some("Mc") -> SubfieldType("Macintosh info (Type and Creator values)"),
+        Some("RO") -> SubfieldType("Acorn Risc OS file type information"),
 
         // unregistered subfields
-        Some("BC") -> "BZGF (BAM)",
-        Some("RA") -> "Random Access (dictzip)"
+        Some("BC") -> SubfieldType("BZGF (BAM)", Some(BZGFSubfield)),
+        Some("RA") -> SubfieldType("Random Access (dictzip)", Some(RandomAccessSubfield))
       )
 
       val siC = add.getContents("Subfield ID", enum(asciiishString(2), knownSubfields))
       builder.setReprLazy(siC.repr)
       val len = add("Length", uInt16L)
       add("Data", fixedSize(
-        if (siC.value.contains(knownSubfields(Some("BC")))) BZGFSubfield
-        else if (siC.value.contains(knownSubfields(Some("RA")))) RandomAccessSubfield
-        else opaque,
+        siC.value.fold(opaque)(_.dissector.getOrElse(opaque)),
         Bytes(len))
       )
 

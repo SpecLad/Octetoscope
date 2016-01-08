@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,12 +22,18 @@ import java.nio.charset.StandardCharsets
 
 import org.scalatest.FunSuite
 import org.scalatest.MustMatchers._
-import ru.corrigendum.octetoscope.core.mocks.MockDissector
 
 class DissectorDriverSuite extends FunSuite {
   test("success") {
-    val driver = getDissectorDriver(Function.const(Some(MockDissector)))
-    driver(DissectorDriverSuite.FakeBlob) mustBe Atom(Bytes(5), new ToStringContents("magic"))
+    val expectedResult = Atom(Bytes(5), EmptyContents)
+    val driver = getDissectorDriver(Function.const(Some(new PlainDissector {
+      override def dissect(context: DissectionContext, offset: InfoSize): Piece[Contents[Any]] = {
+        context.input must be theSameInstanceAs DissectorDriverSuite.FakeBlob
+        context.softLimit mustBe Bytes(DissectorDriverSuite.FakeBlob.size)
+        expectedResult
+      }
+    })))
+    driver(DissectorDriverSuite.FakeBlob) must be theSameInstanceAs expectedResult
   }
 
   test("failure - file too small") {

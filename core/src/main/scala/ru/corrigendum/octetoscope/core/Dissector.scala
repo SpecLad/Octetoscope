@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,11 +20,15 @@ package ru.corrigendum.octetoscope.core
 
 import ru.corrigendum.octetoscope.abstractinfra.Blob
 
-sealed case class DissectionContext(input: Blob, softLimit: InfoSize) {
+sealed case class DissectionContext(input: Blob,
+                                    softLimit: InfoSize,
+                                    untested: () => Unit = DissectionContext.ignoreUntested) {
   require(softLimit <= Bytes(input.size))
 }
 
 object DissectionContext {
+  private val ignoreUntested: () => Unit = () => ()
+
   def apply(): DissectionContext = DissectionContext(Blob.empty, InfoSize())
   def apply(input: Blob): DissectionContext = DissectionContext(input, Bytes(input.size))
 }

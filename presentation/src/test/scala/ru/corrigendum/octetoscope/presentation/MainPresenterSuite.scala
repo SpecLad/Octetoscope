@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -143,7 +143,8 @@ class MainPresenterSuite extends path.FunSpec {
             tab.title mustBe "cadabra"
             tab.toolTip mustBe MainPresenterSuite.FakePath.toString
             DisplayTreeNodeData.from(tab.tree) mustBe DisplayTreeNodeData.from(
-              presentPiece(dissectorDriver(Blob.empty), (offset: InfoSize, size: InfoSize) => ()))
+              presentPiece(dissectorDriver(Blob.empty, DissectionContext.ignoreUntested),
+                (offset: InfoSize, size: InfoSize) => ()))
 
             view.activeTab mustBe Some(tab)
             view.title mustBe "Blarf - cadabra"

@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ object MainPresenter {
                   logger.log(strings.logEntryDissectingFile(path.toString))
                   clock.timeExecution {() =>
                     val blob = binaryReader.readWhole(path)
-                    (blob, dissectorDriver(blob))
+                    (blob, dissectorDriver(blob, DissectionContext.ignoreUntested))
                   }
                 } catch {
                   case e: Exception =>

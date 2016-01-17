@@ -43,7 +43,7 @@ package object core {
 
   type Detector = Blob => Option[PlainDissector]
 
-  type DissectorDriver = Blob => PlainPiece
+  type DissectorDriver = (Blob, UntestedCallback) => PlainPiece
 
   type UntestedCallback = () => Unit
 
@@ -51,10 +51,10 @@ package object core {
   class DetectionFailedException extends Exception
 
   def getDissectorDriver(detector: Detector): DissectorDriver =
-    (blob: Blob) =>
+    (blob: Blob, untested: UntestedCallback) =>
       try {
         val dissector = detector(blob).getOrElse(throw new DetectionFailedException)
-        dissector.dissect(DissectionContext(blob))
+        dissector.dissect(DissectionContext(blob, Bytes(blob.size), untested))
       } catch {
         // This should happen rarely, if ever, since most dissectors will return truncated
         // molecules instead of throwing.

@@ -26,14 +26,16 @@ import org.scalatest.MustMatchers._
 class DissectorDriverSuite extends FunSuite {
   test("success") {
     val expectedResult = Atom(Bytes(5), EmptyContents)
+    val untested = () => ()
     val driver = getDissectorDriver(Function.const(Some(new PlainDissector {
       override def dissect(context: DissectionContext, offset: InfoSize): Piece[Contents[Any]] = {
         context.input must be theSameInstanceAs DissectorDriverSuite.FakeBlob
         context.softLimit mustBe Bytes(DissectorDriverSuite.FakeBlob.size)
+        context.untested must be theSameInstanceAs untested
         expectedResult
       }
     })))
-    driver(DissectorDriverSuite.FakeBlob) must be theSameInstanceAs expectedResult
+    driver(DissectorDriverSuite.FakeBlob, untested) must be theSameInstanceAs expectedResult
   }
 
   test("failure - file too small") {
@@ -42,13 +44,13 @@ class DissectorDriverSuite extends FunSuite {
         throw new IndexOutOfBoundsException
     })))
 
-    a [TooSmallToDissectException] must be thrownBy driver(DissectorDriverSuite.FakeBlob)
+    a [TooSmallToDissectException] must be thrownBy driver(DissectorDriverSuite.FakeBlob, DissectionContext.ignoreUntested)
   }
 
   test("failure - detection failed") {
     val driver = getDissectorDriver(Function.const(None))
 
-    a [DetectionFailedException] must be thrownBy driver(DissectorDriverSuite.FakeBlob)
+    a [DetectionFailedException] must be thrownBy driver(DissectorDriverSuite.FakeBlob, DissectionContext.ignoreUntested)
   }
 }
 

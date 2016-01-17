@@ -22,12 +22,12 @@ import ru.corrigendum.octetoscope.abstractinfra.Blob
 
 sealed case class DissectionContext(input: Blob,
                                     softLimit: InfoSize,
-                                    untested: () => Unit = DissectionContext.ignoreUntested) {
+                                    untested: UntestedCallback = DissectionContext.ignoreUntested) {
   require(softLimit <= Bytes(input.size))
 }
 
 object DissectionContext {
-  private val ignoreUntested: () => Unit = () => ()
+  val ignoreUntested: UntestedCallback = () => ()
 
   def apply(): DissectionContext = DissectionContext(Blob.empty, InfoSize())
   def apply(input: Blob): DissectionContext = DissectionContext(input, Bytes(input.size))

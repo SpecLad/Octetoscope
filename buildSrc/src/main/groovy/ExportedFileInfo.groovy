@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2015-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,9 +19,10 @@
 public final class ExportedFileInfo {
   String path
   boolean executable
+  boolean containsNativeText
 
   @Override
   String toString() {
-    return "$path${executable ? " (executable)" : ""}"
+    return "$path${executable ? " (executable)" : ""}${containsNativeText ? " (native text)" : ""}"
   }
 }

@@ -144,10 +144,7 @@ task configureDistSource << {
     distSource.from(f.path) {
       into RelativePath.parse(true, f.path).parent.pathString
       if (f.executable) fileMode 0755
-      // TODO: apply the CrLf filter where appropriate. Unfortunately, this will be very difficult
-      // to do until JGit adds better attribute support (see https://bugs.eclipse.org/bugs/show_bug.cgi?id=342372).
-      // More specifically, we need to be able to query attributes for the current TreeWalk position
-      // (implemented by https://git.eclipse.org/r/#/c/35377/).
+      if (f.containsNativeText) filter(FixCrLfFilter, eol: exportEOL)
     }
   }
 }

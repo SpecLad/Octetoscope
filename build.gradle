@@ -41,9 +41,9 @@ ext {
   def scalaMajorVersion = '2.11'
 
   deps = [
-    scalaLibrary: "org.scala-lang:scala-library:$scalaMajorVersion.7",
+    scalaLibrary: "org.scala-lang:scala-library:$scalaMajorVersion.8",
     scalaTest: "org.scalatest:scalatest_$scalaMajorVersion:2.2.6",
-    icu: 'com.ibm.icu:icu4j:55.1',
+    icu: 'com.ibm.icu:icu4j:57.1',
     arm: "com.jsuereth:scala-arm_$scalaMajorVersion:1.4",
   ]
 }

@@ -19,10 +19,10 @@
 repositories {
   mavenCentral()
   maven {
-    url 'http://download.eclipse.org/jgit/maven'
+    url 'https://repo.eclipse.org/content/groups/releases/'
   }
 }
 
 dependencies {
-  compile 'org.eclipse.jgit:org.eclipse.jgit:4.2.0.201601211800-r'
+  compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.0.201606070830-r'
 }

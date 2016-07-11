@@ -32,16 +32,16 @@ import ru.corrigendum.octetoscope.presentation.tools.{DisplayTreeNodeData, FakeM
 
 class MainPresenterSuite extends path.FunSpec {
   describe("A MainPresenter") {
+    val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
     val view = new MockMainView()
     val boxer = new MockDialogBoxer()
     val logger = new MockLogger()
     val binaryReader = new MockBinaryReader()
-    val dissectorDriver = new MockDissectorDriver()
-    val strings: PresentationStrings = FakeMessageLocalizer.localize(classOf[PresentationStrings])
-
     val clock = new MockClock(new Date(0), TimeZone.getTimeZone("UTC"))
+    val introspector = new MockIntrospector(MainPresenterSuite.FakeSTE)
+    val dissectorDriver = new MockDissectorDriver()
 
-    MainPresenter.attach(strings, "Blarf", view, boxer, logger, binaryReader, clock, dissectorDriver)
+    MainPresenter.attach(strings, "Blarf", view, boxer, logger, binaryReader, clock, introspector, dissectorDriver)
 
     it("must put the window into the initial state") {
       view mustBe 'visible
@@ -212,6 +212,27 @@ class MainPresenterSuite extends path.FunSpec {
             }
           }
         }
+
+        describe("and the dissector invokes the untested callback") {
+          binaryReader.result = MainPresenterSuite.FakeBlob
+          dissectorDriver.result = MainPresenterSuite.FakePiece
+          dissectorDriver.invokeUntested = true
+          view.trigger(MainView.CommandEvent(MainView.Command.Open))
+
+          it("must generate a log message") {
+            view.tabs must have size 1 // sanity check
+
+            logger.entries mustBe Seq(
+              Seq(strings.logEntryDissectingFile(MainPresenterSuite.FakePath.toString)),
+              Seq(strings.logEntryUntested(MainPresenterSuite.FakeSTE.getClassName,
+                                           MainPresenterSuite.FakeSTE.getMethodName,
+                                           MainPresenterSuite.FakeSTE.getFileName,
+                                           MainPresenterSuite.FakeSTE.getLineNumber)),
+              Seq(strings.logEntrySuccessfullyDissectedFile(MainPresenterSuite.FakePath.toString),
+                  strings.logEntryItTookSeconds(0))
+            )
+          }
+        }
       }
     }
 
@@ -237,4 +258,5 @@ object MainPresenterSuite {
     SubPiece("eta", InfoSize(3, 4), Atom(InfoSize(), EmptyContents)), // zero-length between nibbles
     SubPiece("theta", InfoSize(3, 6), Atom(InfoSize(), EmptyContents)) // zero-length in the middle of a right nibble
   ))
+  private val FakeSTE = new StackTraceElement("Foo", "bar", "Foo.scala", 12)
 }

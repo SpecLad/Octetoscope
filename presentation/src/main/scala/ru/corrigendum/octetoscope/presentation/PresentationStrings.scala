@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -46,6 +46,9 @@ trait PresentationStrings {
 
   @Translation(format = "successfully dissected file \"{0}\"")
   def logEntrySuccessfullyDissectedFile(path: String): String
+
+  @Translation(format = "untested code path hit in {0}.{1} ({2}:{3})")
+  def logEntryUntested(className: String, methodName: String, fileName: String, lineNumber: Int): String
 
   // Miscellaneous UI elements
   @Translation(format = "This is {0} version {1}.")

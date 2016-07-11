@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package ru.corrigendum.octetoscope.application
 import ru.corrigendum.octetoscope.abstractui.UIStrings
 import ru.corrigendum.octetoscope.core.{getDetector, getDissectorDriver}
 import ru.corrigendum.octetoscope.dissectors.magicMap
-import ru.corrigendum.octetoscope.infra.{DefaultBinaryReader, DefaultClock, MessageLocalizer}
+import ru.corrigendum.octetoscope.infra.{DefaultBinaryReader, DefaultClock, DefaultIntrospector, MessageLocalizer}
 import ru.corrigendum.octetoscope.presentation.{DialogBoxerImpl, LoggerImpl, MainPresenter, PresentationStrings}
 import ru.corrigendum.octetoscope.swingui.SwingApplication
 
@@ -45,6 +45,7 @@ object Octetoscope extends App {
         new LoggerImpl(DefaultClock, view.logView),
         DefaultBinaryReader,
         DefaultClock,
+        DefaultIntrospector,
         getDissectorDriver(getDetector(magicMap))
       ))
   }

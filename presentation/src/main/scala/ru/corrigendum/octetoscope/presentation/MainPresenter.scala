@@ -20,7 +20,7 @@ package ru.corrigendum.octetoscope.presentation
 
 import java.io.IOException
 
-import ru.corrigendum.octetoscope.abstractinfra.{BinaryReader, Clock}
+import ru.corrigendum.octetoscope.abstractinfra.{BinaryReader, Clock, Introspector}
 import ru.corrigendum.octetoscope.abstractui.MainView
 import ru.corrigendum.octetoscope.abstractui.MainView._
 import ru.corrigendum.octetoscope.core._
@@ -35,6 +35,7 @@ object MainPresenter {
              logger: Logger,
              binaryReader: BinaryReader,
              clock: Clock,
+             introspector: Introspector,
              dissectorDriver: DissectorDriver): Unit = {
     var numTabs = 0
     var currentTabHandler: Option[TabHandler] = None
@@ -80,7 +81,11 @@ object MainPresenter {
                   logger.log(strings.logEntryDissectingFile(path.toString))
                   clock.timeExecution {() =>
                     val blob = binaryReader.readWhole(path)
-                    (blob, dissectorDriver(blob, DissectionContext.ignoreUntested))
+                    (blob, dissectorDriver(blob, () => {
+                      val ste = introspector.obtainCaller()
+                      logger.log(strings.logEntryUntested(
+                        ste.getClassName, ste.getMethodName, ste.getFileName, ste.getLineNumber))
+                    }))
                   }
                 } catch {
                   case e: Exception =>

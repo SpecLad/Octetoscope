@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2014, 2016 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,19 +16,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package ru.corrigendum.octetoscope.presentation.mocks
+package ru.corrigendum.octetoscope.abstractinfra
 
-import ru.corrigendum.octetoscope.abstractinfra.Blob
-import ru.corrigendum.octetoscope.core.{DissectorDriver, PlainPiece, UntestedCallback}
-
-class MockDissectorDriver extends DissectorDriver {
-  override def apply(path: Blob, untested: UntestedCallback): PlainPiece = {
-    exception.foreach(throw _)
-    if (invokeUntested) untested()
-    result
-  }
-
-  var result: PlainPiece = _
-  var exception: Option[Exception] = None
-  var invokeUntested: Boolean = false
+trait Introspector {
+  def obtainCaller(): StackTraceElement
 }

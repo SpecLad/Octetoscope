@@ -44,63 +44,63 @@ class PrimitiveDissectorsSuite extends FunSuite {
   }
 
   test("sInt8") {
-    verify(sInt8, "-128", -128, -128)
-    verify(sInt8, "-100", -100, -100)
-    verify(sInt8, "-1", -1, -1)
-    verify(sInt8, "0", 0, 0)
-    verify(sInt8, "1", 1, 1)
-    verify(sInt8, "127", 127, 127)
+    verifyInteger(sInt8, -128, -128)
+    verifyInteger(sInt8, -100, -100)
+    verifyInteger(sInt8, -1, -1)
+    verifyInteger(sInt8, 0, 0)
+    verifyInteger(sInt8, 1, 1)
+    verifyInteger(sInt8, 127, 127)
   }
 
   test("uInt8") {
-    verify(uInt8, "0", 0, 0)
-    verify(uInt8, "1", 1, 1)
-    verify(uInt8, "127", 127, 127)
-    verify(uInt8, "128", 128, -128)
-    verify(uInt8, "255", 255, -1)
+    verifyInteger(uInt8, 0, 0)
+    verifyInteger(uInt8, 1, 1)
+    verifyInteger(uInt8, 127, 127)
+    verifyInteger(uInt8, 128, -128)
+    verifyInteger(uInt8, 255, -1)
   }
 
   test("sInt16L") {
-    verify(sInt16L, "-32768", -32768, 0, -128)
-    verify(sInt16L, "-257", -257, -1, -2)
-    verify(sInt16L, "-1", -1, -1, -1)
-    verify(sInt16L, "0", 0, 0, 0)
-    verify(sInt16L, "513", 513, 1, 2)
-    verify(sInt16L, "767", 767, -1, 2)
-    verify(sInt16L, "32767", 32767, -1, 127)
+    verifyInteger(sInt16L, -32768, 0, -128)
+    verifyInteger(sInt16L, -257, -1, -2)
+    verifyInteger(sInt16L, -1, -1, -1)
+    verifyInteger(sInt16L, 0, 0, 0)
+    verifyInteger(sInt16L, 513, 1, 2)
+    verifyInteger(sInt16L, 767, -1, 2)
+    verifyInteger(sInt16L, 32767, -1, 127)
   }
 
   test("uInt16L") {
-    verify(uInt16L, "0", 0, 0, 0)
-    verify(uInt16L, "1", 1, 1, 0)
-    verify(uInt16L, "128", 128, -128, 0)
-    verify(uInt16L, "256", 256, 0, 1)
-    verify(uInt16L, "32768", 32768, 0, -128)
-    verify(uInt16L, "32769", 32769, 1, -128)
-    verify(uInt16L, "65535", 65535, -1, -1)
+    verifyInteger(uInt16L, 0, 0, 0)
+    verifyInteger(uInt16L, 1, 1, 0)
+    verifyInteger(uInt16L, 128, -128, 0)
+    verifyInteger(uInt16L, 256, 0, 1)
+    verifyInteger(uInt16L, 32768, 0, -128)
+    verifyInteger(uInt16L, 32769, 1, -128)
+    verifyInteger(uInt16L, 65535, -1, -1)
   }
 
   test("sInt32L") {
-    verify(sInt32L, "-2147483648", -2147483648, 0, 0, 0, -128)
-    verify(sInt32L, "-50462977", -50462977, -1, -2, -3, -4)
-    verify(sInt32L, "-1", -1, -1, -1, -1, -1)
-    verify(sInt32L, "0", 0, 0, 0, 0, 0)
-    verify(sInt32L, "67305985", 67305985, 1, 2, 3, 4)
-    verify(sInt32L, "83754751", 83754751, -1, -2, -3, 4)
-    verify(sInt32L, "2147483647", 2147483647, -1, -1, -1, 127)
+    verifyInteger(sInt32L, -2147483648, 0, 0, 0, -128)
+    verifyInteger(sInt32L, -50462977, -1, -2, -3, -4)
+    verifyInteger(sInt32L, -1, -1, -1, -1, -1)
+    verifyInteger(sInt32L, 0, 0, 0, 0, 0)
+    verifyInteger(sInt32L, 67305985, 1, 2, 3, 4)
+    verifyInteger(sInt32L, 83754751, -1, -2, -3, 4)
+    verifyInteger(sInt32L, 2147483647, -1, -1, -1, 127)
   }
 
   test("uInt32L") {
-    verify(uInt32L, "0", 0L, 0, 0, 0, 0)
-    verify(uInt32L, "1", 1L, 1, 0, 0, 0)
-    verify(uInt32L, "255", 255L, -1, 0, 0, 0)
-    verify(uInt32L, "256", 256L, 0, 1, 0, 0)
-    verify(uInt32L, "65280", 65280L, 0, -1, 0, 0)
-    verify(uInt32L, "65536", 65536L, 0, 0, 1, 0)
-    verify(uInt32L, "16711680", 16711680L, 0, 0, -1, 0)
-    verify(uInt32L, "16777216", 16777216L, 0, 0, 0, 1)
-    verify(uInt32L, "4278190080", 4278190080L, 0, 0, 0, -1)
-    verify(uInt32L, "4294967295", 4294967295L, -1, -1, -1, -1)
+    verifyInteger(uInt32L, 0L, 0, 0, 0, 0)
+    verifyInteger(uInt32L, 1L, 1, 0, 0, 0)
+    verifyInteger(uInt32L, 255L, -1, 0, 0, 0)
+    verifyInteger(uInt32L, 256L, 0, 1, 0, 0)
+    verifyInteger(uInt32L, 65280L, 0, -1, 0, 0)
+    verifyInteger(uInt32L, 65536L, 0, 0, 1, 0)
+    verifyInteger(uInt32L, 16711680L, 0, 0, -1, 0)
+    verifyInteger(uInt32L, 16777216L, 0, 0, 0, 1)
+    verifyInteger(uInt32L, 4278190080L, 0, 0, 0, -1)
+    verifyInteger(uInt32L, 4294967295L, -1, -1, -1, -1)
   }
 
   test("float32L") {
@@ -204,5 +204,9 @@ object PrimitiveDissectorsSuite {
     expectedNoteSeverities: Seq[NoteSeverity.Value], bytes: Byte*
   ): Unit = {
     verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe expectedValue, expectedNoteSeverities, bytes: _*)
+  }
+
+  def verifyInteger[Value](dissector: DissectorC[Value], expectedValue: Value, bytes: Byte*): Unit = {
+    verify[Value](dissector, expectedValue.toString, expectedValue, bytes: _*)
   }
 }

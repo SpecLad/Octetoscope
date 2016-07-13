@@ -61,6 +61,22 @@ object Gzip extends MoleculeBuilderUnitDissector {
     }
   }
 
+  private object AcornExtraField extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      context.untested()
+
+      val add = new SequentialAdder(context, offset, builder)
+
+      // TODO: implement the alternate interpretation (when the top of the load address is 0xFFF)
+      add("Load address", uInt32L)
+      add("Execution address", uInt32L)
+      add("Object attributes", bitField(32, Map(
+        26L -> "Public write", 27L -> "Public read", 28L -> "Locked", 30L -> "Owner write", 31L -> "Owner read")))
+      add("Object length", uInt32L)
+      add("Reserved", opaque(Bytes(12)))
+    }
+  }
+
   private object RandomAccessSubfield extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
@@ -91,7 +107,7 @@ object Gzip extends MoleculeBuilderUnitDissector {
 
     private val knownSubfields = Map[Option[String], SubfieldType](
       // registered subfields
-      Some("AC") -> SubfieldType("Acorn RISC OS/BBC MOS file type information"),
+      Some("AC") -> SubfieldType("Acorn RISC OS/BBC MOS file type information", Some(AcornExtraField)),
       Some("Ap") -> SubfieldType("Apollo file type information"),
       Some("cp") -> SubfieldType("file compressed by cpio"),
       Some("GS") -> SubfieldType("gzsig"),

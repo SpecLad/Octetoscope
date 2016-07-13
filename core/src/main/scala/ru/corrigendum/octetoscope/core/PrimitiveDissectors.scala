@@ -43,6 +43,7 @@ object PrimitiveDissectors {
   def sInt16L: DissectorCR[Short] = NumberDissectors.SInt16L
   def uInt16L: DissectorCR[Int] = NumberDissectors.UInt16L
   def sInt32L: DissectorCR[Int] = NumberDissectors.SInt32L
+  def uInt32L: DissectorCR[Long] = NumberDissectors.UInt32L
   def float32L: DissectorCR[Float] = NumberDissectors.Float32L
 
   def asciiString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiString(length, false)

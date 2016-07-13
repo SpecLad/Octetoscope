@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2014-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2014-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -36,8 +36,9 @@ private object NumberDissectors {
   private val byteAtomCache = makeNumberAtomCache[Byte]
   private val shortAtomCache = makeNumberAtomCache[Short]
   private val intAtomCache = makeNumberAtomCache[Int]
+  private val longAtomCache = makeNumberAtomCache[Long]
 
-  private def numberIsCached(byteSize: Int, value: Int) =
+  private def numberIsCached(byteSize: Int, value: Long) =
     byteSize > 0 && byteSize <= NumCachedSizes &&
       value >= 0 && value < NumCachedNumbers
 
@@ -58,6 +59,12 @@ private object NumberDissectors {
       intAtomCache(byteSize - 1)(value)
     else
       Atom(Bytes(byteSize), new ToStringContents[Int](value))
+
+  private def getNumberAtom(byteSize: Int, value: Long) =
+    if (numberIsCached(byteSize, value))
+      longAtomCache(byteSize - 1)(value.toInt)
+    else
+      Atom(Bytes(byteSize), new ToStringContents[Long](value))
 
   object SInt8 extends DissectorCR[Byte] {
     override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Byte] = {
@@ -111,6 +118,14 @@ private object NumberDissectors {
       val value = readInt32L(context.input, offset)
 
       getNumberAtom(4, value)
+    }
+  }
+
+  object UInt32L extends DissectorCR[Long] {
+    override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Long] = {
+      val value = readInt32L(context.input, offset)
+
+      getNumberAtom(4, if (value >= 0) value else (1L << 32) + value)
     }
   }
 

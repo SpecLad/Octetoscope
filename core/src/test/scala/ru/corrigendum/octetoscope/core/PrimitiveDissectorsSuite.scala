@@ -90,6 +90,19 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(sInt32L, "2147483647", 2147483647, -1, -1, -1, 127)
   }
 
+  test("uInt32L") {
+    verify(uInt32L, "0", 0L, 0, 0, 0, 0)
+    verify(uInt32L, "1", 1L, 1, 0, 0, 0)
+    verify(uInt32L, "255", 255L, -1, 0, 0, 0)
+    verify(uInt32L, "256", 256L, 0, 1, 0, 0)
+    verify(uInt32L, "65280", 65280L, 0, -1, 0, 0)
+    verify(uInt32L, "65536", 65536L, 0, 0, 1, 0)
+    verify(uInt32L, "16711680", 16711680L, 0, 0, -1, 0)
+    verify(uInt32L, "16777216", 16777216L, 0, 0, 0, 1)
+    verify(uInt32L, "4278190080", 4278190080L, 0, 0, 0, -1)
+    verify(uInt32L, "4294967295", 4294967295L, -1, -1, -1, -1)
+  }
+
   test("float32L") {
     verifyGeneric[Float](float32L, Some("-NaN(0x400001)"), num => Float.box(num) mustBe 'NaN,
       Seq.empty, 0x01, 0x00, 0xC0.toByte, 0xFF.toByte)

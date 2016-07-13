@@ -77,6 +77,16 @@ object Gzip extends MoleculeBuilderUnitDissector {
     }
   }
 
+  private object CpioExtraField extends MoleculeBuilderUnitDissector {
+    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+      context.untested()
+
+      val add = new SequentialAdder(context, offset, builder)
+      // TODO: use this to constrain the FNAME field
+      add("Length of FNAME field", uInt16L)
+    }
+  }
+
   private object RandomAccessSubfield extends MoleculeBuilderUnitDissector {
     override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
       val add = new SequentialAdder(context, offset, builder)
@@ -109,7 +119,7 @@ object Gzip extends MoleculeBuilderUnitDissector {
       // registered subfields
       Some("AC") -> SubfieldType("Acorn RISC OS/BBC MOS file type information", Some(AcornExtraField)),
       Some("Ap") -> SubfieldType("Apollo file type information"),
-      Some("cp") -> SubfieldType("file compressed by cpio"),
+      Some("cp") -> SubfieldType("file compressed by cpio", Some(CpioExtraField)),
       Some("GS") -> SubfieldType("gzsig"),
       Some("KN") -> SubfieldType("KeyNote assertion (RFC 2704)"),
       Some("Mc") -> SubfieldType("Macintosh info (Type and Creator values)"),

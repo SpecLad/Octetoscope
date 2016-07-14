@@ -61,73 +61,73 @@ object Gzip extends MoleculeBuilderUnitDissector {
     }
   }
 
-  private object AcornExtraField extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      context.untested()
-
-      val add = new SequentialAdder(context, offset, builder)
-
-      // TODO: implement the alternate interpretation (when the top of the load address is 0xFFF)
-      add("Load address", uInt32L)
-      add("Execution address", uInt32L)
-      add("Object attributes", bitField(32, Map(
-        26L -> "Public write", 27L -> "Public read", 28L -> "Locked", 30L -> "Owner write", 31L -> "Owner read")))
-      add("Object length", uInt32L)
-      add("Reserved", opaque(Bytes(12)))
-    }
-  }
-
-  private object CpioExtraField extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      context.untested()
-
-      val add = new SequentialAdder(context, offset, builder)
-      // TODO: use this to constrain the FNAME field
-      add("Length of FNAME field", uInt16L)
-    }
-  }
-
-  private object RandomAccessSubfield extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(context, offset, builder)
-
-      val ver = add("Version", uInt16L)
-      if (ver != 1) {
-        builder.addNote(NoteSeverity.Failure, "unsupported version")
-        return
-      }
-
-      add("Chunk length", uInt16L)
-      val chunkCount = add("Chunk count", uInt16L)
-      add("Chunk lengths after compression", array(chunkCount, "Length", uInt16L))
-    }
-  }
-
-  private object BZGFSubfield extends MoleculeBuilderUnitDissector {
-    override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
-      val add = new SequentialAdder(context, offset, builder)
-      add("Member size minus 1", uInt16L)
-    }
-  }
-
   private object ExtraSubfield extends MoleculeBuilderUnitDissector {
+    private object Acorn extends MoleculeBuilderUnitDissector {
+      override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+        context.untested()
+
+        val add = new SequentialAdder(context, offset, builder)
+
+        // TODO: implement the alternate interpretation (when the top of the load address is 0xFFF)
+        add("Load address", uInt32L)
+        add("Execution address", uInt32L)
+        add("Object attributes", bitField(32, Map(
+          26L -> "Public write", 27L -> "Public read", 28L -> "Locked", 30L -> "Owner write", 31L -> "Owner read")))
+        add("Object length", uInt32L)
+        add("Reserved", opaque(Bytes(12)))
+      }
+    }
+
+    private object Cpio extends MoleculeBuilderUnitDissector {
+      override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+        context.untested()
+
+        val add = new SequentialAdder(context, offset, builder)
+        // TODO: use this to constrain the FNAME field
+        add("Length of FNAME field", uInt16L)
+      }
+    }
+
+    private object RandomAccess extends MoleculeBuilderUnitDissector {
+      override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+        val add = new SequentialAdder(context, offset, builder)
+
+        val ver = add("Version", uInt16L)
+        if (ver != 1) {
+          builder.addNote(NoteSeverity.Failure, "unsupported version")
+          return
+        }
+
+        add("Chunk length", uInt16L)
+        val chunkCount = add("Chunk count", uInt16L)
+        add("Chunk lengths after compression", array(chunkCount, "Length", uInt16L))
+      }
+    }
+
+    private object BZGF extends MoleculeBuilderUnitDissector {
+      override def dissectMBU(context: DissectionContext, offset: InfoSize, builder: MoleculeBuilder): Unit = {
+        val add = new SequentialAdder(context, offset, builder)
+        add("Member size minus 1", uInt16L)
+      }
+    }
+
     private case class SubfieldType(name: String, dissector: Option[DissectorWithDefaultValueC[Unit]] = None) {
       override def toString = name
     }
 
     private val knownSubfields = Map[Option[String], SubfieldType](
       // registered subfields
-      Some("AC") -> SubfieldType("Acorn RISC OS/BBC MOS file type information", Some(AcornExtraField)),
+      Some("AC") -> SubfieldType("Acorn RISC OS/BBC MOS file type information", Some(Acorn)),
       Some("Ap") -> SubfieldType("Apollo file type information"),
-      Some("cp") -> SubfieldType("file compressed by cpio", Some(CpioExtraField)),
+      Some("cp") -> SubfieldType("file compressed by cpio", Some(Cpio)),
       Some("GS") -> SubfieldType("gzsig"),
       Some("KN") -> SubfieldType("KeyNote assertion (RFC 2704)"),
       Some("Mc") -> SubfieldType("Macintosh info (Type and Creator values)"),
       Some("RO") -> SubfieldType("Acorn Risc OS file type information"),
 
       // unregistered subfields
-      Some("BC") -> SubfieldType("BZGF (BAM)", Some(BZGFSubfield)),
-      Some("RA") -> SubfieldType("Random Access (dictzip)", Some(RandomAccessSubfield))
+      Some("BC") -> SubfieldType("BZGF (BAM)", Some(BZGF)),
+      Some("RA") -> SubfieldType("Random Access (dictzip)", Some(RandomAccess))
     )
 
     private val subfieldIdDissector = enum(asciiishString(2), knownSubfields)

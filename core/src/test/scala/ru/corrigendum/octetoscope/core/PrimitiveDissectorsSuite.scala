@@ -157,6 +157,9 @@ class PrimitiveDissectorsSuite extends FunSuite {
       verifyWithSeverities(dissector(0), "\"\"", Some(""), Seq(NoteSeverity.Error))
       verifyWithSeverities(dissector(4), "\"abcd\"", Some("abcd"), Seq(NoteSeverity.Error), 'a', 'b', 'c', 'd')
       verifyWithSeverities(dissector(3), "\"a\" 0xf0 \"b\"", None, severitiesOnDecodingErrors, 'a', 0xf0.toByte, 'b')
+
+      an [IndexOutOfBoundsException] must be thrownBy
+        dissector(4).dissect(DissectionContext(new ArrayBlob(Array[Byte](2, 1, 0))))
     }
   }
 

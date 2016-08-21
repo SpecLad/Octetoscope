@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.core
 
-import java.nio.charset.{CoderResult, StandardCharsets}
+import java.nio.charset.{Charset, CoderResult}
 import java.nio.{ByteBuffer, CharBuffer}
 import java.util.StringTokenizer
 
@@ -34,9 +34,9 @@ private object StringDissectors {
       "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
       "CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US").zipWithIndex.map(pair => (pair._2.toChar, pair._1))
 
-  private def readAsciiString(inBuffer: ByteBuffer): ContentsR[Option[String]] = {
+  private def readString(inBuffer: ByteBuffer, encoding: Charset): ContentsR[Option[String]] = {
     val outBuffer = CharBuffer.allocate(256)
-    val decoder = StandardCharsets.US_ASCII.newDecoder()
+    val decoder = encoding.newDecoder()
 
     type Chunk = Either[IndexedSeq[Byte], String]
 
@@ -86,6 +86,8 @@ private object StringDissectors {
 
     def stringifyDecodedChunk(chunk: String): String = {
       import scala.collection.JavaConverters._
+      // TODO: at some point, we'll need to also have special representations for Unicode control characters.
+      // Currently, though, no dissectors can encounter those.
       val tokenizer = new StringTokenizer(chunk, AsciiSpecialChars.keys.mkString, true)
       tokenizer.asScala.map { o =>
         val s = o.toString
@@ -104,13 +106,13 @@ private object StringDissectors {
   private val noteMissingTerminator = Note(NoteSeverity.Error, "missing NUL terminator")
   private val noteInvalidEncoding = Note(NoteSeverity.Failure, "invalid encoding")
 
-  class AsciiString(length: Int, allowDecodingErrors: Boolean)
+  class SizedString(encoding: Charset, length: Int, allowDecodingErrors: Boolean)
       extends DissectorCR[Option[String]] {
     final override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Option[String]] = {
       val Bytes(bo) = offset
 
       val inBuffer = ByteBuffer.wrap(context.input.getRangeAsArray(bo, bo + length))
-      val contents = readAsciiString(inBuffer)
+      val contents = readString(inBuffer, encoding)
 
       Atom(
         Bytes(length),
@@ -119,7 +121,7 @@ private object StringDissectors {
     }
   }
 
-  class AsciiZString(length: Int, allowDecodingErrors: Boolean)
+  class SizedZString(encoding: Charset, length: Int, allowDecodingErrors: Boolean)
       extends DissectorCR[Option[String]] {
     final override def dissect(context: DissectionContext, offset: InfoSize): AtomCR[Option[String]] = {
       val Bytes(bo) = offset
@@ -129,7 +131,7 @@ private object StringDissectors {
       val range = context.input.getRangeAsArray(bo, bo + length)
       val nulIndex = range.indexOf(0)
       val inBuffer = ByteBuffer.wrap(range, 0, if (nulIndex >= 0) nulIndex else range.length)
-      val contents = readAsciiString(inBuffer)
+      val contents = readString(inBuffer, encoding)
 
       var notes: Seq[Note] = Nil
 

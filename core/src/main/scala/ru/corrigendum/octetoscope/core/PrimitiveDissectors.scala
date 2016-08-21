@@ -18,6 +18,8 @@
 
 package ru.corrigendum.octetoscope.core
 
+import java.nio.charset.StandardCharsets
+
 object PrimitiveDissectors {
   private object UnsizedOpaque extends DissectorWithDefaultValueC[Unit] {
     override def defaultValue: Unit = ()
@@ -46,13 +48,17 @@ object PrimitiveDissectors {
   def uInt32L: DissectorCR[Long] = NumberDissectors.UInt32L
   def float32L: DissectorCR[Float] = NumberDissectors.Float32L
 
-  def asciiString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiString(length, false)
-  def asciiZString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiZString(length, false)
+  def asciiString(length: Int): DissectorCR[Option[String]] =
+    new StringDissectors.SizedString(StandardCharsets.US_ASCII, length, false)
+  def asciiZString(length: Int): DissectorCR[Option[String]] =
+    new StringDissectors.SizedZString(StandardCharsets.US_ASCII, length, false)
 
   // ASCIIish strings are the same as ASCII, except undecodable characters are not considered an error.
   // Essentially, they're strings in an unknown encoding that's compatible with ASCII.
-  def asciiishString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiString(length, true)
-  def asciiishZString(length: Int): DissectorCR[Option[String]] = new StringDissectors.AsciiZString(length, true)
+  def asciiishString(length: Int): DissectorCR[Option[String]] =
+    new StringDissectors.SizedString(StandardCharsets.US_ASCII, length, true)
+  def asciiishZString(length: Int): DissectorCR[Option[String]] =
+    new StringDissectors.SizedZString(StandardCharsets.US_ASCII, length, true)
 
   private class Magic(expected: Array[Byte], interpretation: String) extends DissectorC[Option[Unit]] {
     override def dissect(context: DissectionContext, offset: InfoSize): AtomC[Option[Unit]] = {

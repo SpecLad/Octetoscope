@@ -28,7 +28,7 @@ private object StringDissectors {
   /* The double quote is used to delimit printable characters in string reprs,
      so to avoid ambiguity we treat it as a special character. The rest are
      simply non-printable. */
-  val AsciiSpecialChars = Map('\u007f' -> "DEL", '"' -> "QUOTE") ++
+  private val AsciiSpecialChars = Map('\u007f' -> "DEL", '"' -> "QUOTE") ++
     Seq("NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
       "BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
       "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",

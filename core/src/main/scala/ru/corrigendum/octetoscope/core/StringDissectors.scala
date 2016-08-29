@@ -144,4 +144,28 @@ private object StringDissectors {
       Atom(Bytes(length), contents, notes)
     }
   }
+
+  class ZString(encoding: Charset) extends DissectorCR[Option[String]] {
+    override def dissect(context: DissectionContext, offset: InfoSize): Piece[ContentsR[Option[String]]] = {
+      val Bytes(bo) = offset
+
+      var nulIndex = 0L
+      while (bo + nulIndex < context.softLimit.bytes && context.input(bo + nulIndex) != 0) nulIndex += 1
+
+      val inBuffer = ByteBuffer.wrap(context.input.getRangeAsArray(bo, bo + nulIndex))
+      val contents = readString(inBuffer, encoding)
+
+      val nulMissing = bo + nulIndex == context.softLimit.bytes
+
+      var notes: Seq[Note] = Nil
+
+      if (nulMissing)
+        notes = noteMissingTerminator +: notes
+
+      if (contents.value.isEmpty)
+        notes = noteInvalidEncoding +: notes
+
+      Atom(Bytes(if (nulMissing) nulIndex else nulIndex + 1), contents, notes)
+    }
+  }
 }

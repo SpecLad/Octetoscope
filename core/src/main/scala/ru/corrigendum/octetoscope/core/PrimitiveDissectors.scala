@@ -18,7 +18,7 @@
 
 package ru.corrigendum.octetoscope.core
 
-import java.nio.charset.StandardCharsets
+import java.nio.charset.{Charset, StandardCharsets}
 
 object PrimitiveDissectors {
   private object UnsizedOpaque extends DissectorWithDefaultValueC[Unit] {
@@ -59,6 +59,8 @@ object PrimitiveDissectors {
     new StringDissectors.SizedString(StandardCharsets.US_ASCII, length, true)
   def asciiishZString(length: Int): DissectorCR[Option[String]] =
     new StringDissectors.SizedZString(StandardCharsets.US_ASCII, length, true)
+
+  def zString(encoding: Charset): DissectorCR[Option[String]] = new StringDissectors.ZString(encoding)
 
   private class Magic(expected: Array[Byte], interpretation: String) extends DissectorC[Option[Unit]] {
     override def dissect(context: DissectionContext, offset: InfoSize): AtomC[Option[Unit]] = {

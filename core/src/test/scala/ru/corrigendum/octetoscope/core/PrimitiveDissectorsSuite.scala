@@ -18,6 +18,8 @@
 
 package ru.corrigendum.octetoscope.core
 
+import java.nio.charset.StandardCharsets
+
 import org.scalatest.FunSuite
 import org.scalatest.Inside._
 import org.scalatest.MustMatchers._
@@ -104,9 +106,9 @@ class PrimitiveDissectorsSuite extends FunSuite {
   }
 
   test("float32L") {
-    verifyGeneric[Float](float32L, Some("-NaN(0x400001)"), num => Float.box(num) mustBe 'NaN,
+    verifyGeneric[Float](float32L, Bytes(4), Some("-NaN(0x400001)"), num => Float.box(num) mustBe 'NaN,
       Seq.empty, 0x01, 0x00, 0xC0.toByte, 0xFF.toByte)
-    verifyGeneric[Float](float32L, Some("-NaN(0x000001)"), num => Float.box(num) mustBe 'NaN,
+    verifyGeneric[Float](float32L, Bytes(4), Some("-NaN(0x000001)"), num => Float.box(num) mustBe 'NaN,
       Seq.empty, 0x01, 0x00, 0x80.toByte, 0xFF.toByte)
     verify(float32L, "-Infinity", Float.NegativeInfinity, 0x00, 0x00, 0x80.toByte, 0xFF.toByte)
     verify(float32L, "-1.50000000", -1.5f, 0x00, 0x00, 0xC0.toByte, 0xBF.toByte)
@@ -120,9 +122,9 @@ class PrimitiveDissectorsSuite extends FunSuite {
     verify(float32L, "5.50000000", 5.5f, 0x00, 0x00, 0xB0.toByte, 0x40)
     verify(float32L, "1.73782444e+34", 1.73782444e+34f, 0x12, 0x34, 0x56, 0x78)
     verify(float32L, "Infinity", Float.PositiveInfinity, 0x00, 0x00, 0x80.toByte, 0x7F)
-    verifyGeneric[Float](float32L, Some("NaN(0x000001)"), num => Float.box(num) mustBe 'NaN,
+    verifyGeneric[Float](float32L, Bytes(4), Some("NaN(0x000001)"), num => Float.box(num) mustBe 'NaN,
       Seq.empty, 0x01, 0x00, 0x80.toByte, 0x7F.toByte)
-    verifyGeneric[Float](float32L, Some("NaN(0x400001)"), num => Float.box(num) mustBe 'NaN,
+    verifyGeneric[Float](float32L, Bytes(4), Some("NaN(0x400001)"), num => Float.box(num) mustBe 'NaN,
       Seq.empty, 0x01, 0x00, 0xC0.toByte, 0x7F.toByte)
   }
 
@@ -163,6 +165,20 @@ class PrimitiveDissectorsSuite extends FunSuite {
     }
   }
 
+  test("zString") {
+    val dissector = zString(StandardCharsets.UTF_8)
+    verify(dissector, "\"\"", Some(""), 0)
+    verify(dissector, "\"abc\u00c0\"", Some("abc\u00c0"), 'a', 'b', 'c', 0xc3.toByte, 0x80.toByte, 0)
+    // check that the size is set correctly when there's other stuff after the terminator
+    verifyGeneric(dissector, Bytes(4), Some("\"abc\""), (str: Option[String]) => str mustBe Some("abc"), Nil,
+      'a', 'b', 'c', 0, -1, -2)
+
+    verifyWithSeverities(dissector, "0xff \"a\" LF HT 0xc0c1", None, Seq(NoteSeverity.Failure),
+      0xff.toByte, 'a', '\n', '\t', 0xc0.toByte, 0xc1.toByte, 0)
+    verifyWithSeverities(dissector, "\"\"", Some(""), Seq(NoteSeverity.Error))
+    verifyWithSeverities(dissector, "\"abc\"", Some("abc"), Seq(NoteSeverity.Error), 'a', 'b', 'c')
+  }
+
   test("magic") {
     val dissector = magic(Array[Byte](1, 2, 3), "123")
     verify(dissector, "123", Some(()), 1, 2, 3)
@@ -180,17 +196,19 @@ class PrimitiveDissectorsSuite extends FunSuite {
 
 object PrimitiveDissectorsSuite {
   def verifyGeneric[Value](
-    dissector: DissectorC[Value], expectedRepr: Option[String], valueAssert: Value => Unit,
+    dissector: DissectorC[Value], expectedSize: InfoSize, expectedRepr: Option[String], valueAssert: Value => Unit,
     expectedNoteSeverities: Seq[NoteSeverity.Value], bytes: Byte*
   ): Unit = {
     for (padSize <- List(0, 1)) {
       val pad = List.fill(padSize)(-1: Byte)
       val paddedBytes = pad ++ bytes ++ pad
       val blob = new ArrayBlob(paddedBytes.toArray)
-      val piece = dissector.dissect(DissectionContext(blob), Bytes(padSize))
+      val piece = dissector.dissect(
+        DissectionContext(blob, softLimit = Bytes(padSize + bytes.size)),
+        Bytes(padSize))
 
       inside(piece) { case Atom(size_, contents, notes) =>
-        size_ mustBe Bytes(bytes.size)
+        size_ mustBe expectedSize
         valueAssert(contents.value)
         contents.reprO mustBe expectedRepr
         notes.map(_.severity).sorted mustBe expectedNoteSeverities.sorted
@@ -199,14 +217,16 @@ object PrimitiveDissectorsSuite {
   }
 
   def verify[Value](dissector: DissectorC[Value], expectedRepr: String, expectedValue: Value, bytes: Byte*): Unit = {
-    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe expectedValue, Seq.empty, bytes: _*)
+    verifyGeneric[Value](dissector, Bytes(bytes.length), Some(expectedRepr),
+      _ mustBe expectedValue, Seq.empty, bytes: _*)
   }
 
   def verifyWithSeverities[Value](
     dissector: DissectorC[Value], expectedRepr: String, expectedValue: Value,
     expectedNoteSeverities: Seq[NoteSeverity.Value], bytes: Byte*
   ): Unit = {
-    verifyGeneric[Value](dissector, Some(expectedRepr), _ mustBe expectedValue, expectedNoteSeverities, bytes: _*)
+    verifyGeneric[Value](dissector, Bytes(bytes.length), Some(expectedRepr),
+      _ mustBe expectedValue, expectedNoteSeverities, bytes: _*)
   }
 
   def verifyInteger[Value](dissector: DissectorC[Value], expectedValue: Value, bytes: Byte*): Unit = {

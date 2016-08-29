@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2013-2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2013-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,13 +18,14 @@
 
 package ru.corrigendum.octetoscope.dissectors
 
-import scala.util.control.Breaks._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 import ru.corrigendum.octetoscope.core.SpecialDissectors._
 import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.dissectors.Common.vector3
+
+import scala.util.control.Breaks._
 
 /*
   Quake II models (*.md2).

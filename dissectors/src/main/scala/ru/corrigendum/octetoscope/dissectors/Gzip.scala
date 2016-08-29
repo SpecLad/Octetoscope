@@ -20,13 +20,13 @@ package ru.corrigendum.octetoscope.dissectors
 
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
-import java.util.{Locale, TimeZone, Date}
+import java.util.{Date, Locale, TimeZone}
 
-import ru.corrigendum.octetoscope.core._
 import ru.corrigendum.octetoscope.core.CommonConstraints._
 import ru.corrigendum.octetoscope.core.CompoundDissectors._
 import ru.corrigendum.octetoscope.core.PrimitiveDissectors._
 import ru.corrigendum.octetoscope.core.SpecialDissectors._
+import ru.corrigendum.octetoscope.core._
 
 /*
   Gzip compression format.

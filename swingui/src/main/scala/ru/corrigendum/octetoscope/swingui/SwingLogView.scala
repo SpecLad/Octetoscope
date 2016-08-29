@@ -1,6 +1,6 @@
 /*
   This file is part of Octetoscope.
-  Copyright (C) 2015 Octetoscope contributors (see /AUTHORS.txt)
+  Copyright (C) 2015-2016 Octetoscope contributors (see /AUTHORS.txt)
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 package ru.corrigendum.octetoscope.swingui
 
 import java.awt.{Dimension, Font}
-import javax.swing.{JScrollPane, JFileChooser, JTextArea}
+import javax.swing.{JFileChooser, JScrollPane, JTextArea}
 
 import ru.corrigendum.octetoscope.abstractui.LogView
 

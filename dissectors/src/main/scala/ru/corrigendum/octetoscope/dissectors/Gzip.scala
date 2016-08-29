@@ -18,6 +18,7 @@
 
 package ru.corrigendum.octetoscope.dissectors
 
+import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.{Locale, TimeZone, Date}
 
@@ -201,6 +202,11 @@ object Gzip extends MoleculeBuilderUnitDissector {
       if (flags("FEXTRA")) {
         val xlen = add("Extra length", uInt16L)
         add("Extra field", fixedSize(sequence("Subfield", ExtraSubfield), Bytes(xlen)))
+      }
+
+      if (flags("FNAME")) {
+        val fname = add.getContents("Original file name", zString(StandardCharsets.ISO_8859_1)).repr
+        builder.setRepr(fname)
       }
 
       // TODO: complete this
